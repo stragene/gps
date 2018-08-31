@@ -13,10 +13,24 @@ uint32_t Ticks;
 **********************************************************************/
 void vSysTickInit(void)
 {
-	SysTick_Config(SystemCoreClock/100);			//100ms中断一次
+    //SysTick_Config(SystemCoreClock / 100); //100ms中断一次
+
+    /* set reload register */
+    SysTick->LOAD = ((SystemCoreClock / 100) & SysTick_LOAD_RELOAD_Msk) - 1;
+    /* set Priority for Systick Interrupt */
+    NVIC_SetPriority(SysTick_IRQn, (1 << __NVIC_PRIO_BITS) - 1);
+    /* Load the SysTick Counter Value */
+    SysTick->VAL = 0;
+    /* Enable SysTick Timer ,but no interupt */
+    SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk |
+                    //SysTick_CTRL_TICKINT_Msk |
+                    SysTick_CTRL_ENABLE_Msk;
+
+    /*关闭SysTick中断*/
+    /*NVIC_DisableIRQ(SysTick_IRQn);*/
+    /*CTRL寄存器的TICKINIT位和ENABLE位清除*/
+    /*SysTick->CTRL &= (!SysTick_CTRL_TICKINT_Msk) & (!SysTick_CTRL_ENABLE_Msk);*/
 }
-
-
 
 /********************************************************************
 * 功    能：计时器清零
@@ -28,9 +42,7 @@ void vSysTickInit(void)
 **********************************************************************/
 void vTimerClear(void)
 {
-
 }
-
 
 /********************************************************************
 * 功    能：计时器累加
@@ -44,8 +56,6 @@ void vTimerPlus(void)
 {
 }
 
-
-
 /********************************************************************
 * 功    能：计时器暂停
 * 输    入：None
@@ -57,8 +67,6 @@ void vTimerPlus(void)
 void vTimerSuspend(void)
 {
 }
-
-
 
 /********************************************************************
 * 功    能：计时器初始化函数
@@ -100,4 +108,3 @@ void vTimer_Init(void)
 void vIRQ_TIME_Config(void)
 {
 }
-

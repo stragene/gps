@@ -93,7 +93,7 @@ void vBoardInit(void)
     /*GPS初始化*/
     vGps_Init();
     /*系统节拍初始化*/
-    //vSysTickInit();
+    vSysTickInit();
 }
 
 void vSim800_ComInit(void)
