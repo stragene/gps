@@ -40,36 +40,6 @@ void vSim800_HardInit(void)
     UART_GPRS.Init();
 }
 
-/********************************************************************
-* 功    能：SIM800电源使能
-* 输    入：none
-* 输    出：none
-* 编 写 人：stragen
-* 编写日期：2018.3.27
-**********************************************************************/
-void vSim800_pEn(void)
-{
-    GPIO_WriteBit(GPIOA, GPIO_Pin_1, Bit_SET);
-}
-/********************************************************************
-* 功    能：SIM800电源禁能
-* 输    入：none
-* 输    出：none
-* 编 写 人：stragen
-* 编写日期：2018.3.27
-**********************************************************************/
-void vSim800_PDen(void)
-{
-    GPIO_WriteBit(GPIOA, GPIO_Pin_1, Bit_RESET);
-}
-
-/********************************************************************
-* 功    能：SIM800开关机
-* 输    入：none
-* 输    出：none
-* 编 写 人：stragen
-* 编写日期：2018.3.27
-**********************************************************************/
 void vSim800_OnOff(void)
 {
     /*引脚拉高*/
@@ -84,26 +54,15 @@ void vSim800_OnOff(void)
 }
 
 /********************************************************************
-* 功    能：SIM800复位
-* 输    入：none
-* 输    出：none
-* 编 写 人：stragen
-* 编写日期：2018.3.27
-**********************************************************************/
-void vSim800_Reset(void)
-{
-}
-
-/********************************************************************
 * 功    能：SIM800发送命令
 * 输    入：none
 * 输    出：none
 * 编 写 人：stragen
 * 编写日期：2018.3.27
 **********************************************************************/
-void vSim800_SndCmd(char *cmd)
+void vSim800_SndCmd(UART_TypeDef *puart, char *cmd)
 {
-    UART_GPRS.Send(&UART_GPRS, cmd, strlen(cmd)); // 末尾的\0 也要发送
+    puart->Send(puart, cmd, strlen(cmd)); // 末尾的\0 也要发送
 }
 
 /********************************************************************
@@ -113,7 +72,7 @@ void vSim800_SndCmd(char *cmd)
 * 编 写 人：stragen
 * 编写日期：2018.3.27
 **********************************************************************/
-uint32_t Sim800_RsvCmd(char *cmd, uint32_t len, uint32_t delayMs)
+uint32_t Sim800_RsvCmd(UART_TypeDef *puart, char *cmd, uint32_t len, uint32_t delayMs)
 {
-    return UART_GPRS.Receive(&UART_GPRS, cmd, len, delayMs);
+    return puart->Receive(puart, (uint8_t *)cmd, len, delayMs);
 }

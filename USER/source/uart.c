@@ -16,8 +16,14 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-UART_TypeDef UART_GPS = {.hard = USART1, .Init = vUart_GPS_Init, .Send = vUart_Send, .Receive = udwUart_Receive};
-UART_TypeDef UART_GPRS = {.hard = USART3, .Init = vUart_GPRS_Init, .Send = vUart_Send, .Receive = udwUart_Receive};
+UART_TypeDef UART_GPS = {.hard = USART1,
+                         .Init = vUart_GPS_Init,
+                         .Send = vUart_Send,
+                         .Receive = udwUart_Receive};
+UART_TypeDef UART_GPRS = {.hard = USART3,
+                          .Init = vUart_GPRS_Init,
+                          .Send = vUart_Send,
+                          .Receive = udwUart_Receive};
 
 /********************************************************************
 * 功    能：GPS串口初始化函数
@@ -121,8 +127,8 @@ void vUart_Send(UART_TypeDef *puart, uint8_t *pstring, uint8_t len)
 **********************************************************************/
 uint32_t udwUart_Receive(UART_TypeDef *puart, uint8_t *pstring, uint8_t len, uint32_t waitMs)
 {
-    uint32_t i;
-    uint32_t readed_len;
+    uint32_t i = 0;
+    uint32_t readed_len = 0;
     USART_ITConfig(puart->hard, USART_IT_RXNE, ENABLE);
     vTaskDelay(waitMs / portTICK_RATE_MS); //超时退出
     USART_ITConfig(puart->hard, USART_IT_RXNE, DISABLE);

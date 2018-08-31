@@ -110,11 +110,11 @@ void vSim800_ComInit(void)
     vSim800_OnOff();
     /*—” ±2√Î*/
     //vTaskDelay(2000 / portTICK_RATE_MS);
-    rsvLen = Sim800_RsvCmd(pcmd, 10, 2000);
+    rsvLen = Sim800_RsvCmd(&UART_GPRS, pcmd, 10, 2000);
     while ((rsvLen != 6) && (j--))
     {
-        vSim800_SndCmd("AT\r\n");
-        rsvLen = Sim800_RsvCmd(pcmd, 10, 2000);
+        vSim800_SndCmd(&UART_GPRS, "AT\r\n");
+        rsvLen = Sim800_RsvCmd(&UART_GPRS, pcmd, 10, 2000);
     }
     vTaskDelay(2000 / portTICK_RATE_MS);
     while (1)
