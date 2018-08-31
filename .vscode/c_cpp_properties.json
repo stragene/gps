@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/CMSIS/inclulde",
+                "${workspaceFolder}/STDPERIPH/include",
+                "${workspaceFolder}/FreeRTOS/include",
+                "${workspaceFolder}/USER/include",
+                "${workspaceFolder}/CMSIS/include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "USE_STDPERITH_DRIVER",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "msvc-x64"
+        }
+    ],
+    "version": 4
+}
