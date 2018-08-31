@@ -2,7 +2,7 @@
 #include "gpio.h"
 #include "uart.h"
 #include "flash.h"
-//#include "sim800.h"
+#include "sim800.h"
 //#include "gps.h"
 //#include "time.h"
 
