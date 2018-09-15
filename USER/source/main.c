@@ -22,13 +22,12 @@ QueueHandle_t handQueueU1Frame;
 
 void vSim800_TestInit(void)
 {
-
     pSim800GPRS->Init();
     pSim800GPRS->PowerEn();
     pSim800GPRS->delay(1000);
     pSim800GPRS->OnOff();
-    //vSim800_OnOff();
-    USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
+    pSim800GPRS->delay(2000);
+    pSim800GPRS->SendCmd("AT\r\n", "OK\r\n", 3, 2000);
     while (1)
         ;
 }

@@ -9,8 +9,7 @@ struct gprs_dev
     void (*OnOff)(void);
     void (*PowerEn)(void);
     void (*PowerDen)(void);
-    void (*Write)(UartDef *port, uint32_t *data, uint8_t datalen);
-    uint32_t (*Read)(UartDef *port, uint8_t *dest, uint32_t len, uint32_t delay);
+    bool (*SendCmd)(char *pcmd, char* response, uint32_t timeout, uint32_t retry);
     void (*delay)(uint32_t);
 };
 

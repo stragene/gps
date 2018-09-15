@@ -11,15 +11,15 @@ static void vSim800_HardInit(void);
 static void vSim800_pEn(void);
 static void vSim800_PDen(void);
 static void vSim800_OnOff(void);
+static bool blSim800SendCmd(char *pcmd, char *response, uint32_t timeout, uint32_t retry);
+
 struct gprs_dev Sim800GPRS = {.Init = vSim800_HardInit,
                               .PowerEn = vSim800_pEn,
                               .PowerDen = vSim800_PDen,
                               .OnOff = vSim800_OnOff,
-                              .Write = Uart_OnceWrite,
-                              .Read = Uart_OnceRead,
+                              .SendCmd = blSim800SendCmd,
                               .delay = vDelay_Ms};
 struct gprs_dev *pSim800GPRS = &Sim800GPRS;
-
 
 /********************************************************************
 * 功    能：SIM800初始化
@@ -141,7 +141,7 @@ void vSysTickInit_1ms(void)
 **********************************************************************/
 void vDelay_Ms(uint32_t ms)
 {
-    if (ms!= 0xFFFFFFFF)
+    if (ms != 0xFFFFFFFF)
         ms++;
     while (ms)
     {
@@ -150,4 +150,28 @@ void vDelay_Ms(uint32_t ms)
             ms--;
         }
     }
+}
+
+/********************************************************************
+* 功    能：vSim800SendCmd
+* 输    入：
+* 输    出：
+* 编 写 人：stragen
+* 编写日期：
+**********************************************************************/
+bool blSim800SendCmd(char *pcmd, char *response, uint32_t timeout, uint32_t retry)
+{
+    uint8_t buf[50], *pbuf;
+    uint32_t readlen;
+    bool    result;
+    pbuf = buf;
+    do
+    {
+        Uart_OnceWrite(pUartGPRS, (uint8_t *)pcmd, sizeof(pcmd), 500);
+        readlen = Uart_OnceRead(pUartGPRS, pbuf, 50, timeout);
+        buf[readlen] = '\0';
+        result = strcmp(response, (char *)pbuf);
+        retry--;
+    } while (result && retry);
+    return (!result);
 }
