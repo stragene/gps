@@ -15,19 +15,20 @@ void vRunLed_Init(void);
 void vTaskComInit(void);
 void vTaskRunLed(void);
 
-
-
 SemaphoreHandle_t xSemaphore_MeterReceived;
 QueueHandle_t handQueueU1Frame;
 
 void vSim800_TestInit(void)
 {
+    uint8_t buf[BUF_SIZE];
+    uint8_t *pbuf = &buf;
     pSim800GPRS->Init();
     pSim800GPRS->PowerEn();
     pSim800GPRS->delay(1000);
     pSim800GPRS->OnOff();
-    pSim800GPRS->delay(2000);
-    pSim800GPRS->SendCmd("AT\r\n", "OK\r\n", 3, 2000);
+    pSim800GPRS->delay(4000);
+    USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
+    pSim800GPRS->SendCmd("AT", "OK", 1000, 100);
     while (1)
         ;
 }

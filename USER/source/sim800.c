@@ -38,6 +38,7 @@ void vSim800_HardInit(void)
     GPIO_Initstruc.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_3;
     GPIO_Initstruc.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_Initstruc.GPIO_OType = GPIO_OType_PP; //开漏
+    //GPIO_Initstruc.GPIO_OType = GPIO_OType_OD; //开漏
     GPIO_Initstruc.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Initstruc.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_WriteBit(GPIOA, GPIO_Pin_1 | GPIO_Pin_3, Bit_RESET); //默认为低
@@ -48,13 +49,14 @@ void vSim800_HardInit(void)
     GPIO_Initstruc.GPIO_Mode = GPIO_Mode_AF;
     GPIO_Initstruc.GPIO_OType = GPIO_OType_PP;
     GPIO_Initstruc.GPIO_PuPd = GPIO_PuPd_UP;
-    GPIO_Initstruc.GPIO_Speed = GPIO_Speed_2MHz;
+    //GPIO_Initstruc.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_Initstruc.GPIO_Speed = GPIO_Speed_10MHz;
     GPIO_Initstruc.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9;
     GPIO_Init(GPIOB, &GPIO_Initstruc);
     /*串口初始化*/
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
     USART_OverSampling8Cmd(USART3, ENABLE);
-    USART_Initstruc.USART_BaudRate = 38400;
+    USART_Initstruc.USART_BaudRate = 115200;
     USART_Initstruc.USART_Mode = (USART_Mode_Rx | USART_Mode_Tx);
     USART_Initstruc.USART_WordLength = USART_WordLength_9b;
     USART_Initstruc.USART_Parity = USART_Parity_No;
@@ -163,11 +165,11 @@ bool blSim800SendCmd(char *pcmd, char *response, uint32_t timeout, uint32_t retr
 {
     uint8_t buf[50], *pbuf;
     uint32_t readlen;
-    bool    result;
+    bool result;
     pbuf = buf;
     do
     {
-        Uart_OnceWrite(pUartGPRS, (uint8_t *)pcmd, sizeof(pcmd), 500);
+        Uart_OnceWrite(pUartGPRS, (uint8_t *)pcmd, strlen(pcmd), 500);
         readlen = Uart_OnceRead(pUartGPRS, pbuf, 50, timeout);
         buf[readlen] = '\0';
         result = strcmp(response, (char *)pbuf);

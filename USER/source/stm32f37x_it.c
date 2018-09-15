@@ -198,7 +198,7 @@ void USART1_IRQHandler(void)
     if (USART_GetITStatus(USART1, USART_IT_TXE) != RESET)
     {
         USART_ClearITPendingBit(USART1, USART_IT_TXE);
-        if (pUartGPS->pSndbuf->rd == pUartGPS->pSndbuf->wr) 
+        if (pUartGPS->pSndbuf->rd == pUartGPS->pSndbuf->wr)
         {
             USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
         }
@@ -234,37 +234,26 @@ void USART2_IRQHandler(void)
 **********************************************************************/
 void USART3_IRQHandler(void)
 {
-    if (USART_GetFlagStatus(USART3, USART_FLAG_ORE) == SET)
-        USART_ClearFlag(USART3, USART_FLAG_ORE);
-
-    if (USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
+    if (USART_GetFlagStatus(USART3, USART_FLAG_ORE))
     {
-        USART_ClearITPendingBit(USART3, USART_IT_RXNE);
-        if (pUartGPRS->pRsvbuf->rd == (pUartGPRS->pRsvbuf->wr + 1) % BUF_SIZE)
-        {
-            USART_ITConfig(USART3, USART_IT_RXNE, DISABLE);
-        }
-        else
+        USART_ClearFlag(USART3, USART_FLAG_ORE);
+    }
+    if (RESET != USART_GetITStatus(USART3, USART_IT_RXNE)) //读一个字节入串口3接收缓存
+    {
+        if (uwBuf_EmpLen(pUartGPRS->pRsvbuf))
         {
             pUartGPRS->pRsvbuf->data[pUartGPRS->pRsvbuf->wr] = (uint8_t)USART_ReceiveData(USART3);
-            pUartGPRS->pRsvbuf->wr = (pUartGPRS->pRsvbuf->wr + 1) % BUF_SIZE;
+            pUartGPRS->pRsvbuf->wr = (++pUartGPRS->pRsvbuf->wr) % BUF_SIZE;
         }
     }
-
-    //�Ӵ���1�ķ��ͻ������ⷢһ���ֽ�
     if (USART_GetITStatus(USART3, USART_IT_TXE) != RESET)
     {
         USART_ClearITPendingBit(USART3, USART_IT_TXE);
-        if (pUartGPRS->pSndbuf->rd == pUartGPRS->pSndbuf->wr) 
-        {
+        USART_SendData(USART3, (uint16_t)pUartGPRS->pSndbuf->data[pUartGPRS->pSndbuf->rd]);
+        pUartGPRS->pSndbuf->rd = ++(pUartGPRS->pSndbuf->rd) & BUF_SIZE;
+        if (uwBuf_UnReadLen(pUartGPRS->pSndbuf) == 0)
             USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
-        }
-        else
-        {
-            USART_SendData(USART3, (uint16_t)pUartGPRS->pSndbuf->data[pUartGPRS->pSndbuf->rd]);
-            pUartGPRS->pSndbuf->rd = (pUartGPRS->pSndbuf->rd + 1) % BUF_SIZE;
-        }
-    };
+    }
 }
 
 /********************************************************************
