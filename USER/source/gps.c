@@ -1,102 +1,139 @@
-#include "stm32f37x.h"
-#include "gps.h"
 #include <stdlib.h>
 #include <string.h>
+#include "stm32f37x.h"
+#include "gps.h"
+#include "uart.h"
 
+static void vGps_Init(void);
+static void vGps_PEn(void);
+static void vGps_PDen(void);
+static char *pGetGprmc(uint8_t *buf, uint8_t len);
+static bool GprmcFill(char *pframe, struct frame_gprmc *tmpGprmc);
+/* ç»“æ„ä½“å®šä¹‰-- ------------------------------------------------------------------*/
 
+struct gps_dev Sim800GPS = {.Init= vGps_Init,
+							.PowerEn= vGps_PEn,
+							.PowerDen=vGps_PDen,
+							.Read = Uart_OnceRead,
+							.pGetGprmc = pGetGprmc,
+							.GprmcFill = GprmcFill};
 
-/* ½á¹¹Ìå¶¨Òå-- ------------------------------------------------------------------*/
-
-
+struct gps_dev *pSim800GPS = &Sim800GPS;
 
 /*******************************************************************************
-* º¯ÊıÃû³Æ           : vGps_Init()
-* º¯Êı¹¦ÄÜ           : GPSÍâÉè³õÊ¼»¯
-* Êä    Èë           : 
-* Êä    ³ö           : 
-* ·µ »Ø Öµ           : 1
-* ±¸    ×¢           :                       
+* å‡½æ•°åç§°           : vGps_Init()
+* å‡½æ•°åŠŸèƒ½           : GPSå¤–è®¾åˆå§‹åŒ–
+* è¾“    å…¥           : 
+* è¾“    å‡º           : 
+* è¿” å› å€¼           : 1
+* å¤‡    æ³¨           :                       
 *******************************************************************************/
 void vGps_Init(void)
-{	
-	/*PA2ÅäÖÃÎªGPSÊ¹ÄÜ*/
+{
+	/*PA2é…ç½®ä¸ºGPSä½¿èƒ½*/
 	GPIO_InitTypeDef GPIO_Initstruc;
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA,ENABLE);
-	GPIO_Initstruc.GPIO_Pin  =GPIO_Pin_2;
-	GPIO_Initstruc.GPIO_Mode =GPIO_Mode_OUT;
-	GPIO_Initstruc.GPIO_OType=GPIO_OType_PP;//¿ªÂ©
-	GPIO_Initstruc.GPIO_Speed=GPIO_Speed_2MHz;
-	GPIO_Initstruc.GPIO_PuPd =GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOA,&GPIO_Initstruc);
-	/*B6ºÍB7ÅäÖÃÎª´®¿Ú1,GPS*/
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB,ENABLE);
-	GPIO_PinAFConfig(GPIOB,GPIO_PinSource6,GPIO_AF_7);
-	GPIO_PinAFConfig(GPIOB,GPIO_PinSource7,GPIO_AF_7);
-	GPIO_Initstruc.GPIO_Mode=GPIO_Mode_AF;
-	GPIO_Initstruc.GPIO_OType=GPIO_OType_PP;
-	GPIO_Initstruc.GPIO_PuPd=GPIO_PuPd_UP;
-	GPIO_Initstruc.GPIO_Speed=GPIO_Speed_2MHz;
-	GPIO_Initstruc.GPIO_Pin=GPIO_Pin_6|GPIO_Pin_7;
-	GPIO_Init(GPIOB,&GPIO_Initstruc);
-	/*´®¿Ú³õÊ¼»¯*/
-	UART_GPS.Init();
+	USART_InitTypeDef USART_Initstruc;
+	NVIC_InitTypeDef NVIC_Initstruc;
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+	GPIO_Initstruc.GPIO_Pin = GPIO_Pin_2;
+	GPIO_Initstruc.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_Initstruc.GPIO_OType = GPIO_OType_PP; //å¼€æ¼
+	GPIO_Initstruc.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_Initstruc.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOA, &GPIO_Initstruc);
+	/*B6å’ŒB7é…ç½®ä¸ºä¸²å£1,GPS*/
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_7);
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_7);
+	GPIO_Initstruc.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_Initstruc.GPIO_OType = GPIO_OType_PP;
+	GPIO_Initstruc.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_Initstruc.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_Initstruc.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
+	GPIO_Init(GPIOB, &GPIO_Initstruc);
+	/*ä¸²å£åˆå§‹åŒ–*/
+
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+	USART_OverSampling8Cmd(USART1, ENABLE);
+	USART_Initstruc.USART_BaudRate = 115200;
+	USART_Initstruc.USART_Mode = (USART_Mode_Rx | USART_Mode_Tx);
+	USART_Initstruc.USART_WordLength = USART_WordLength_9b;
+	USART_Initstruc.USART_Parity = USART_Parity_No;
+	USART_Initstruc.USART_StopBits = USART_StopBits_1;
+	USART_Initstruc.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+	USART_Init(USART1, &USART_Initstruc);
+
+	NVIC_Initstruc.NVIC_IRQChannel = USART1_IRQn;
+	NVIC_Initstruc.NVIC_IRQChannelPreemptionPriority = 0;
+	//NVIC_Initstruc.NVIC_IRQChannelSubPriority = 0;
+	NVIC_Initstruc.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_Initstruc);
+
+	USART_Cmd(USART3, ENABLE);
+	//UART_GPS.Init();
 }
 
 /*******************************************************************************
-* º¯ÊıÃû³Æ           : vGps_EnDen()
-* º¯Êı¹¦ÄÜ           : GPSÊ¹ÄÜ/½ûÄÜ
-* Êä    Èë           : 
-* Êä    ³ö           : 
-* ·µ »Ø Öµ           : 1
-* ±¸    ×¢           :                       
+* å‡½æ•°åç§°           : vGps_EnDen()
+* å‡½æ•°åŠŸèƒ½           : GPSä½¿èƒ½/ç¦èƒ½
+* è¾“    å…¥           : 
+* è¾“    å‡º           : 
+* è¿” å› å€¼           : 1
+* å¤‡    æ³¨           :                       
 *******************************************************************************/
 void vGps_PEn(void)
 {
 	GPIO_WriteBit(GPIOA, GPIO_Pin_2, Bit_SET);
 }
 /*******************************************************************************
-* º¯ÊıÃû³Æ           : vGps_EnDen()
-* º¯Êı¹¦ÄÜ           : GPSÊ¹ÄÜ/½ûÄÜ
-* Êä    Èë           : 
-* Êä    ³ö           : 
-* ·µ »Ø Öµ           : 1
-* ±¸    ×¢           :                       
+* å‡½æ•°åç§°           : vGps_EnDen()
+* å‡½æ•°åŠŸèƒ½           : GPSä½¿èƒ½/ç¦èƒ½
+* è¾“    å…¥           : 
+* è¾“    å‡º           : 
+* è¿” å› å€¼           : 1
+* å¤‡    æ³¨           :                       
 *******************************************************************************/
-void vGps_EnDen(void)
+void vGps_PDen(void)
 {
 	GPIO_WriteBit(GPIOA, GPIO_Pin_2, Bit_RESET);
 }
 
 /*******************************************************************************
-* º¯ÊıÃû³Æ           : GPS_Analysis()
-* º¯Êı¹¦ÄÜ           : ¶ÔGPSÊı¾İÖ¡½øĞĞ½âÎö²¢×°Èëµ½½á¹¹ÌåÖĞ
-* Êä    Èë           : 
-* Êä    ³ö           : 
-* ·µ »Ø Öµ           : 1
-* ±¸    ×¢           :                       
+* å‡½æ•°åç§°           : è¯»å–Gprmcå¸§
+* å‡½æ•°åŠŸèƒ½           : 
+* è¾“    å…¥           : 
+* è¾“    å‡º           : 
+* è¿” å› å€¼           : 1
+* å¤‡    æ³¨           :                       
 *******************************************************************************/
-bool Gps_ReadFromeBuf(GpsGprmc_TypeDef *tmpGprmc) 
+char *pGetGprmc(uint8_t *buf, uint8_t len)
 {
-	char     		ucGPSFrame[DRV_BUF_SIZE];
-	char			*pGPSFrame;
-	uint32_t 		i= 0;
-	uint32_t 		j= 0;
-	char 			*tmpchr[14];
-	bool 			result=false;
-
-	/*´ÓÇı¶¯»º´æ¶ÁÈ¡È«²¿Ö¡*/
-	for(i=0; i< DRV_BUF_SIZE; i++)
-	{
-		ucGPSFrame[i]= UART_GPS.Rsvbuf.buf [ UART_GPS.Rsvbuf.rd];
-		UART_GPS.Rsvbuf.rd= ( UART_GPS.Rsvbuf.rd+ DRV_BUF_SIZE )% DRV_BUF_SIZE;
-	}
-	/*ÕÒµ½$GPRMC*/
+	//char ucGPSFrame[DRV_BUF_SIZE];
+	*(buf + len) = '\0';
+	char *pGPSFrame = (char *)buf;
+	/*æ‰¾åˆ°$GPRMC*/
 	do
 	{
-		pGPSFrame= strchr(ucGPSFrame, '$');
-	}
-	while  ( strncmp(pGPSFrame, "$GPRMC", 6) != 0);
-	
+		pGPSFrame = strchr(pGPSFrame, '$');
+	} while (strncmp(pGPSFrame, "$GPRMC", 6) != 0);
+	return pGPSFrame;
+}
+/*******************************************************************************
+* å‡½æ•°åç§°           : GPS_Analysis()
+* å‡½æ•°åŠŸèƒ½           : å¯¹GPSæ•°æ®å¸§è¿›è¡Œè§£æå¹¶è£…å…¥åˆ°ç»“æ„ä½“ä¸­
+* è¾“    å…¥           : 
+* è¾“    å‡º           : 
+* è¿” å› å€¼           : 1
+* å¤‡    æ³¨           :                       
+*******************************************************************************/
+bool GprmcFill(char *pframe, struct frame_gprmc *tmpGprmc)
+{
+	uint32_t j = 0;
+	char *tmpchr[14];
+	char *pGPSFrame;
+	bool result = false;
+
+
 	/*
 	tmpchr[0]= strtok( pGPSFrame, ","); 	
 	for( j= 1; j< 13; j++)
@@ -108,46 +145,45 @@ bool Gps_ReadFromeBuf(GpsGprmc_TypeDef *tmpGprmc)
 			break;
 	}*/
 
-	/*×Ó´®»¯²¢×ª´æ*/
-	tmpchr[0]= strtok( pGPSFrame, ","); 	
-	while (tmpchr[j] != NULL && j< 12)				//ÒÔ´Ë´æ´¢µÚ1~12×ÓÖ¡£¬µÚ12Ö¡ÒÔ*½áÎ²
+	/*å­ä¸²åŒ–å¹¶è½¬å­˜*/
+	tmpchr[0] = strtok(pframe, ",");
+	while (tmpchr[j] != NULL && j < 12) //ä»¥æ­¤å­˜å‚¨ç¬¬1~12å­å¸§ï¼Œç¬¬12å¸§ä»¥*ç»“å°¾
 	{
-		tmpchr[++j]= strtok( NULL, ",");	
+		tmpchr[++j] = strtok(NULL, ",");
 	}
 
-	pGPSFrame  = tmpchr[12];						// mode*sum
-	tmpchr[12] = strtok(pGPSFrame, "*");			// mode
-	tmpchr[13] = strtok(NULL, "*");					// sum
+	pGPSFrame = tmpchr[12];				 // mode*sum
+	tmpchr[12] = strtok(pGPSFrame, "*"); // mode
+	tmpchr[13] = strtok(NULL, "*");		 // sum
 	if (j != 12)
 	{
-		result= false;
+		result = false;
 	}
 	else
 	{
-		if( !strncmp( tmpchr[12], "V", 1) )
+		if (!strncmp(tmpchr[12], "V", 1))
 		{
-			result= false;
+			result = false;
 		}
 
 		else
 		{
-			tmpGprmc->UTC 		= *tmpchr[1];
-			tmpGprmc->VA		= *tmpchr[2];
-			tmpGprmc->WD 		= atof(tmpchr[3]);
-			tmpGprmc->WDNS 		= *tmpchr[4];
-			tmpGprmc->JD		= atof(tmpchr[5]);
-			tmpGprmc->JDWE 		= *tmpchr[6];
-			tmpGprmc->SPEED 	= atof(tmpchr[7]);
-			tmpGprmc->XHQD 		= *tmpchr[8];
-			tmpGprmc->DATE 		= *tmpchr[9];
-			tmpGprmc->MAGE 		= *tmpchr[10];
-			tmpGprmc->ANGLE 	= *tmpchr[11];
-			tmpGprmc->MODE 		= *tmpchr[12];
-			tmpGprmc->SUM 		= atoi(tmpchr[13]);
-			result 				= true;
+			tmpGprmc->UTC = *tmpchr[1];
+			tmpGprmc->VA = *tmpchr[2];
+			tmpGprmc->WD = atof(tmpchr[3]);
+			tmpGprmc->WDNS = *tmpchr[4];
+			tmpGprmc->JD = atof(tmpchr[5]);
+			tmpGprmc->JDWE = *tmpchr[6];
+			tmpGprmc->SPEED = atof(tmpchr[7]);
+			tmpGprmc->XHQD = *tmpchr[8];
+			tmpGprmc->DATE = *tmpchr[9];
+			tmpGprmc->MAGE = *tmpchr[10];
+			tmpGprmc->ANGLE = *tmpchr[11];
+			tmpGprmc->MODE = *tmpchr[12];
+			tmpGprmc->SUM = atoi(tmpchr[13]);
+			result = true;
 		}
 	}
 
 	return result;
 }
-

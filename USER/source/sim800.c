@@ -5,29 +5,44 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-char cSim800_Rsv;
-char *pcSim800Rsv = &cSim800_Rsv;
+static void vSysTickInit_1ms(void);
+static void vDelay_Ms(uint32_t delay);
+static void vSim800_HardInit(void);
+static void vSim800_pEn(void);
+static void vSim800_PDen(void);
+static void vSim800_OnOff(void);
+struct gprs_dev Sim800GPRS = {.Init = vSim800_HardInit,
+                              .PowerEn = vSim800_pEn,
+                              .PowerDen = vSim800_PDen,
+                              .OnOff = vSim800_OnOff,
+                              .Write = Uart_OnceWrite,
+                              .Read = Uart_OnceRead,
+                              .delay = vDelay_Ms};
+struct gprs_dev *pSim800GPRS = &Sim800GPRS;
+
 
 /********************************************************************
-* ¹¦    ÄÜ£ºSIM800³õÊ¼»¯
-* Êä    Èë£ºnone
-* Êä    ³ö£ºnone
-* ±à Ð´ ÈË£ºstragen
-* ±àÐ´ÈÕÆÚ£º2018.3.27
+* åŠŸ    èƒ½ï¼šSIM800åˆå§‹åŒ–
+* è¾“    å…¥ï¼šnone
+* è¾“    å‡ºï¼šnone
+* ç¼– å†™ äººï¼šstragen
+* ç¼–å†™æ—¥æœŸï¼š2018.3.27
 **********************************************************************/
 void vSim800_HardInit(void)
 {
     GPIO_InitTypeDef GPIO_Initstruc;
-    //A1ÅäÖÃÎªGPRSµçÔ´Ê¹ÄÜ,A3ÅäÖÃÎªGPRS¿ª¹Ø»ú
+    USART_InitTypeDef USART_Initstruc;
+    NVIC_InitTypeDef NVIC_Initstruc;
+    //A1é…ç½®ä¸ºGPRSç”µæºä½¿èƒ½,A3é…ç½®ä¸ºGPRSå¼€å…³æœº
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
     GPIO_Initstruc.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_3;
     GPIO_Initstruc.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_Initstruc.GPIO_OType = GPIO_OType_PP; //¿ªÂ©
+    GPIO_Initstruc.GPIO_OType = GPIO_OType_PP; //å¼€æ¼
     GPIO_Initstruc.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Initstruc.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_WriteBit(GPIOA, GPIO_Pin_1 | GPIO_Pin_3, Bit_RESET); //é»˜è®¤ä¸ºä½Ž
     GPIO_Init(GPIOA, &GPIO_Initstruc);
-    GPIO_WriteBit(GPIOA, GPIO_Pin_1 | GPIO_Pin_3, Bit_RESET); //Ä¬ÈÏÎªµÍ
-    /*B8ºÍB9ÅäÖÃÎª´®¿Ú3,GPRS*/
+    /*B8å’ŒB9é…ç½®ä¸ºä¸²å£3,GPRS*/
     GPIO_PinAFConfig(GPIOB, GPIO_PinSource8, GPIO_AF_7);
     GPIO_PinAFConfig(GPIOB, GPIO_PinSource9, GPIO_AF_7);
     GPIO_Initstruc.GPIO_Mode = GPIO_Mode_AF;
@@ -36,43 +51,103 @@ void vSim800_HardInit(void)
     GPIO_Initstruc.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Initstruc.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9;
     GPIO_Init(GPIOB, &GPIO_Initstruc);
-    /*´®¿Ú³õÊ¼»¯*/
-    UART_GPRS.Init();
+    /*ä¸²å£åˆå§‹åŒ–*/
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+    USART_OverSampling8Cmd(USART3, ENABLE);
+    USART_Initstruc.USART_BaudRate = 38400;
+    USART_Initstruc.USART_Mode = (USART_Mode_Rx | USART_Mode_Tx);
+    USART_Initstruc.USART_WordLength = USART_WordLength_9b;
+    USART_Initstruc.USART_Parity = USART_Parity_No;
+    USART_Initstruc.USART_StopBits = USART_StopBits_1;
+    USART_Initstruc.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+    USART_Init(USART3, &USART_Initstruc);
+
+    NVIC_Initstruc.NVIC_IRQChannel = USART3_IRQn;
+    NVIC_Initstruc.NVIC_IRQChannelPreemptionPriority = 0;
+    //NVIC_Initstruc.NVIC_IRQChannelSubPriority = 0;
+    NVIC_Init(&NVIC_Initstruc);
+    USART_Cmd(USART3, ENABLE);
+
+    vSysTickInit_1ms();
 }
 
+/********************************************************************
+* åŠŸ    èƒ½ï¼šSim800 Power On or Powen Off
+* è¾“    å…¥ï¼šnone
+* è¾“    å‡ºï¼šnone
+* ç¼– å†™ äººï¼šstragen
+* ç¼–å†™æ—¥æœŸï¼š
+**********************************************************************/
 void vSim800_OnOff(void)
 {
-    /*Òý½ÅÀ­¸ß*/
+    /*å¼•è„šæ‹‰é«˜*/
     GPIO_WriteBit(GPIOA, GPIO_Pin_3, Bit_RESET);
-    vTaskDelay(500 / portTICK_RATE_MS);
-    /*Òý½ÅÀ­µÍ*/
+    vDelay_Ms(500);
+    /*å¼•è„šæ‹‰ä½Ž*/
     GPIO_WriteBit(GPIOA, GPIO_Pin_3, Bit_SET);
-    /*ÑÓÊ±1Ãë*/
-    vTaskDelay(1000 / portTICK_RATE_MS);
-    /*Òý½ÅÀ­¸ß*/
+    /*å»¶æ—¶1ç§’*/
+    vDelay_Ms(1000);
+    /*å¼•è„šæ‹‰é«˜*/
     GPIO_WriteBit(GPIOA, GPIO_Pin_3, Bit_RESET);
 }
 
-/********************************************************************
-* ¹¦    ÄÜ£ºSIM800·¢ËÍÃüÁî
-* Êä    Èë£ºnone
-* Êä    ³ö£ºnone
-* ±à Ð´ ÈË£ºstragen
-* ±àÐ´ÈÕÆÚ£º2018.3.27
+/****im***************************************************************
+* åŠŸ    èƒ½ï¼šSim800 Power enable
+* è¾“    å…¥ï¼šnone
+* è¾“    å‡ºï¼šnone
+* ç¼– å†™ äººï¼šstragen
+* ç¼–å†™æ—¥æœŸï¼š
 **********************************************************************/
-void vSim800_SndCmd(UART_TypeDef *puart, char *cmd)
+void vSim800_pEn(void)
 {
-    puart->Send(puart, cmd, strlen(cmd)); // Ä©Î²µÄ\0 Ò²Òª·¢ËÍ
+    GPIO_WriteBit(GPIOA, GPIO_Pin_1, Bit_SET);
+}
+/********************************************************************
+* åŠŸ    èƒ½ï¼šSim800 Power Disable
+* è¾“    å…¥ï¼šnone
+* è¾“    å‡ºï¼šnone
+* ç¼– å†™ äººï¼šstragen
+* ç¼–å†™æ—¥æœŸï¼š
+**********************************************************************/
+void vSim800_PDen(void)
+{
+    GPIO_WriteBit(GPIOA, GPIO_Pin_1, Bit_RESET);
 }
 
 /********************************************************************
-* ¹¦    ÄÜ£ºSIM800½ÓÊÕÃüÁî
-* Êä    Èë£º´æ·ÅÃüÁîµÄ×Ö·û´®Ö¸Õë
-* Êä    ³ö£º½ÓÊÕµ½µÄ×Ö·ûÊý
-* ±à Ð´ ÈË£ºstragen
-* ±àÐ´ÈÕÆÚ£º2018.3.27
+* åŠŸ    èƒ½ï¼šEnable 1ms Systick , no interrupt
+* è¾“    å…¥ï¼šnone
+* è¾“    å‡ºï¼šnone
+* ç¼– å†™ äººï¼šstragen
+* ç¼–å†™æ—¥æœŸï¼š
 **********************************************************************/
-uint32_t Sim800_RsvCmd(UART_TypeDef *puart, char *cmd, uint32_t len, uint32_t delayMs)
+void vSysTickInit_1ms(void)
 {
-    return puart->Receive(puart, (uint8_t *)cmd, len, delayMs);
+    uint32_t ticks = SystemCoreClock / 1000;
+    SysTick->LOAD = (ticks & SysTick_LOAD_RELOAD_Msk) - 1;       /* set reload register */
+    NVIC_SetPriority(SysTick_IRQn, (1 << __NVIC_PRIO_BITS) - 1); /* set Priority for Systick Interrupt */
+    SysTick->VAL = 0;                                            /* Load the SysTick Counter Value */
+    SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk |
+                    //SysTick_CTRL_TICKINT_Msk   |
+                    SysTick_CTRL_ENABLE_Msk; /* Enable SysTick IRQ and SysTick Timer */
+}
+
+/********************************************************************
+* åŠŸ    èƒ½ï¼šdelayms
+* è¾“    å…¥ï¼šnone
+* è¾“    å‡ºï¼šnone
+* ç¼– å†™ äººï¼šstragen
+* ç¼–å†™æ—¥æœŸï¼š
+**********************************************************************/
+void vDelay_Ms(uint32_t ms)
+{
+    if (ms!= 0xFFFFFFFF)
+        ms++;
+    while (ms)
+    {
+        if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) != 0U)
+        {
+            ms--;
+        }
+    }
 }

@@ -33,8 +33,8 @@
 #include "stm32f37x_it.h"
 #include "main.h"
 #include "uart.h"
-#include "time.h"
-
+#include "sim800.h"
+#include "gps.h"
 /** @addtogroup Template_Project
   * @{
   */
@@ -168,13 +168,13 @@ void DebugMon_Handler(void)
 }*/
 
 /********************************************************************
-* ¹¦    ÄÜ£ºGPS ´®¿Ú1½ÓÊÕ·¢ËÍ 
-            ½«´®¿ÚÊý¾ÝÐ´µ½Uart1»º´æ½á¹¹ÌåÖÐµÄÊý×é
-* Êä    Èë£ºNone
-* Êä    ³ö£ºNone
+* ï¿½ï¿½    ï¿½Ü£ï¿½GPS ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½Õ·ï¿½ï¿½ï¿½ 
+            ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½Uart1ï¿½ï¿½ï¿½ï¿½á¹¹ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½
+* ï¿½ï¿½    ï¿½ë£ºNone
+* ï¿½ï¿½    ï¿½ï¿½ï¿½ï¿½None
 *           
-* ±à Ð´ ÈË£ºÍõ¾ýÁú
-* ±àÐ´ÈÕÆÚ£º2016.6.23
+* ï¿½ï¿½ Ð´ ï¿½Ë£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+* ï¿½ï¿½Ð´ï¿½ï¿½ï¿½Ú£ï¿½2016.6.23
 **********************************************************************/
 void USART1_IRQHandler(void)
 {
@@ -184,61 +184,53 @@ void USART1_IRQHandler(void)
     if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
     {
         USART_ClearITPendingBit(USART1, USART_IT_RXNE);
-        if (UART_GPS.Rsvbuf.rd == (UART_GPS.Rsvbuf.wr + 1) % DRV_BUF_SIZE)
+        if (pUartGPS->pRsvbuf->rd == (pUartGPS->pRsvbuf->wr + 1) % BUF_SIZE)
         {
             USART_ITConfig(USART1, USART_IT_RXNE, DISABLE);
         }
         else
         {
-            UART_GPS.Rsvbuf.buf[UART_GPS.Rsvbuf.wr] = (uint8_t)USART_ReceiveData(USART1);
-            UART_GPS.Rsvbuf.wr = (UART_GPS.Rsvbuf.wr + 1) % DRV_BUF_SIZE;
+            pUartGPS->pRsvbuf->data[pUartGPS->pRsvbuf->wr] = (uint8_t)USART_ReceiveData(USART1);
+            pUartGPS->pRsvbuf->wr = (pUartGPS->pRsvbuf->wr + 1) % BUF_SIZE;
         }
     };
 
-    //´Ó´®¿Ú1µÄ·¢ËÍ»º´æÏòÍâ·¢Ò»¸ö×Ö½Ú
     if (USART_GetITStatus(USART1, USART_IT_TXE) != RESET)
     {
         USART_ClearITPendingBit(USART1, USART_IT_TXE);
-        if (UART_GPS.Sndbuf.rd == UART_GPS.Sndbuf.wr) //»º´æÎª¿Õ
+        if (pUartGPS->pSndbuf->rd == pUartGPS->pSndbuf->wr) 
         {
             USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
         }
         else
         {
-            USART_SendData(USART1, (uint16_t)UART_GPS.Sndbuf.buf[UART_GPS.Sndbuf.rd]);
-            UART_GPS.Sndbuf.rd = (UART_GPS.Sndbuf.rd + 1) % DRV_BUF_SIZE;
+            USART_SendData(USART1, (uint16_t)pUartGPS->pSndbuf->data[pUartGPS->pSndbuf->rd]);
+            pUartGPS->pSndbuf->rd = (pUartGPS->pSndbuf->rd + 1) % BUF_SIZE;
         }
     };
 }
 
 /********************************************************************
-* ¹¦    ÄÜ£ºUSART2_IRQHandlerÖÐ¶Ïº¯Êý
-            ½«´®¿ÚÊý¾Ý¶ÁÈ¡µ½Uart2»º´æ½á¹¹ÌåÖÐµÄÊý×é
-* Êä    Èë£ºNone
-* Êä    ³ö£ºNone
+* ï¿½ï¿½    ï¿½Ü£ï¿½USART2_IRQHandlerï¿½Ð¶Ïºï¿½ï¿½ï¿½
+            ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¶ï¿½È¡ï¿½ï¿½Uart2ï¿½ï¿½ï¿½ï¿½á¹¹ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½
+* ï¿½ï¿½    ï¿½ë£ºNone
+* ï¿½ï¿½    ï¿½ï¿½ï¿½ï¿½None
 *           
-* ±à Ð´ ÈË£ºÍõ¾ýÁú
-* ±àÐ´ÈÕÆÚ£º2016.6.23
+* ï¿½ï¿½ Ð´ ï¿½Ë£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+* ï¿½ï¿½Ð´ï¿½ï¿½ï¿½Ú£ï¿½2016.6.23
 **********************************************************************/
 void USART2_IRQHandler(void)
 {
-    /*
-	if (SET==USART_GetFlagStatus(USART2,USART_IT_RXNE))
-	{
-		
-		ucDrv_Buf_Uart2_Rcv.ucDrv_Buf[ucDrv_Buf_Uart2_Rcv.WR_Index++]=(uint8_t)USART_ReceiveData(USART2);
-		ucDrv_Buf_Uart2_Rcv.WR_Index=(ucDrv_Buf_Uart2_Rcv.WR_Index+1)%DRV_BUF_SIZE;
-	}*/
 }
 
 /********************************************************************
-* ¹¦    ÄÜ£ºGPRS Receive
-            ½«´®¿ÚÊý¾Ý¶ÁÈ¡µ½Uart3»º´æ½á¹¹ÌåÖÐµÄÊý×é
-* Êä    Èë£ºNone
-* Êä    ³ö£ºNone
+* ï¿½ï¿½    ï¿½Ü£ï¿½GPRS Receive
+            ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¶ï¿½È¡ï¿½ï¿½Uart3ï¿½ï¿½ï¿½ï¿½á¹¹ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½
+* ï¿½ï¿½    ï¿½ë£ºNone
+* ï¿½ï¿½    ï¿½ï¿½ï¿½ï¿½None
 *           
-* ±à Ð´ ÈË£ºÍõ¾ýÁú
-* ±àÐ´ÈÕÆÚ£º2016.6.23
+* ï¿½ï¿½ Ð´ ï¿½Ë£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+* ï¿½ï¿½Ð´ï¿½ï¿½ï¿½Ú£ï¿½2016.6.23
 **********************************************************************/
 void USART3_IRQHandler(void)
 {
@@ -248,48 +240,44 @@ void USART3_IRQHandler(void)
     if (USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
     {
         USART_ClearITPendingBit(USART3, USART_IT_RXNE);
-        if (UART_GPRS.Rsvbuf.rd == (UART_GPRS.Rsvbuf.wr + 1) % DRV_BUF_SIZE)
+        if (pUartGPRS->pRsvbuf->rd == (pUartGPRS->pRsvbuf->wr + 1) % BUF_SIZE)
         {
             USART_ITConfig(USART3, USART_IT_RXNE, DISABLE);
         }
         else
         {
-            UART_GPRS.Rsvbuf.buf[UART_GPRS.Rsvbuf.wr] = (uint8_t)USART_ReceiveData(USART3);
-            UART_GPRS.Rsvbuf.wr = (UART_GPRS.Rsvbuf.wr + 1) % DRV_BUF_SIZE;
+            pUartGPRS->pRsvbuf->data[pUartGPRS->pRsvbuf->wr] = (uint8_t)USART_ReceiveData(USART3);
+            pUartGPRS->pRsvbuf->wr = (pUartGPRS->pRsvbuf->wr + 1) % BUF_SIZE;
         }
     }
 
-    //´Ó´®¿Ú1µÄ·¢ËÍ»º´æÏòÍâ·¢Ò»¸ö×Ö½Ú
+    //ï¿½Ó´ï¿½ï¿½ï¿½1ï¿½Ä·ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â·¢Ò»ï¿½ï¿½ï¿½Ö½ï¿½
     if (USART_GetITStatus(USART3, USART_IT_TXE) != RESET)
     {
         USART_ClearITPendingBit(USART3, USART_IT_TXE);
-        if (UART_GPRS.Sndbuf.rd == UART_GPRS.Sndbuf.wr) //»º´æÎª¿Õ
+        if (pUartGPRS->pSndbuf->rd == pUartGPRS->pSndbuf->wr) 
         {
             USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
         }
         else
         {
-            USART_SendData(USART3, (uint16_t)UART_GPRS.Sndbuf.buf[UART_GPRS.Sndbuf.rd]);
-            UART_GPRS.Sndbuf.rd = (UART_GPRS.Sndbuf.rd + 1) % DRV_BUF_SIZE;
+            USART_SendData(USART3, (uint16_t)pUartGPRS->pSndbuf->data[pUartGPRS->pSndbuf->rd]);
+            pUartGPRS->pSndbuf->rd = (pUartGPRS->pSndbuf->rd + 1) % BUF_SIZE;
         }
     };
 }
 
 /********************************************************************
-* ¹¦    ÄÜ£ºTIM2_IRQHandler¶Ïº¯Êý
-            ¼ÆÊ±ÀÛ¼Ó
-* Êä    Èë£ºNone
-* Êä    ³ö£ºNone
+* ï¿½ï¿½    ï¿½Ü£ï¿½TIM2_IRQHandlerï¿½Ïºï¿½ï¿½ï¿½
+            ï¿½ï¿½Ê±ï¿½Û¼ï¿½
+* ï¿½ï¿½    ï¿½ë£ºNone
+* ï¿½ï¿½    ï¿½ï¿½ï¿½ï¿½None
 *           
-* ±à Ð´ ÈË£ºÍõ¾ýÁú
-* ±àÐ´ÈÕÆÚ£º2016.6.23
+* ï¿½ï¿½ Ð´ ï¿½Ë£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+* ï¿½ï¿½Ð´ï¿½ï¿½ï¿½Ú£ï¿½2016.6.23
 **********************************************************************/
 void TIM2_IRQHandler(void)
 {
-    if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET)
-    {
-        TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-    }
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

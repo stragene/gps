@@ -4,6 +4,7 @@
         "main.h": "c",
         "time.h": "c",
         "sim800.h": "c",
-        "uart.h": "c"
+        "uart.h": "c",
+        "flash.h": "c"
     }
 }

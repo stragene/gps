@@ -5,32 +5,37 @@
 #include "BaseDef.h"
 #include "uart.h"
 
-typedef struct gps_gprmc
+struct frame_gprmc
 {
-	bool 			IsValid;	//帧合法判断
-	char 		 	Command;	//命令
-	char 			UTC;		//时间
-	char 			VA;		//数据有效标记
-	double 			WD;		//纬度值
-	char 			WDNS;		//纬度区域
-	double 			JD;		//经度值
-	char 			JDWE;		//经度区域
-	double 			SPEED;	 	//速度
-	double 			XHQD;		//相对方向
-	char 			DATE;		//日期
-	float 			MAGE;		//磁偏角
-	float 			ANGLE;		//磁偏角方向
-	char 			MODE;		//模式
-	uint32_t 		SUM;		//校验和
-}GpsGprmc_TypeDef;
+	bool IsValid; //帧合法判断
+	char Command; //命令
+	char UTC;	 //时间
+	char VA;	  //数据有效标记
+	double WD;	//纬度值
+	char WDNS;	//纬度区域
+	double JD;	//经度值
+	char JDWE;	//经度区域
+	double SPEED; //速度
+	double XHQD;  //相对方向
+	char DATE;	//日期
+	float MAGE;   //磁偏角
+	float ANGLE;  //磁偏角方向
+	char MODE;	//模式
+	uint32_t SUM; //校验和
+} ;
+
+struct gps_dev 
+{
+    void (*Init)(void);
+    void (*PowerEn)(void);
+    void (*PowerDen)(void);
+	uint32_t (*Read)(void *port, uint8_t *dest, uint8_t len, uint32_t delay);
+	char *(*pGetGprmc)(uint8_t *buf, uint8_t len);
+	bool (*GprmcFill)(char *frame, struct frame_gprmc *dest);
+};
 
 
-extern void 		vGps_Init(void);
-extern void 		vGps_EnDen();
-extern bool 		Gps_ReadFromBuf(GpsGprmc_TypeDef *tmpGprmc);
-	
-
-
+extern struct gps_dev *pSim800GPS;
 
 /*
 typedef struct gps_time
@@ -77,4 +82,3 @@ typedef struct gps_inf
 
 */
 #endif
-

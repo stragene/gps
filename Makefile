@@ -6,10 +6,10 @@ BUILD_DIR = build
 OPT = -Og
 #源代码目录 
 SOURCES_DIR = \
-CMSIS/source \
-STDPERIPH/source \
-USER/source \
-FREERTOS
+cmsis/source \
+stdperiph/source \
+user/source \
+FreeRTOS
 # 固件库
 PERIFLIB_PATH = 
 # 编译路径
@@ -49,10 +49,10 @@ C_DEFS = \
 AS_INCLUDES =  
 # C头文件路径 
 C_INCLUDES = \
--ICMSIS/include \
--ISTDPERIPH/include \
--IFREERTOS/include \
--IUSER/include
+-Icmsis/include \
+-Istdperiph/include \
+-IFreeRTOS/include \
+-Iuser/include
 # ASFLAGS
 ASFLAGS = 
 # CFLAGS

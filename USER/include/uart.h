@@ -1,47 +1,45 @@
 #ifndef UART_H
 #define UART_H
 #include "stm32f37x.h"
-#include "BaseDef.h"
+#include <stdbool.h>
 
-#define DRV_BUF_SIZE 300 //串口缓存大小
-//#define DATA_BUF_SIZE  	300
+/*涓插彛椹卞姩缂撳瓨*/
+#define BUF_SIZE 0x3FF
 
-/*缓存结构体类型定义*/
-typedef struct ucdrv_buf
+struct ucbuf
 {
-    uint8_t buf[DRV_BUF_SIZE];
-    uint16_t wr;
-    uint16_t rd;
+    uint8_t data[BUF_SIZE];
+    uint32_t rd;
+    uint32_t wr;
+};
 
-} UCDRV_BUF;
-
-//串口结构体类型
-typedef struct uart_typedef
+typedef struct uartdef
 {
-    USART_TypeDef *hard;
-    UCDRV_BUF Rsvbuf;
-    UCDRV_BUF Sndbuf;
-    void (*Init)(void);
-    void (*Send)(struct uart_typedef *, uint8_t *, uint8_t);
-    uint32_t (*Receive)(struct uart_typedef *, uint8_t *, uint8_t, uint32_t);
-    void (*mDelay)(uint32_t);
-} UART_TypeDef;
+    USART_TypeDef *handler;
+    struct ucbuf *pRsvbuf;
+    struct ucbuf *pSndbuf;
+} UartDef;
 
-extern UART_TypeDef UART_GPS, UART_GPRS;
+extern UartDef *pUartGPRS, *pUartGPS;
 
-/*GPS串口初始化函数*/
 extern void vUart_GPS_Init(void);
-/*GPRS串口初始化函数*/
 extern void vUart_GPRS_Init(void);
-/*串口发送函数*/
-extern void vUart_Send(UART_TypeDef *puart, uint8_t *pstring, uint8_t len);
-/*串口接收函数*/
-extern uint32_t udwUart_Receive(UART_TypeDef *puart, uint8_t *pstrint, uint8_t len, uint32_t RcvWait1Ms);
 
-extern uint16_t ucDrvBuf_DataLen(const UCDRV_BUF *ucdrv_buf);                               //驱动缓存中未读取的字节数
-extern uint16_t ucDrvBuf_EmpLen(const UCDRV_BUF *ucdrv_buf);                                //驱动缓存中的剩余空间
-extern bool ucDrv_Buf_GetBytes(UCDRV_BUF *ucdrv_buf, uint8_t *ucdata_buf, uint16_t length); //从驱动缓存中读取指定数量的字节到数据缓存数组
-extern bool Bufchr(UCDRV_BUF *uc_buf, uint8_t chr, uint16_t ln);                            //从驱动缓存中查找特定字符，读指针
-extern bool Buf_cmp(UCDRV_BUF *uc_buf, char *ptchr, uint8_t ln);                            //从驱动缓存中查找特定字符串
+extern uint32_t Uart_Read(UartDef *puart, uint8_t *buf, uint32_t count);
+extern uint32_t Uart_IdleRead(UartDef *puart, uint8_t *buf, uint32_t count, uint32_t idleMs);
+extern uint32_t Uart_OnceRead(UartDef *puart, uint8_t *buf, uint32_t count, uint32_t delay);
+
+extern int32_t Uart_OnceWrite(UartDef *puart, const uint8_t *buf, uint32_t count, uint32_t delay);
+extern void Uart_Write(UartDef *puart, const uint8_t *pbuf, uint32_t count);
+
+extern void Uart_ITReadEnable(UartDef *puart);
+extern void Uart_ITReadDisable(UartDef *puart);
+
+extern uint32_t uwBuf_EmpLen(const struct ucbuf *buf);
+extern uint32_t uwBuf_UnReadLen(const struct ucbuf *buf);
+extern bool blBufchr(struct ucbuf *uc_buf, uint8_t chr, uint16_t ln);
+extern bool blBufcmp(struct ucbuf *uc_buf, char *ptchr, uint8_t ln);
+extern void vBuf_Clear(struct ucbuf *buf);
+
 
 #endif

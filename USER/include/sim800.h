@@ -3,14 +3,16 @@
 #include "stm32f37x.h"
 #include "uart.h"
 
-extern char cSim800_Rsv;
-extern char *pcSim800Rsv;
+struct gprs_dev 
+{
+    void (*Init)(void);
+    void (*OnOff)(void);
+    void (*PowerEn)(void);
+    void (*PowerDen)(void);
+    void (*Write)(UartDef *port, uint32_t *data, uint8_t datalen);
+    uint32_t (*Read)(UartDef *port, uint8_t *dest, uint32_t len, uint32_t delay);
+    void (*delay)(uint32_t);
+};
 
-#define vSim800_pEn() GPIO_WriteBit(GPIOA, GPIO_Pin_1, Bit_SET)
-#define vSim800_PDen() GPIO_WriteBit(GPIOA, GPIO_Pin_1, Bit_RESET);
-
-extern void vSim800_HardInit(void);
-extern void vSim800_SndCmd(UART_TypeDef *puart, char *cmd);
-extern uint32_t Sim800_RsvCmd(UART_TypeDef *puart, char *cmd, uint32_t len, uint32_t delayMs);
-
+extern struct gprs_dev *pSim800GPRS;
 #endif

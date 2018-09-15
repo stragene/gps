@@ -3,11 +3,10 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/CMSIS/inclulde",
-                "${workspaceFolder}/STDPERIPH/include",
+                "${workspaceFolder}/cmsis/inclulde",
+                "${workspaceFolder}/stdperiph/include",
                 "${workspaceFolder}/FreeRTOS/include",
-                "${workspaceFolder}/USER/include",
-                "${workspaceFolder}/CMSIS/include"
+                "${workspaceFolder}/user/include"
             ],
             "defines": [
                 "_DEBUG",

@@ -1,193 +1,289 @@
-/*********************************************************************** 
-* Copyright (c) 2012,»ı³Éµç×Ó¹É·İÓĞÏŞ¹«Ë¾ All rights reserved.
-*
-* ÎÄ¼şÃû³Æ£º UART.c
-* Ãè    Êö£º ´®¿ÚÍ¨ĞÅ´úÂëÎÄ¼ş
-* 
-* ĞŞ¸Ä¼ÇÂ¼£º
-*
-* V1.0£¬2016.06.19£¬
-***********************************************************************/
 
 #include <string.h>
 #include "uart.h"
 #include "stm32f37x.h"
 #include "stm32f37x_it.h"
-#include "FreeRTOS.h"
-#include "task.h"
+//#include "FreeRTOS.h"
+//#include "task.h"
 
-UART_TypeDef UART_GPS = {.hard = USART1,
-                         .Init = vUart_GPS_Init,
-                         .Send = vUart_Send,
-                         .Receive = udwUart_Receive};
-UART_TypeDef UART_GPRS = {.hard = USART3,
-                          .Init = vUart_GPRS_Init,
-                          .Send = vUart_Send,
-                          .Receive = udwUart_Receive};
+static struct ucbuf Uart1_Rsvbuf, Uart1_Sndbuf, Uart3_Rsvbuf, Uart3_Sndbuf;
+/*åº”ç”¨å±‚ä¸²å£ç»“æ„ä½“*/
+static UartDef UartGPS = {USART1, &Uart1_Rsvbuf, &Uart1_Sndbuf};
+static UartDef UartGPRS = {USART3, &Uart3_Rsvbuf, &Uart3_Sndbuf};
 
-/********************************************************************
-* ¹¦    ÄÜ£ºGPS´®¿Ú³õÊ¼»¯º¯Êı
-* Êä    Èë£ºNone
-* Êä    ³ö£ºNone
-*           
-* ±à Ğ´ ÈË£º
-* ±àĞ´ÈÕÆÚ£º2016.6.23
-**********************************************************************/
-void vUart_GPS_Init(void)
+UartDef * pUartGPS = &UartGPS;
+UartDef * pUartGPRS = &UartGPRS;
+
+
+
+/************************************************************
+* å‡½æ•°åç§°: Uart_Write
+* åŠŸèƒ½æè¿°: å†™ä¸²å£ï¼Œä¸­æ–­å‘é€ï¼Œæœ€å¤§å‘é€æ—¶é•¿delay
+* è¾“å…¥å‚æ•°: uartï¼šç³»ç»Ÿä¸²å£  buf:å­˜å‚¨ä½ç½®   countï¼šå‘é€æ•°é‡
+* è¾“å‡ºå‚æ•°: æ— 
+* è¿” å› å€¼: > 0ï¼šå®é™…å‘é€çš„æ•°é‡   -1ï¼šå‘é€å¤±è´¥
+****************************************************************/
+int32_t Uart_OnceWrite(UartDef *puart, const uint8_t *pbuf, uint32_t count, uint32_t delay)
 {
-    USART_InitTypeDef USART_Initstruc;
-    NVIC_InitTypeDef NVIC_Initstruc;
-
-    /*USART1ÅäÖÃ gps*/
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-    USART_OverSampling8Cmd(USART1, ENABLE);
-    USART_Initstruc.USART_BaudRate = 115200;
-    USART_Initstruc.USART_Mode = (USART_Mode_Rx | USART_Mode_Tx);
-    USART_Initstruc.USART_WordLength = USART_WordLength_9b;
-    USART_Initstruc.USART_Parity = USART_Parity_No;
-    USART_Initstruc.USART_StopBits = USART_StopBits_1;
-    USART_Initstruc.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_Init(USART1, &USART_Initstruc);
-
-    /*ÅäÖÃ´®¿Ú1ÖĞ¶Ï*/
-
-    NVIC_Initstruc.NVIC_IRQChannel = USART1_IRQn;
-    NVIC_Initstruc.NVIC_IRQChannelPreemptionPriority = 0;
-    //NVIC_Initstruc.NVIC_IRQChannelSubPriority = 0;
-    NVIC_Initstruc.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_Initstruc);
-
-    USART_Cmd(USART3, ENABLE);
-}
-
-/********************************************************************
-* ¹¦    ÄÜ£ºGPS´®¿Ú³õÊ¼»¯º¯Êı
-* Êä    Èë£ºNone
-* Êä    ³ö£ºNone
-*           
-* ±à Ğ´ ÈË£º
-* ±àĞ´ÈÕÆÚ£º2016.6.23
-**********************************************************************/
-void vUart_GPRS_Init(void)
-{
-    USART_InitTypeDef USART_Initstruc;
-    NVIC_InitTypeDef NVIC_Initstruc;
-
-    /*USART3ÅäÖÃGPRS*/
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
-    USART_OverSampling8Cmd(USART3, ENABLE);
-    USART_Initstruc.USART_BaudRate = 115200;
-    USART_Initstruc.USART_Mode = (USART_Mode_Rx | USART_Mode_Tx);
-    USART_Initstruc.USART_WordLength = USART_WordLength_9b;
-    USART_Initstruc.USART_Parity = USART_Parity_No;
-    USART_Initstruc.USART_StopBits = USART_StopBits_1;
-    USART_Initstruc.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_Init(USART3, &USART_Initstruc);
-
-    /*ÅäÖÃ´®¿Ú3ÖĞ¶Ï*/
-    NVIC_Initstruc.NVIC_IRQChannel = USART3_IRQn;
-    NVIC_Initstruc.NVIC_IRQChannelPreemptionPriority = 0;
-    //NVIC_Initstruc.NVIC_IRQChannelSubPriority = 0;
-    NVIC_Init(&NVIC_Initstruc);
-
-    USART_Cmd(USART3, ENABLE);
-}
-
-/********************************************************************
-* ¹¦    ÄÜ£ºGPS´®¿Ú·¢ËÍ
-* Êä    Èë£ºÒª·¢ËÍ´ò×Ö·û´®
-* Êä    ³ö£º
-*           
-* ±à Ğ´ ÈË£º
-* ±àĞ´ÈÕÆÚ£º2018.2.28
-**********************************************************************/
-void vUart_Send(UART_TypeDef *puart, uint8_t *pstring, uint8_t len)
-{
-    uint8_t i;
-    if (ucDrvBuf_EmpLen(&(puart->Sndbuf)) >= len)
+    uint32_t sendlen = 0;
+    uint16_t i;
+    //ä¿è¯countä¸ä¸º0ï¼Œå¯è‡³å°‘å¼€å¯ä¸€æ¬¡å‘é€ä¸­æ–­
+    if (!count || count > uwBuf_EmpLen(puart->pSndbuf))
+        return -1;
+    for (i = 0; i < count; i++)
     {
-        for (i = 0; i < len; i++)
+        puart->pSndbuf->data[puart->pSndbuf->wr] = *(pbuf + i);
+        puart->pSndbuf->wr = (++puart->pSndbuf->wr) % BUF_SIZE;
+    }
+    sendlen = puart->pSndbuf->rd;
+    //LL_USART_EnableIT_TXE(puart->handler);
+    USART_ITConfig(puart->handler, USART_IT_TXE, ENABLE);
+    while (delay)
+    {
+        /*å‘é€å®Œæˆ*/
+        if (!uwBuf_UnReadLen(puart->pSndbuf))
+            break;
+        if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) != 0U)
         {
-            puart->Sndbuf.buf[puart->Sndbuf.wr] = *(pstring + i);
-            puart->Sndbuf.wr = (puart->Sndbuf.wr + 1) % DRV_BUF_SIZE;
+            delay--;
         }
-        USART_ITConfig(puart->hard, USART_IT_TXE, ENABLE);
     }
-    else
+    /*è§„å®šæ—¶é—´å†…æœªå‘é€å®Œæˆï¼Œä¹Ÿè¦å…³é—­ä¸­æ–­*/
+    //LL_USART_DisableIT_TXE(puart->handler);
+    USART_ITConfig(puart->handler, USART_IT_TXE, DISABLE);
+    return (puart->pSndbuf->rd - sendlen + BUF_SIZE) % BUF_SIZE;
+}
+
+/**********************************************
+    * å‡½æ•°åç§°: Uart_IdleRead
+    * åŠŸèƒ½æè¿°: è¯»ä¸²å£,å­—èŠ‚é—´éš”å¤§äºidleMsï¼Œæˆ–è€…è¯»å–æ•°é‡è¾¾åˆ°countæ—¶ç»“æŸæ¥æ”¶
+    * è¾“å…¥å‚æ•°: puartï¼šä¸²å£ç»“æ„ä½“æŒ‡é’ˆ  buf:å­˜å‚¨ä½ç½®   countï¼šè¯»å–æ•°é‡  idleï¼šå­—èŠ‚è¶…æ—¶æ—¶é—´msï¼Œå¯ä»¥ä¸º0
+    * è¾“å‡ºå‚æ•°: æ— 
+    * è¿” å› å€¼: > 0ï¼šå®é™…è¯»å–çš„æ•°é‡   0ï¼šæ— æ•°æ®æˆ–count==0æˆ–é”™è¯¯ 
+    ****************************************************************/
+uint32_t Uart_IdleRead(UartDef *puart, uint8_t *buf, uint32_t count, uint32_t idleMs)
+{
+    volatile uint32_t readlen = 0;
+    volatile uint32_t readlenow = 0;
+    volatile uint32_t idleMsCount;
+    uint16_t i;
+    /*è¯»å–æ•°é‡> 0ï¼Œ<ç¼“å­˜é•¿åº¦*/
+    if (!count || count > BUF_SIZE)
+    {
+        return 0;
+    }
+    /*ä¿è¯æœ€å°å»¶æ—¶*/
+    if (idleMs < 0xFFFFFFFF)
+    {
+        idleMsCount = ++idleMs;
+    }
+    USART_ITConfig(puart->handler, USART_IT_RXNE, ENABLE);
+    readlenow = uwBuf_UnReadLen(puart->pRsvbuf);
+    while (readlenow < count && idleMsCount > 0)
+    {
+        /*idleMsCountè®¡æ—¶ç´¯å‡*/
+        if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) != 0U)
+        {
+            idleMsCount--;
+        }
+        readlenow = uwBuf_UnReadLen(puart->pRsvbuf);
+        /*readlennow æœ‰å˜åŒ–ï¼ŒidleMsCounté‡è½½*/
+        if (readlenow > readlen)
+        {
+            idleMsCount = idleMs;
+            readlen = readlenow;
+        }
+    }
+    USART_ITConfig(puart->handler, USART_IT_RXNE, DISABLE);
+    if (readlen)
+    {
+        /*å®é™…è¯»åˆ°çš„é•¿åº¦*/
+        readlen = (readlen < count ? readlen : count);
+        for (i = 0; i < readlen; i++)
+        {
+            *(buf + i) = puart->pRsvbuf->data[puart->pRsvbuf->rd];
+            puart->pRsvbuf->rd = (++puart->pRsvbuf->rd) % BUF_SIZE;
+        }
+    }
+    return readlen;
+}
+
+/**********************************************
+    * å‡½æ•°åç§°: Uart_OnceRead
+    * åŠŸèƒ½æè¿°: è¯»ä¸²å£,è¯»åˆ°æŒ‡å®šæ•°é‡æˆ–è¯»å–æ—¶é—´è¶…æ—¶åé€€å‡º
+    * è¾“å…¥å‚æ•°: puartï¼šä¸²å£ç»“æ„ä½“æŒ‡é’ˆ  buf:å­˜å‚¨ä½ç½®   countï¼šè¯»å–æ•°é‡  delayï¼šå­—èŠ‚è¶…æ—¶æ—¶é—´msï¼Œå¯ä»¥ä¸º0
+    * è¾“å‡ºå‚æ•°: æ— 
+    * è¿” å› å€¼: > 0ï¼šå®é™…è¯»å–çš„æ•°é‡   0ï¼šæ— æ•°æ®æˆ–count==0æˆ–é”™è¯¯ 
+    ****************************************************************/
+uint32_t Uart_OnceRead(UartDef *puart, uint8_t *buf, uint32_t count, uint32_t delay)
+{
+    volatile uint32_t readlen = 0;
+    uint16_t i;
+    /*è¯»å–æ•°é‡> 0ï¼Œ<ç¼“å­˜é•¿åº¦*/
+    if (!count || count > BUF_SIZE)
+    {
+        return 0;
+    }
+    USART_ITConfig(puart->handler, USART_IT_RXNE, ENABLE);
+    readlen = uwBuf_UnReadLen(puart->pRsvbuf);
+    while (delay)
+    {
+        readlen = uwBuf_UnReadLen(puart->pRsvbuf);
+        /*å¤šä½™çš„å­—èŠ‚æœ¬æ¬¡ä¸¢å¼ƒï¼Œå¹¶è°ƒç”¨BufClearé˜²æ­¢åé¢å†è¯»å–*/
+        if (readlen >= count)
+            break;
+        if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) != 0U)
+        {
+            delay--;
+        }
+    }
+    USART_ITConfig(puart->handler, USART_IT_RXNE, DISABLE);
+    if (readlen)
+    {
+        /*å®é™…è¯»åˆ°çš„é•¿åº¦*/
+        readlen = (readlen < count ? readlen : count);
+        for (i = 0; i < readlen; i++)
+        {
+            *(buf + i) = puart->pRsvbuf->data[puart->pRsvbuf->rd];
+            puart->pRsvbuf->rd = (++puart->pRsvbuf->rd) % BUF_SIZE;
+        }
+    }
+    return readlen;
+}
+
+/***************************************************************
+* å‡½æ•°åç§°: Uart_Send
+* åŠŸèƒ½æè¿°: å†™ä¸²å£
+* è¾“å…¥å‚æ•°: uartï¼šç³»ç»Ÿä¸²å£  buf:å­˜å‚¨ä½ç½®   countï¼šå‘é€æ•°é‡
+* è¾“å‡ºå‚æ•°: æ— 
+* è¿” å› å€¼: > 0ï¼šå®é™…å‘é€çš„æ•°é‡   -1ï¼šå‘é€å¤±è´¥
+****************************************************************/
+
+void Uart_Write(UartDef *puart, const uint8_t *pbuf, uint32_t count)
+{
+    //uint32_t sendlen = 0;
+    uint16_t i;
+    //ä¿è¯countä¸ä¸º0ï¼Œå¯è‡³å°‘å¼€å¯ä¸€æ¬¡å‘é€ä¸­æ–­
+    if (!count || count > uwBuf_EmpLen(puart->pSndbuf))
         return;
-}
-
-/********************************************************************
-* ¹¦    ÄÜ£ºGPS´®¿Ú½ÓÊÕ
-* Êä    Èë£º
-* Êä    ³ö£º
-*           
-* ±à Ğ´ ÈË£º
-* ±àĞ´ÈÕÆÚ£º2018.2.28
-**********************************************************************/
-uint32_t udwUart_Receive(UART_TypeDef *puart, uint8_t *pstring, uint8_t len, uint32_t waitMs)
-{
-    uint32_t i = 0;
-    uint32_t readed_len = 0;
-    USART_ITConfig(puart->hard, USART_IT_RXNE, ENABLE);
-    vTaskDelay(waitMs / portTICK_RATE_MS); //³¬Ê±ÍË³ö
-    USART_ITConfig(puart->hard, USART_IT_RXNE, DISABLE);
-    /*»º´æÖĞÎ´¶Á³¤¶È*/
-    readed_len = ucDrvBuf_DataLen(&(puart->Rsvbuf));
-    if (readed_len >= len)
+    for (i = 0; i < count; i++)
     {
-        readed_len = len;
+        puart->pSndbuf->data[puart->pSndbuf->wr] = *(pbuf + i);
+        puart->pSndbuf->wr = (++puart->pSndbuf->wr) % BUF_SIZE;
     }
-    for (i = 0; i < readed_len; i++)
-    {
-        *(pstring + i) = puart->Rsvbuf.buf[puart->Rsvbuf.rd];
-        puart->Rsvbuf.rd = (puart->Rsvbuf.rd + 1) % DRV_BUF_SIZE;
-    }
-    return readed_len;
+    //sendlen = puart->pSndbuf->rd;
+    USART_ITConfig(puart->handler, USART_IT_TXE, ENABLE);
 }
 
-/********************************************************************
-* ¹¦    ÄÜ£º²éÑ¯Çı¶¯²ã»º´æÊ£Óà¿Õ¼ä
-* Êä    Èë£ºÊı¾İ»º´æ½á¹¹ÌåµØÖ·
-* Êä    ³ö£ºuint16_t
-*           
-* ±à Ğ´ ÈË£º
-* ±àĞ´ÈÕÆÚ£º2016.6.28
-**********************************************************************/
-uint16_t ucDrvBuf_EmpLen(const UCDRV_BUF *ucdrv_buf)
+/**********************************************
+    * å‡½æ•°åç§°: Uart_Read
+    * åŠŸèƒ½æè¿°: è¯»ä¸²å£ï¼Œç›´æ¥ä»ç¼“å­˜è¯»å–ï¼Œç¼“å­˜è‡ªåŠ¨æ¥æ”¶
+    * è¾“å…¥å‚æ•°: puartï¼šä¸²å£ç»“æ„ä½“æŒ‡é’ˆ  buf:å­˜å‚¨ä½ç½®   countï¼šè¯»å–æ•°é‡
+    * è¾“å‡ºå‚æ•°: æ— 
+    * è¿” å› å€¼: > 0ï¼šå®é™…è¯»å–çš„æ•°é‡   0ï¼šæ— æ•°æ®æˆ–count==0æˆ–é”™è¯¯ 
+    ****************************************************************/
+uint32_t Uart_Read(UartDef *puart, uint8_t *buf, uint32_t count)
 {
-    uint16_t i = (ucdrv_buf->rd - ucdrv_buf->wr) % DRV_BUF_SIZE - 1;
-
-    return i;
+    volatile uint32_t readlen = 0;
+    uint16_t i;
+    if (!count || count > 0xFFFF)
+        return 0;
+    readlen = uwBuf_UnReadLen(puart->pRsvbuf);
+    if (readlen)
+    {
+        /*å®é™…è¯»åˆ°çš„é•¿åº¦*/
+        readlen = (readlen < count ? readlen : count);
+        
+        for (i = 0; i < readlen; i++)
+        {
+            *(buf + i) = puart->pRsvbuf->data[puart->pRsvbuf->rd];
+            puart->pRsvbuf->rd = (++puart->pRsvbuf->rd) % BUF_SIZE;
+        }
+    }
+    return readlen;
+}
+/**********************************************
+* å‡½æ•°åç§°: Uart_ReadITEnable
+* åŠŸèƒ½æè¿°: ä¸²å£Idleä¸­æ–­æ–¹å¼è¿ç»­æ¥æ”¶æ˜¯å¦ä½¿èƒ½
+* è¾“å…¥å‚æ•°: puartï¼šä¸²å£ç»“æ„ä½“æŒ‡é’ˆ cmd:EN/DEN 
+* è¾“å‡ºå‚æ•°: 
+* è¿” å› å€¼: 
+****************************************************************/
+void Uart_ITReadEnable(UartDef *puart)
+{
+    USART_ITConfig(puart->handler, USART_IT_RXNE, ENABLE);
+    USART_ClearITPendingBit(puart->handler, USART_IT_IDLE);
+    puart->handler->ISR;
+    USART_ITConfig(puart->handler, USART_IT_IDLE, ENABLE);
+}
+/**********************************************
+* å‡½æ•°åç§°: Uart_ReadITdisable
+* åŠŸèƒ½æè¿°: ä¸²å£Idleä¸­æ–­æ–¹å¼è¿ç»­æ¥æ”¶æ˜¯å¦ä½¿èƒ½
+* è¾“å…¥å‚æ•°: puartï¼šä¸²å£ç»“æ„ä½“æŒ‡é’ˆ cmd:EN/DEN 
+* è¾“å‡ºå‚æ•°: 
+* è¿” å› å€¼: 
+****************************************************************/
+void Uart_ITReadDisable(UartDef *puart)
+{
+    USART_ITConfig(puart->handler, USART_IT_RXNE, DISABLE);
+    USART_ITConfig(puart->handler, USART_IT_IDLE, DISABLE);
+    USART_ClearITPendingBit(puart->handler, USART_IT_IDLE);
+    puart->handler->ISR;
 }
 
+/*******************************************************
+* åŠŸ    èƒ½ï¼šæŸ¥è¯¢é©±åŠ¨å±‚ç¼“å­˜å‰©ä½™ç©ºé—´
+* è¾“    å…¥ï¼šæ•°æ®ç¼“å­˜ç»“æ„ä½“åœ°å€
+* è¾“    å‡ºï¼šuint32_t
+*           
+* ç¼– å†™ äººï¼š
+* ç¼–å†™æ—¥æœŸï¼š2018å¹´9æœˆ7æ—¥11:04:55
+**********************************************************************/
+uint32_t uwBuf_EmpLen(const struct ucbuf *buf)
+{
+    /*return ((buf->rd + BUF_SIZE - buf->wr) % BUF_SIZE -1);*/
+    return ((buf->rd + BUF_SIZE - buf->wr - 1) % BUF_SIZE);
+}
 /********************************************************************
-* ¹¦    ÄÜ£º²éÑ¯»º´æÖĞÎ´¶ÁµÄ×Ö½ÚÊı
-* Êä    Èë£ºÊı¾İ»º´æ½á¹¹ÌåµØÖ·
-* Êä    ³ö£ºuint16_t
+* åŠŸ    èƒ½ï¼šæŸ¥è¯¢ç¼“å­˜ä¸­æœªè¯»çš„å­—èŠ‚æ•°
+* è¾“    å…¥ï¼šæ•°æ®ç¼“å­˜ç»“æ„ä½“åœ°å€
+* è¾“    å‡ºï¼šuint32_t
 *          
-* ±à Ğ´ ÈË£º
-* ±àĞ´ÈÕÆÚ£º2016.6.28
+* ç¼– å†™ äººï¼š
+* ç¼–å†™æ—¥æœŸï¼š2016.6.28
 **********************************************************************/
-uint16_t ucDrvBuf_DataLen(const UCDRV_BUF *ucdrv_buf)
+uint32_t uwBuf_UnReadLen(const struct ucbuf *buf)
 {
-    return (ucdrv_buf->wr - ucdrv_buf->rd + DRV_BUF_SIZE) % DRV_BUF_SIZE;
+    return (buf->wr - buf->rd + BUF_SIZE) % BUF_SIZE;
 }
 /********************************************************************
-* ¹¦    ÄÜ£º²éÕÒ»º´æÖĞÌØ¶¨×Ö·û
-* Êä    Èë£º»º´æ½á¹¹ÌåÖ¸Õëuc_buf£¬ÌØ¶¨×Ö·ûchr,»º´æÄÚ×Ö½ÚÊıln
-* Êä    ³ö£ºtrue/false
-* Ëµ    Ã÷£º¶ÁÖ¸ÕëÖ¸Ïò¸Ã×Ö·û           
-* ±à Ğ´ ÈË£ºstragen
-* ±àĞ´ÈÕÆÚ£º2016.8.25
+* åŠŸ    èƒ½ï¼šæ¸…ç©ºç¼“å­˜
+* è¾“    å…¥ï¼šæ•°æ®ç¼“å­˜ç»“æ„ä½“åœ°å€
+* è¾“    å‡ºï¼š
+*          
+* ç¼– å†™ äººï¼š
+* ç¼–å†™æ—¥æœŸï¼š2016.6.28
 **********************************************************************/
-bool Bufchr(UCDRV_BUF *uc_buf, uint8_t chr, uint16_t ln)
+void vBuf_Clear(struct ucbuf *buf)
 {
-    while (ln-- && (uc_buf->buf[uc_buf->rd] != chr)) // &&(uc_buf->RD_Index != uc_buf->WR_Index))
+    buf->rd = buf->wr;
+}
+
+/********************************************************************
+* åŠŸ    èƒ½ï¼šæŸ¥æ‰¾ç¼“å­˜ä¸­ç‰¹å®šå­—ç¬¦
+* è¾“    å…¥ï¼šç¼“å­˜ç»“æ„ä½“æŒ‡é’ˆuc_bufï¼Œç‰¹å®šå­—ç¬¦chr,ç¼“å­˜å†…å­—èŠ‚æ•°ln
+* è¾“    å‡ºï¼štrue/false
+* è¯´    æ˜ï¼šè¯»æŒ‡é’ˆæŒ‡å‘è¯¥å­—ç¬¦           
+* ç¼– å†™ äººï¼šstragen
+* ç¼–å†™æ—¥æœŸï¼š2016.8.25
+**********************************************************************/
+bool blBufchr(struct ucbuf *uc_buf, uint8_t chr, uint16_t ln)
+{
+    while (ln-- && (uc_buf->data[uc_buf->rd] != chr)) // &&(uc_buf->RD_Index != uc_buf->WR_Index))
     {
-        uc_buf->rd = (uc_buf->rd + 1) % DRV_BUF_SIZE;
+        uc_buf->rd = (uc_buf->rd + 1) % BUF_SIZE;
     }
-    //return(ln ? true : false);						//¶ÁÖ¸Õë¿ÉÄÜÊÇ0
+    //return(ln ? true : false);						//è¯»æŒ‡é’ˆå¯èƒ½æ˜¯0
     if (ln)
         return false;
     else
@@ -195,18 +291,18 @@ bool Bufchr(UCDRV_BUF *uc_buf, uint8_t chr, uint16_t ln)
 }
 
 /********************************************************************
-* ¹¦    ÄÜ£ºÅĞ¶Ï»º´æÖĞ×Ö·û´®ÊÇ·ñÊÇÌØ¶¨×Ö·û´®
-* Êä    Èë£º»º´æ½á¹¹ÌåµØÖ·uc_buf£¬×Ö·û´®Ö¸Õëptchr£¬×Ö·û´®³¤¶Èln
-* Êä    ³ö£ºtrue/false
-* Ëµ    Ã÷£º¶ÁÖ¸Õë²»¸Ä±ä
-* ±à Ğ´ ÈË£ºstragen
-* ±àĞ´ÈÕÆÚ£º2016.8.25
+* åŠŸ    èƒ½ï¼šåˆ¤æ–­ç¼“å­˜ä¸­å­—ç¬¦ä¸²æ˜¯å¦æ˜¯ç‰¹å®šå­—ç¬¦ä¸²
+* è¾“    å…¥ï¼šç¼“å­˜ç»“æ„ä½“åœ°å€uc_bufï¼Œå­—ç¬¦ä¸²æŒ‡é’ˆptchrï¼Œå­—ç¬¦ä¸²é•¿åº¦ln
+* è¾“    å‡ºï¼štrue/false
+* è¯´    æ˜ï¼šè¯»æŒ‡é’ˆä¸æ”¹å˜
+* ç¼– å†™ äººï¼šstragen
+* ç¼–å†™æ—¥æœŸï¼š2016.8.25
 **********************************************************************/
-bool Buf_cmp(UCDRV_BUF *uc_buf, char *ptchr, uint8_t ln)
+bool blBufcmp(struct ucbuf *uc_buf, char *ptchr, uint8_t ln)
 {
-    while (ln-- && (uc_buf->buf[uc_buf->rd] == *(ptchr++)) && (uc_buf->rd != uc_buf->wr)) //·ÀÖ¹¶ÁÈ¡Ô½½ç
+    while (ln-- && (uc_buf->data[uc_buf->rd] == *(ptchr++)) && (uc_buf->rd != uc_buf->wr)) //é˜²æ­¢è¯»å–è¶Šç•Œ
     {
-        uc_buf->rd = (uc_buf->rd + 1) % DRV_BUF_SIZE;
+        uc_buf->rd = (uc_buf->rd + 1) % BUF_SIZE;
     }
     return (ln ? false : true);
 }
