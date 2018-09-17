@@ -28,9 +28,7 @@ void vSim800_TestInit(void)
     pSim800GPRS->OnOff();
     pSim800GPRS->delay(4000);
     USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
-    pSim800GPRS->SendCmd("AT", "OK", 1000, 100);
-    while (1)
-        ;
+    pSim800GPRS->SendCmd("AT", "AT", 1000, 6);
 }
 
 int main(void)

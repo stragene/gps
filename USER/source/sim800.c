@@ -58,7 +58,7 @@ void vSim800_HardInit(void)
     USART_OverSampling8Cmd(USART3, ENABLE);
     USART_Initstruc.USART_BaudRate = 115200;
     USART_Initstruc.USART_Mode = (USART_Mode_Rx | USART_Mode_Tx);
-    USART_Initstruc.USART_WordLength = USART_WordLength_9b;
+    USART_Initstruc.USART_WordLength = USART_WordLength_8b;
     USART_Initstruc.USART_Parity = USART_Parity_No;
     USART_Initstruc.USART_StopBits = USART_StopBits_1;
     USART_Initstruc.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
@@ -172,7 +172,8 @@ bool blSim800SendCmd(char *pcmd, char *response, uint32_t timeout, uint32_t retr
         Uart_OnceWrite(pUartGPRS, (uint8_t *)pcmd, strlen(pcmd), 500);
         readlen = Uart_OnceRead(pUartGPRS, pbuf, 50, timeout);
         buf[readlen] = '\0';
-        result = strcmp(response, (char *)pbuf);
+        //result = strcmp(response, (char *)pbuf);
+        result = bcmp(response, (char *)pbuf, strlen(response));
         retry--;
     } while (result && retry);
     return (!result);
