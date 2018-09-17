@@ -34,24 +34,15 @@
 
 #include "cpu.h"
 
-/*
-typedef unsigned   char    u8_t;
-typedef signed     char    s8_t;
-typedef unsigned   short   u16_t;
-typedef signed     short   s16_t;
-typedef unsigned   long    u32_t;
-typedef signed     long    s32_t;
-typedef u32_t mem_ptr_t;
-*/
-typedef unsigned   char    uint8_t;
-typedef signed     char    int8_t;
-typedef unsigned   short   uint16_t;
-typedef signed     short   int16_t;
-typedef unsigned   long    uint32_t;
-typedef signed     long    int32_t;
-typedef uint32_t mem_ptr_t;
+typedef unsigned char u8_t;
+typedef signed char s8_t;
+typedef unsigned short u16_t;
+typedef signed short s16_t;
+typedef unsigned long u32_t;
+typedef signed long s32_t;
+/*delete 2018年9月17日16:30:48*/
+/*typedef u32_t mem_ptr_t;*/
 typedef int sys_prot_t;
-
 
 #define U16_F "hu"
 #define S16_F "d"
@@ -59,36 +50,32 @@ typedef int sys_prot_t;
 #define U32_F "u"
 #define S32_F "d"
 #define X32_F "x"
-#define SZT_F "uz" 
-
-
-
-
+#define SZT_F "uz"
 
 /* define compiler specific symbols */
-#if defined (__ICCARM__)
+#if defined(__ICCARM__)
 
 #define PACK_STRUCT_BEGIN
-#define PACK_STRUCT_STRUCT 
+#define PACK_STRUCT_STRUCT
 #define PACK_STRUCT_END
 #define PACK_STRUCT_FIELD(x) x
 #define PACK_STRUCT_USE_INCLUDES
 
-#elif defined (__CC_ARM)
+#elif defined(__CC_ARM)
 
 #define PACK_STRUCT_BEGIN __packed
-#define PACK_STRUCT_STRUCT 
+#define PACK_STRUCT_STRUCT
 #define PACK_STRUCT_END
 #define PACK_STRUCT_FIELD(x) x
 
-#elif defined (__GNUC__)
+#elif defined(__GNUC__)
 
 #define PACK_STRUCT_BEGIN
-#define PACK_STRUCT_STRUCT __attribute__ ((__packed__))
+#define PACK_STRUCT_STRUCT __attribute__((__packed__))
 #define PACK_STRUCT_END
 #define PACK_STRUCT_FIELD(x) x
 
-#elif defined (__TASKING__)
+#elif defined(__TASKING__)
 
 #define PACK_STRUCT_BEGIN
 #define PACK_STRUCT_STRUCT

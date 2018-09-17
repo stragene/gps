@@ -38,22 +38,22 @@
 #include "semphr.h"
 
 #define SYS_MBOX_NULL (xQueueHandle)0
-#define SYS_SEM_NULL  (xSemaphoreHandle)0
-#define SYS_DEFAULT_THREAD_STACK_DEPTH	configMINIMAL_STACK_SIZE
-
+#define SYS_SEM_NULL (xSemaphoreHandle)0
+#define SYS_DEFAULT_THREAD_STACK_DEPTH configMINIMAL_STACK_SIZE
+/*add 2018?9?17?16:41:33?????????*/
+#define LWIP_COMPAT_MUTEX 1
+#define LWIP_COMPAT_MUTEX_ALLOWED
 typedef xSemaphoreHandle sys_sem_t;
 typedef xQueueHandle sys_mbox_t;
 typedef xTaskHandle sys_thread_t;
 
 typedef struct _sys_arch_state_t
 {
-	// Task creation data.
-	char cTaskName[configMAX_TASK_NAME_LEN];
-	unsigned short nStackDepth;
-	unsigned short nTaskCount;
+    // Task creation data.
+    char cTaskName[configMAX_TASK_NAME_LEN];
+    unsigned short nStackDepth;
+    unsigned short nTaskCount;
 } sys_arch_state_t;
-
-
 
 //extern sys_arch_state_t s_sys_arch_state;
 
@@ -61,6 +61,5 @@ typedef struct _sys_arch_state_t
 //void sys_set_state(signed char *pTaskName, unsigned short nStackSize);
 
 /* Message queue constants. */
-#define archMESG_QUEUE_LENGTH	( 6 )
+#define archMESG_QUEUE_LENGTH (6)
 #endif /* __SYS_RTXC_H__ */
-

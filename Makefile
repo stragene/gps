@@ -54,6 +54,7 @@ C_INCLUDES = \
 -IFreeRTOS/include \
 -IFreeRTOS/Source/portable/GCC/ARM_CM4_MPU \
 -Ilwip/include\
+-Ilwip/include/arch \
 -Iuser/include
 # ASFLAGS
 ASFLAGS = 
