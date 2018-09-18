@@ -153,36 +153,6 @@ void vDelay_Ms(uint32_t ms)
         }
     }
 }
-/********************************************************************
-* 功    能：ucGetCSQ
-* 输    入：
-* 输    出：
-* 编 写 人：stragen
-* 编写日期：
-**********************************************************************/
-uint8_t ucGetCSQ(char *response)
-{
-    uint8_t csq;
-    char *pcsq;
-    pcsq = strchr(response, ' ');
-    csq = (*(++pcsq) - '0') * 10 + (*(++pcsq) - '0');
-    return csq;
-}
-/********************************************************************
-* 功    能：ucGetCGATT
-* 输    入：
-* 输    出：
-* 编 写 人：stragen
-* 编写日期：
-**********************************************************************/
-uint8_t ucGetCGATT(char *response)
-{
-    uint8_t cgatt;
-    char *pcgatt;
-    pcgatt = strchr(response, ' ');
-    cgatt = *(++pcgatt) - '0';
-    return cgatt;
-}
 
 /********************************************************************
 * 功    能：vSim800SendCmd
@@ -191,32 +161,36 @@ uint8_t ucGetCGATT(char *response)
 * 编 写 人：stragen
 * 编写日期：
 **********************************************************************/
-bool blSim800SendCmd(char *pcmd, char *response, uint32_t timeout, uint32_t retry)
+bool blSim800SendCmd(char *pcmd, char *pExpectAns, uint32_t timeout, uint32_t retry)
 {
-    uint8_t buf[50], *pbuf;
+    uint8_t buf[50];
     uint32_t readlen;
     bool result;
-    pbuf = buf;
+    char *pAns;
     do
     {
         Uart_OnceWrite(pUartGPRS, (uint8_t *)pcmd, strlen(pcmd), 500);
-        readlen = Uart_OnceRead(pUartGPRS, pbuf, 50, timeout);
+        readlen = Uart_OnceRead(pUartGPRS, &buf[0], 50, timeout);
         buf[readlen] = '\0';
-        //result = strcmp(response, (char *)pbuf);
-        if (0 == strcmp(pcmd, "AT+CSQ"))
+        pAns = (char *)buf;
+        if (pExpectAns == NULL)
         {
-            result = (ucGetCSQ((char *)pbuf) >= 16);
-        }
-        else if (0 == strcmp(pcmd, "AT+CGATT?"))
-        {
-            result = (ucGetCGATT((char *)pbuf) == '1');
-        }
-        else if (0 == strcmp(pcmd, "AT+CIFSR "))
-        {
+            if (0 == strcmp(pcmd, "AT+CSQ"))
+            {
+                result = ((buf[8] - '0') * 10 + (buf[9] - '0') >= 16);
+            }
+            else if (0 == strcmp(pcmd, "AT+CGATT?"))
+            {
+                result = ((buf[10] - '0') == 1);
+            }
+            else if (0 == strcmp(pcmd, "AT+CIFSR "))
+            {
+            }
         }
         else
         {
-            result = !bcmp(response, (char *)pbuf, strlen(response));
+            pAns = strchr(pAns, *pExpectAns);
+            result = !bcmp(pExpectAns, pAns, strlen(pExpectAns));
         }
         retry--;
     } while (!result && retry);

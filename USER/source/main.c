@@ -26,17 +26,16 @@ void vSim800_TestInit(void)
     pSim800GPRS->OnOff();
     pSim800GPRS->delay(2000);
     USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
-#if 1
     while (1)
     {
-        pSim800GPRS->SendCmd("AT\r\n", "AT\r\r\nOK\r\n", 1000, 6);
-        pSim800GPRS->SendCmd("ATE0\r\n", "ATE0\r\r\nOK\r\n", 1000, 6);
-        pSim800GPRS->SendCmd("AT+CPIN?\r\n", "\r\nAT+CPIN: READY", 500, 3);
-        pSim800GPRS->SendCmd("AT+CSQ\r\n", "", 500, 3);
-        pSim800GPRS->SendCmd("AT+CGATT?\r\n", "", 500, 3);
-        pSim800GPRS->SendCmd("AT+CIPSHUT\r\n", "\r\nSHUT OK\r\n", 2000, 3);
+        if (pSim800GPRS->SendCmd("AT\r\n", "OK", 1000, 6))
+            if (pSim800GPRS->SendCmd("ATE0\r\n", "OK", 1000, 6))
+                if (pSim800GPRS->SendCmd("AT+CPIN?\r\n", "READY", 500, 3))
+                    if (pSim800GPRS->SendCmd("AT+CSQ\r\n", "", 500, 3))
+                        if (pSim800GPRS->SendCmd("AT+CGATT?\r\n", "", 500, 3))
+                            if (pSim800GPRS->SendCmd("AT+CIPSHUT\r\n", "SHUT OK", 2000, 3))
+                                ;
     }
-#endif
 }
 
 int main(void)
