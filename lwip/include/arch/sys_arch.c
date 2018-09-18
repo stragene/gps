@@ -599,3 +599,19 @@ void sys_arch_unprotect(sys_prot_t pval)
 {
 	vPortExitCritical();
 }
+
+/*add 2018-9-18 22:27:38*/
+u32_t sys_now(void)
+{
+	TickType_t count;
+	count = xTaskGetTickCount();
+	return count;
+}
+
+/* need modified*/
+u32_t sys_jiffies(void)
+{
+	TickType_t count;
+	count = xTaskGetTickCount();
+	return count;
+}

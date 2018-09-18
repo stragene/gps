@@ -93,7 +93,7 @@
 extern uint32_t SystemCoreClock;
 #endif
 
-#define configUSE_TICKLESS_IDLE 0 //±£³ÖÏµÍ³½ÚÅÄ£¨SysTick£©ÖĞ¶ÏÒ»Ö±ÔËĞĞ
+#define configUSE_TICKLESS_IDLE 0 //ä¿æŒç³»ç»ŸèŠ‚æ‹ï¼ˆSysTickï¼‰ä¸­æ–­ä¸€ç›´è¿è¡Œ
 #define configUSE_MALLOC_FAILED_HOOK 0
 #define IDLE_SHOULD_YIELD 0
 
@@ -104,7 +104,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_TICK_HOOK 0
 #define configCPU_CLOCK_HZ (SystemCoreClock)
 #define configTICK_RATE_HZ ((TickType_t)50)
-#define configMAX_PRIORITIES (5) //ÈÎÎñÖĞ¿ÉÓÃµÄÓÅÏÈ¼¶ÊıÄ¿
+#define configMAX_PRIORITIES (5) //ä»»åŠ¡ä¸­å¯ç”¨çš„ä¼˜å…ˆçº§æ•°ç›®
 #define configMINIMAL_STACK_SIZE ((uint16_t)128)
 #define configTOTAL_HEAP_SIZE ((size_t)3072)
 #define configMAX_TASK_NAME_LEN (16)
@@ -115,7 +115,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_TIME_SLICING 1
 
 /* Co-routine definitions. */
-#define configUSE_CO_ROUTINES 0 //²»Ê¹ÓÃĞ­³Ì
+#define configUSE_CO_ROUTINES 0 //ä¸ä½¿ç”¨åç¨‹
 #define configMAX_CO_ROUTINE_PRIORITIES (2)
 
 /* Set the following definitions to 1 to include the API function, or zero
@@ -145,7 +145,7 @@ function. */
 routine that makes calls to interrupt safe FreeRTOS API functions.  DO NOT CALL
 INTERRUPT SAFE FREERTOS API FUNCTIONS FROM ANY INTERRUPT THAT HAS A HIGHER
 PRIORITY THAN THIS! (higher priorities are lower numeric values. */
-#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY 5 //ÏëÔÚÖĞ¶Ï·şÎñ³ÌĞòÖĞµ÷ÓÃRTOSAPI£¬ÔòÖĞ¶ÏµÄÂß¼­ÓÅÏÈ¼¶±ØĞëµÍÓÚ´ËÂß¼­ÓÅÏÈ¼¶
+#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY 5 //æƒ³åœ¨ä¸­æ–­æœåŠ¡ç¨‹åºä¸­è°ƒç”¨RTOSAPIï¼Œåˆ™ä¸­æ–­çš„é€»è¾‘ä¼˜å…ˆçº§å¿…é¡»ä½äºæ­¤é€»è¾‘ä¼˜å…ˆçº§
 
 /* Interrupt priorities used by the kernel port layer itself.  These are generic
 to all Cortex-M ports, and do not rely on any particular library functions. */

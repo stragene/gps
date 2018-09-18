@@ -1,8 +1,9 @@
 #ifndef _MAIN_H
 #define _MAIN_H
 
-#include "stm32f37x.h"
 
 
+//extern SemaphoreHandle_t xSemGprsRsvd;
+extern void vTaskRsvPPP(void);
 
 #endif
