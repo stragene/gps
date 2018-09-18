@@ -173,7 +173,9 @@ The STM32F2x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums
 /**
  * LWIP_NETCONN==1: Enable Netconn API (require to use api_lib.c)
  */
-#define LWIP_NETCONN 1
+/*changed 2018-9-18 16:05:13*/
+//#define LWIP_NETCONN 1
+#define LWIP_NETCONN 0
 
 /*
    ------------------------------------
@@ -183,8 +185,9 @@ The STM32F2x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums
 /**
  * LWIP_SOCKET==1: Enable Socket API (require to use sockets.c)
  */
-#define LWIP_SOCKET 0
-
+/*changed 2018-9-18 16:05:41*/
+//#define LWIP_SOCKET 0
+#define LWIP_SOCKET 1
 /*
    -----------------------------------
    ---------- DEBUG options ----------
@@ -193,9 +196,12 @@ The STM32F2x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums
 
 #define LWIP_DEBUG 0
 
-/*add 2018年9月17日15:40:28*/
+/*add 2018-9-18 16:08:47*/
 #define LWIP_DNS 1
 #define LWIP_SO_RCVTIMEO 1
+#define LWIP_TIMEVAL_PRIVATE 0
+#define PPP_SUPPORT 1
+#define PPPOS_SUPPORT 1
 /*
    ---------------------------------
    ---------- OS options ----------

@@ -6,6 +6,9 @@
                 "${workspaceFolder}/cmsis/inclulde",
                 "${workspaceFolder}/stdperiph/include",
                 "${workspaceFolder}/FreeRTOS/include",
+                "${workspaceFolder}/FreeRTOS/Source/portable/GCC/ARM_CM4_MPU",
+                "${workspaceFolder}/lwip/include",
+                "${workspaceFolder}/lwip/include/arch",
                 "${workspaceFolder}/user/include"
             ],
             "defines": [

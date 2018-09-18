@@ -5,6 +5,9 @@
         "time.h": "c",
         "sim800.h": "c",
         "uart.h": "c",
-        "flash.h": "c"
+        "flash.h": "c",
+        "ppp_opts.h": "c",
+        "opt.h": "c",
+        "lwipopts.h": "c"
     }
 }
