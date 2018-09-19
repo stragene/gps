@@ -3,13 +3,14 @@
 #include "stm32f37x.h"
 #include "uart.h"
 
-struct gprs_dev 
+struct gprs_dev
 {
     void (*Init)(void);
     void (*OnOff)(void);
     void (*PowerEn)(void);
     void (*PowerDen)(void);
-    bool (*SendCmd)(char *pcmd, char* response, uint32_t timeout, uint32_t retry);
+    bool (*SendCmd)(char *pcmd, char *response, uint32_t timeout, uint32_t retry);
+    uint32_t (*Send)(uint8_t *pbuf, uint32_t len);
     void (*delay)(uint32_t);
 };
 

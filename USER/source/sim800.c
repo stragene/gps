@@ -12,12 +12,13 @@ static void vSim800_pEn(void);
 static void vSim800_PDen(void);
 static void vSim800_OnOff(void);
 static bool blSim800SendCmd(char *pcmd, char *response, uint32_t timeout, uint32_t retry);
-
+static uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len);
 struct gprs_dev Sim800GPRS = {.Init = vSim800_HardInit,
                               .PowerEn = vSim800_pEn,
                               .PowerDen = vSim800_PDen,
                               .OnOff = vSim800_OnOff,
                               .SendCmd = blSim800SendCmd,
+                              .Send = dwSim800Send,
                               .delay = vDelay_Ms};
 struct gprs_dev *pSim800GPRS = &Sim800GPRS;
 
@@ -65,7 +66,8 @@ void vSim800_HardInit(void)
     USART_Init(USART3, &USART_Initstruc);
 
     NVIC_Initstruc.NVIC_IRQChannel = USART3_IRQn;
-    NVIC_Initstruc.NVIC_IRQChannelPreemptionPriority = 0;
+    //NVIC_Initstruc.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_Initstruc.NVIC_IRQChannelPreemptionPriority = configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1;
     //NVIC_Initstruc.NVIC_IRQChannelSubPriority = 0;
     NVIC_Init(&NVIC_Initstruc);
     USART_Cmd(USART3, ENABLE);
@@ -195,4 +197,16 @@ bool blSim800SendCmd(char *pcmd, char *pExpectAns, uint32_t timeout, uint32_t re
         retry--;
     } while (!result && retry);
     return (result);
+}
+/********************************************************************
+* 功    能：vSim800Send
+* 输    入：
+* 输    出：
+* 编 写 人：stragen
+* 编写日期：
+**********************************************************************/
+uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len)
+{
+    uint32_t sendlen;
+    sendlen = Uart_OnceWrite(pUartGPRS, pbuf, len, 500);
 }

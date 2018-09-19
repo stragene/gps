@@ -4,18 +4,17 @@
 #include "flash.h"
 #include "sim800.h"
 #include "gps.h"
-
 #include "FreeRTOS.h"
-#include "portmacro.h"
 #include "task.h"
 #include "semphr.h"
+#include "netif/ppp/pppos.h"
+#include "netif/ppp/pppapi.h"
 
 void vBoardInit(void);
 void vRunLed_Init(void);
-void vTaskComInit(void);
 void vTaskRunLed(void);
 
-SemaphoreHandle_t xSemaphore_MeterReceived;
+SemaphoreHandle_t xSemGprsRsvd;
 QueueHandle_t handQueueU1Frame;
 
 void vSim800_TestInit(void)
@@ -33,8 +32,10 @@ void vSim800_TestInit(void)
                 if (pSim800GPRS->SendCmd("AT+CPIN?\r\n", "READY", 500, 3))
                     if (pSim800GPRS->SendCmd("AT+CSQ\r\n", "", 500, 3))
                         if (pSim800GPRS->SendCmd("AT+CGATT?\r\n", "", 500, 3))
-                            if (pSim800GPRS->SendCmd("AT+CIPSHUT\r\n", "SHUT OK", 2000, 3))
-                                ;
+                            //if (pSim800GPRS->SendCmd("AT+CIPSHUT\r\n", "SHUT OK", 2000, 3))
+                            if (pSim800GPRS->SendCmd("AT+CGDCONT=1,\"IP\",\"CMNET\"\r\n", "OK", 1000, 3))
+                                if (pSim800GPRS->SendCmd("ATD*99#\r\n", "CONNECT", 2000, 3))
+                                    ;
     }
 }
 
