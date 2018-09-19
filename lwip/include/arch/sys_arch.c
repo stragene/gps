@@ -47,14 +47,15 @@
 #include "lwip/opt.h"
 #include "lwip/stats.h"
 
-#define SYS_ARCH_BLOCKING_TICKTIMEOUT    ((portTickType)10000)
+#define SYS_ARCH_BLOCKING_TICKTIMEOUT ((portTickType)10000)
 
 /* This is the number of threads that can be started with sys_thread_new() */
 #define SYS_THREAD_MAX 6
 
 /* Structure associating a thread to a struct sys_timeouts */
-struct TimeoutlistPerThread {
-	sys_thread_t pid;        /* The thread id */
+struct TimeoutlistPerThread
+{
+    sys_thread_t pid; /* The thread id */
 };
 
 /* Thread & struct sys_timeouts association statically allocated per thread.
@@ -70,16 +71,17 @@ static u16_t NbActiveThreads = 0;
  */
 void sys_init(void)
 {
-	int i;
+    int i;
 
-	/* Initialize the the per-thread sys_timeouts structures
+    /* Initialize the the per-thread sys_timeouts structures
 	   make sure there are no valid pids in the list */
-	for (i = 0; i < SYS_THREAD_MAX; i++) {
-		Threads_TimeoutsList[i].pid = 0;
-	}
+    for (i = 0; i < SYS_THREAD_MAX; i++)
+    {
+        Threads_TimeoutsList[i].pid = 0;
+    }
 
-	/* Keep track of how many threads have been created */
-	NbActiveThreads = 0;
+    /* Keep track of how many threads have been created */
+    NbActiveThreads = 0;
 }
 
 /**
@@ -92,34 +94,38 @@ void sys_init(void)
  */
 err_t sys_sem_new(sys_sem_t *sem, u8_t count)
 {
-	err_t err_sem = ERR_MEM;
+    err_t err_sem = ERR_MEM;
 
-	/* Sanity check */
-	if (sem != NULL) {
-		portENTER_CRITICAL();
+    /* Sanity check */
+    if (sem != NULL)
+    {
+        portENTER_CRITICAL();
 
-		vSemaphoreCreateBinary( *sem );
-		if (*sem != SYS_SEM_NULL) {
-  #if SYS_STATS
-			lwip_stats.sys.sem.used++;
-			if (lwip_stats.sys.sem.used > lwip_stats.sys.sem.max) {
-				lwip_stats.sys.sem.max = lwip_stats.sys.sem.used;
-			}
+        vSemaphoreCreateBinary(*sem);
+        if (*sem != SYS_SEM_NULL)
+        {
+#if SYS_STATS
+            lwip_stats.sys.sem.used++;
+            if (lwip_stats.sys.sem.used > lwip_stats.sys.sem.max)
+            {
+                lwip_stats.sys.sem.max = lwip_stats.sys.sem.used;
+            }
 
-  #endif /* SYS_STATS */
+#endif /* SYS_STATS */
 
-			if (0 == count) { /* Means we want the sem to be
+            if (0 == count)
+            { /* Means we want the sem to be
 			                     unavailable at init state. */
-				xSemaphoreTake( *sem, 1);
-			}
+                xSemaphoreTake(*sem, 1);
+            }
 
-			err_sem = ERR_OK;
-		}
+            err_sem = ERR_OK;
+        }
 
-		portEXIT_CRITICAL();
-	}
+        portEXIT_CRITICAL();
+    }
 
-	return err_sem;
+    return err_sem;
 }
 
 /**
@@ -129,15 +135,17 @@ err_t sys_sem_new(sys_sem_t *sem, u8_t count)
  */
 void sys_sem_free(sys_sem_t *sem)
 {
-	/* Sanity check */
-	if (sem != NULL) {
-		if (SYS_SEM_NULL != *sem) {
-  #if SYS_STATS
-			lwip_stats.sys.sem.used--;
-  #endif /* SYS_STATS */
-			vQueueDelete( *sem );
-		}
-	}
+    /* Sanity check */
+    if (sem != NULL)
+    {
+        if (SYS_SEM_NULL != *sem)
+        {
+#if SYS_STATS
+            lwip_stats.sys.sem.used--;
+#endif /* SYS_STATS */
+            vQueueDelete(*sem);
+        }
+    }
 }
 
 /**
@@ -147,10 +155,11 @@ void sys_sem_free(sys_sem_t *sem)
  */
 void sys_sem_signal(sys_sem_t *sem)
 {
-	/* Sanity check */
-	if (sem != NULL) {
-		xSemaphoreGive( *sem );
-	}
+    /* Sanity check */
+    if (sem != NULL)
+    {
+        xSemaphoreGive(*sem);
+    }
 }
 
 /**
@@ -172,44 +181,56 @@ void sys_sem_signal(sys_sem_t *sem)
  */
 u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t timeout)
 {
-	portTickType TickStart;
-	portTickType TickStop;
-	/* Express the timeout in OS tick. */
-	portTickType TickElapsed = (portTickType)(timeout / portTICK_RATE_MS);
+    portTickType TickStart;
+    portTickType TickStop;
+    /* Express the timeout in OS tick. */
+    portTickType TickElapsed = (portTickType)(timeout / portTICK_RATE_MS);
 
-	/* Sanity check */
-	if (sem != NULL) {
-		if (timeout && !TickElapsed) {
-			TickElapsed = 1; /* Wait at least one tick */
-		}
+    /* Sanity check */
+    if (sem != NULL)
+    {
+        if (timeout && !TickElapsed)
+        {
+            TickElapsed = 1; /* Wait at least one tick */
+        }
 
-		if (0 == TickElapsed) {
-			TickStart = xTaskGetTickCount();
-			/* If timeout=0, then the function should block indefinitely */
-			while (pdFALSE == xSemaphoreTake( *sem,	SYS_ARCH_BLOCKING_TICKTIMEOUT )) {
-			}
-		} else {
-			TickStart = xTaskGetTickCount();
-			if (pdFALSE == xSemaphoreTake( *sem, TickElapsed )) {
-				/* if the function times out, it should return SYS_ARCH_TIMEOUT */
-				return(SYS_ARCH_TIMEOUT);
-			}
-		}
+        if (0 == TickElapsed)
+        {
+            TickStart = xTaskGetTickCount();
+            /* If timeout=0, then the function should block indefinitely */
+            while (pdFALSE == xSemaphoreTake(*sem, SYS_ARCH_BLOCKING_TICKTIMEOUT))
+            {
+            }
+        }
+        else
+        {
+            TickStart = xTaskGetTickCount();
+            if (pdFALSE == xSemaphoreTake(*sem, TickElapsed))
+            {
+                /* if the function times out, it should return SYS_ARCH_TIMEOUT */
+                return (SYS_ARCH_TIMEOUT);
+            }
+        }
 
-		/* If the function acquires the semaphore, it should return how
+        /* If the function acquires the semaphore, it should return how
 		  many milliseconds expired while waiting for the semaphore */
-		TickStop = xTaskGetTickCount();
-		/* Take care of wrap-around */
-		if (TickStop >= TickStart) {
-			TickElapsed = TickStop - TickStart;
-		} else {
-			TickElapsed = portMAX_DELAY - TickStart + TickStop;
-		}
+        TickStop = xTaskGetTickCount();
+        /* Take care of wrap-around */
+        if (TickStop >= TickStart)
+        {
+            TickElapsed = TickStop - TickStart;
+        }
+        else
+        {
+            TickElapsed = portMAX_DELAY - TickStart + TickStop;
+        }
 
-		return(TickElapsed * portTICK_RATE_MS);
-	} else {
-		return (u32_t)ERR_MEM;
-	}
+        return (TickElapsed * portTICK_RATE_MS);
+    }
+    else
+    {
+        return (u32_t)ERR_MEM;
+    }
 }
 
 #ifndef sys_sem_valid
@@ -222,7 +243,7 @@ u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t timeout)
  */
 int sys_sem_valid(sys_sem_t *sem)
 {
-	return ((int)(*sem));
+    return ((int)(*sem));
 }
 
 #endif
@@ -235,7 +256,7 @@ int sys_sem_valid(sys_sem_t *sem)
  */
 void sys_sem_set_invalid(sys_sem_t *sem)
 {
-	*sem = NULL;
+    *sem = NULL;
 }
 #endif
 
@@ -248,26 +269,29 @@ void sys_sem_set_invalid(sys_sem_t *sem)
  *
  * \return ERR_OK if successfull or ERR_MEM on error.
  */
-err_t sys_mbox_new(sys_mbox_t *mBoxNew, int size )
+err_t sys_mbox_new(sys_mbox_t *mBoxNew, int size)
 {
-	err_t err_mbox = ERR_MEM;
+    err_t err_mbox = ERR_MEM;
 
-	/* Sanity check */
-	if (mBoxNew != NULL) {
-		*mBoxNew = xQueueCreate( size, sizeof(void *));
-  #if SYS_STATS
-		if (SYS_MBOX_NULL != *mBoxNew) {
-			lwip_stats.sys.mbox.used++;
-			if (lwip_stats.sys.mbox.used > lwip_stats.sys.mbox.max) {
-				lwip_stats.sys.mbox.max	= lwip_stats.sys.mbox.used;
-			}
-		}
+    /* Sanity check */
+    if (mBoxNew != NULL)
+    {
+        *mBoxNew = xQueueCreate(size, sizeof(void *));
+#if SYS_STATS
+        if (SYS_MBOX_NULL != *mBoxNew)
+        {
+            lwip_stats.sys.mbox.used++;
+            if (lwip_stats.sys.mbox.used > lwip_stats.sys.mbox.max)
+            {
+                lwip_stats.sys.mbox.max = lwip_stats.sys.mbox.used;
+            }
+        }
 
-  #endif /* SYS_STATS */
-		err_mbox = ERR_OK;
-	}
+#endif /* SYS_STATS */
+        err_mbox = ERR_OK;
+    }
 
-	return(err_mbox);
+    return (err_mbox);
 }
 
 /**
@@ -280,15 +304,17 @@ err_t sys_mbox_new(sys_mbox_t *mBoxNew, int size )
  */
 void sys_mbox_free(sys_mbox_t *mbox)
 {
-	/* Sanity check */
-	if (mbox != NULL) {
-		if (SYS_MBOX_NULL != *mbox) {
-  #if SYS_STATS
-			lwip_stats.sys.mbox.used--;
-  #endif /* SYS_STATS */
-			vQueueDelete( *mbox );
-		}
-	}
+    /* Sanity check */
+    if (mbox != NULL)
+    {
+        if (SYS_MBOX_NULL != *mbox)
+        {
+#if SYS_STATS
+            lwip_stats.sys.mbox.used--;
+#endif /* SYS_STATS */
+            vQueueDelete(*mbox);
+        }
+    }
 }
 
 /**
@@ -300,11 +326,13 @@ void sys_mbox_free(sys_mbox_t *mbox)
  */
 void sys_mbox_post(sys_mbox_t *mbox, void *msg)
 {
-	/* Sanit check */
-	if (mbox != NULL) {
-		while (pdTRUE != xQueueSend( *mbox, &msg, SYS_ARCH_BLOCKING_TICKTIMEOUT )) {
-		}
-	}
+    /* Sanit check */
+    if (mbox != NULL)
+    {
+        while (pdTRUE != xQueueSend(*mbox, &msg, SYS_ARCH_BLOCKING_TICKTIMEOUT))
+        {
+        }
+    }
 }
 
 /**
@@ -317,16 +345,18 @@ void sys_mbox_post(sys_mbox_t *mbox, void *msg)
  */
 err_t sys_mbox_trypost(sys_mbox_t *mbox, void *msg)
 {
-	err_t err_mbox = ERR_MEM;
+    err_t err_mbox = ERR_MEM;
 
-	/* Sanity check */
-	if (mbox != NULL) {
-		if (errQUEUE_FULL != xQueueSend( *mbox, &msg, 0 )) {
-			err_mbox = ERR_OK;
-		}
-	}
+    /* Sanity check */
+    if (mbox != NULL)
+    {
+        if (errQUEUE_FULL != xQueueSend(*mbox, &msg, 0))
+        {
+            err_mbox = ERR_OK;
+        }
+    }
 
-	return (err_mbox);
+    return (err_mbox);
 }
 
 /**
@@ -345,55 +375,68 @@ err_t sys_mbox_trypost(sys_mbox_t *mbox, void *msg)
  */
 u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
 {
-	portTickType TickStart;
-	portTickType TickStop;
-	void *tempoptr;
-	/* Express the timeout in OS tick. */
-	portTickType TickElapsed = (portTickType)(timeout / portTICK_RATE_MS);
+    portTickType TickStart;
+    portTickType TickStop;
+    void *tempoptr;
+    /* Express the timeout in OS tick. */
+    portTickType TickElapsed = (portTickType)(timeout / portTICK_RATE_MS);
 
-	/* Sanity check */
-	if (mbox != NULL) {
-		if (timeout && !TickElapsed) {
-			TickElapsed = 1; /* Wait at least one tick */
-		}
+    /* Sanity check */
+    if (mbox != NULL)
+    {
+        if (timeout && !TickElapsed)
+        {
+            TickElapsed = 1; /* Wait at least one tick */
+        }
 
-		if (msg == NULL) {
-			msg = &tempoptr;
-		}
+        if (msg == NULL)
+        {
+            msg = &tempoptr;
+        }
 
-		/* NOTE: INCLUDE_xTaskGetSchedulerState must be set to 1 in
+        /* NOTE: INCLUDE_xTaskGetSchedulerState must be set to 1 in
 		 * FreeRTOSConfig.h for xTaskGetTickCount() to be available */
-		if (0 == TickElapsed) {
-			TickStart = xTaskGetTickCount();
-			/* If "timeout" is 0, the thread should be blocked until
+        if (0 == TickElapsed)
+        {
+            TickStart = xTaskGetTickCount();
+            /* If "timeout" is 0, the thread should be blocked until
 			 * a message arrives */
-			while (pdFALSE == xQueueReceive( *mbox, &(*msg),
-					SYS_ARCH_BLOCKING_TICKTIMEOUT )) {
-			}
-		} else {
-			TickStart = xTaskGetTickCount();
-			if (pdFALSE == xQueueReceive( *mbox, &(*msg), TickElapsed )) {
-				*msg = NULL;
-				/* if the function times out, it should return
+            while (pdFALSE == xQueueReceive(*mbox, &(*msg),
+                                            SYS_ARCH_BLOCKING_TICKTIMEOUT))
+            {
+            }
+        }
+        else
+        {
+            TickStart = xTaskGetTickCount();
+            if (pdFALSE == xQueueReceive(*mbox, &(*msg), TickElapsed))
+            {
+                *msg = NULL;
+                /* if the function times out, it should return
 				 * SYS_ARCH_TIMEOUT. */
-				return(SYS_ARCH_TIMEOUT);
-			}
-		}
+                return (SYS_ARCH_TIMEOUT);
+            }
+        }
 
-		/* If the function gets a msg, it should return the number of ms
+        /* If the function gets a msg, it should return the number of ms
 		 * spent waiting. */
-		TickStop = xTaskGetTickCount();
-		/* Take care of wrap-around. */
-		if (TickStop >= TickStart) {
-			TickElapsed = TickStop - TickStart;
-		} else {
-			TickElapsed = portMAX_DELAY - TickStart + TickStop;
-		}
+        TickStop = xTaskGetTickCount();
+        /* Take care of wrap-around. */
+        if (TickStop >= TickStart)
+        {
+            TickElapsed = TickStop - TickStart;
+        }
+        else
+        {
+            TickElapsed = portMAX_DELAY - TickStart + TickStop;
+        }
 
-		return(TickElapsed * portTICK_RATE_MS);
-	} else {
-		return (u32_t)ERR_MEM;
-	}
+        return (TickElapsed * portTICK_RATE_MS);
+    }
+    else
+    {
+        return (u32_t)ERR_MEM;
+    }
 }
 
 /**
@@ -411,26 +454,31 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
  */
 u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
 {
-	void *tempoptr;
+    void *tempoptr;
 
-	/* Sanity check */
-	if (mbox != NULL) {
-		if (msg == NULL) {
-			msg = &tempoptr;
-		}
+    /* Sanity check */
+    if (mbox != NULL)
+    {
+        if (msg == NULL)
+        {
+            msg = &tempoptr;
+        }
 
-		if (pdFALSE == xQueueReceive( *mbox, &(*msg), 0 )) {
-			/* if a message is not present in the mailbox, it
+        if (pdFALSE == xQueueReceive(*mbox, &(*msg), 0))
+        {
+            /* if a message is not present in the mailbox, it
 			 * immediately returns with */
-			/* the code SYS_MBOX_EMPTY. */
-			return(SYS_MBOX_EMPTY);
-		}
+            /* the code SYS_MBOX_EMPTY. */
+            return (SYS_MBOX_EMPTY);
+        }
 
-		/* On success 0 is returned. */
-		return(0);
-	} else {
-		return(SYS_MBOX_EMPTY);
-	}
+        /* On success 0 is returned. */
+        return (0);
+    }
+    else
+    {
+        return (SYS_MBOX_EMPTY);
+    }
 }
 
 #ifndef sys_mbox_valid
@@ -443,7 +491,7 @@ u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
  */
 int sys_mbox_valid(sys_mbox_t *mbox)
 {
-	return ((int)(*mbox));
+    return ((int)(*mbox));
 }
 #endif
 
@@ -455,7 +503,7 @@ int sys_mbox_valid(sys_mbox_t *mbox)
  */
 void sys_mbox_set_invalid(sys_mbox_t *mbox)
 {
-	*mbox = NULL;
+    *mbox = NULL;
 }
 
 #endif
@@ -472,29 +520,32 @@ void sys_mbox_set_invalid(sys_mbox_t *mbox)
  * \return The id of the new thread.
  */
 sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread, void *arg,
-		int stacksize, int prio)
+                            int stacksize, int prio)
 {
-	sys_thread_t newthread;
-	portBASE_TYPE result;
-	SYS_ARCH_DECL_PROTECT(protectionLevel);
+    sys_thread_t newthread;
+    portBASE_TYPE result;
+    SYS_ARCH_DECL_PROTECT(protectionLevel);
 
-	result = xTaskCreate( thread, (const portCHAR *)name, stacksize, arg,
-			prio, &newthread );
+    result = xTaskCreate(thread, (const portCHAR *)name, stacksize, arg,
+                         prio, &newthread);
 
-	/* Need to protect this -- preemption here could be a problem! */
-	SYS_ARCH_PROTECT(protectionLevel);
-	if (pdPASS == result) {
-		/* For each task created, store the task handle (pid) in the
+    /* Need to protect this -- preemption here could be a problem! */
+    SYS_ARCH_PROTECT(protectionLevel);
+    if (pdPASS == result)
+    {
+        /* For each task created, store the task handle (pid) in the
 		 * timers array. */
-		/* This scheme doesn't allow for threads to be deleted */
-		Threads_TimeoutsList[NbActiveThreads++].pid = newthread;
-	} else {
-		newthread = NULL;
-	}
+        /* This scheme doesn't allow for threads to be deleted */
+        Threads_TimeoutsList[NbActiveThreads++].pid = newthread;
+    }
+    else
+    {
+        newthread = NULL;
+    }
 
-	SYS_ARCH_UNPROTECT(protectionLevel);
+    SYS_ARCH_UNPROTECT(protectionLevel);
 
-	return(newthread);
+    return (newthread);
 }
 
 /* Mutex functions: */
@@ -551,7 +602,7 @@ void sys_mutex_free(sys_mutex_t *mutex)
  */
 int sys_mutex_valid(sys_mutex_t *mutex)
 {
-	return ((int)(*mutex));
+    return ((int)(*mutex));
 }
 
 #endif
@@ -564,7 +615,7 @@ int sys_mutex_valid(sys_mutex_t *mutex)
  */
 void sys_mutex_set_invalid(sys_mutex_t *mutex)
 {
-	*mutex = NULL;
+    *mutex = NULL;
 }
 
 #endif
@@ -586,8 +637,8 @@ extern volatile unsigned portLONG ulCriticalNesting;
  */
 sys_prot_t sys_arch_protect(void)
 {
-	vPortEnterCritical();
-	return 1; /* Not used */
+    vPortEnterCritical();
+    return 1; /* Not used */
 }
 
 /**
@@ -597,5 +648,19 @@ sys_prot_t sys_arch_protect(void)
  */
 void sys_arch_unprotect(sys_prot_t pval)
 {
-	vPortExitCritical();
+    vPortExitCritical();
+}
+/*add 2018-9-18 22:27:38*/
+u32_t sys_now(void)
+{
+    TickType_t count;
+    count = xTaskGetTickCount();
+    return count;
+}
+/* need modified*/
+u32_t sys_jiffies(void)
+{
+    TickType_t count;
+    count = xTaskGetTickCount();
+    return count;
 }

@@ -250,7 +250,7 @@ void USART3_IRQHandler(void)
     {
         USART_ClearITPendingBit(USART3, USART_IT_TXE);
         USART_SendData(USART3, (uint16_t)pUartGPRS->pSndbuf->data[pUartGPRS->pSndbuf->rd]);
-        pUartGPRS->pSndbuf->rd = ++(pUartGPRS->pSndbuf->rd) & BUF_SIZE;
+        pUartGPRS->pSndbuf->rd = (++pUartGPRS->pSndbuf->rd) % BUF_SIZE;
         if (uwBuf_UnReadLen(pUartGPRS->pSndbuf) == 0)
             USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
     }

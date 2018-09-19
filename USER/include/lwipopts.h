@@ -29,6 +29,7 @@
  * critical regions during buffer allocation, deallocation and memory
  * allocation and deallocation.
  */
+/*0* 2018-9-19 15:51:22*/
 #define SYS_LIGHTWEIGHT_PROT 0
 
 #define ETHARP_TRUST_IP_MAC 0
@@ -50,21 +51,25 @@
 
 /* MEM_SIZE: the size of the heap memory. If the application will send
 a lot of data that needs to be copied, this should be set high. */
-#define MEM_SIZE (5 * 1024)
+/*5* 2018-9-19 13:23:40*/
+#define MEM_SIZE (4 * 1024)
 
 /* MEMP_NUM_PBUF: the number of memp struct pbufs. If the application
    sends a lot of data out of ROM (or other static memory), this
    should be set high. */
+/*100* 2018-9-19 13:23:40*/
 #define MEMP_NUM_PBUF 100
 /* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
    per active UDP "connection". */
 #define MEMP_NUM_UDP_PCB 6
 /* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP
    connections. */
+/*10* 2018-9-19 13:24:28*/
 #define MEMP_NUM_TCP_PCB 10
 /* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
    connections. */
-#define MEMP_NUM_TCP_PCB_LISTEN 5
+/*5 2018-9-19 13:24:49*/
+#define MEMP_NUM_TCP_PCB_LISTEN 10
 /* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP
    segments. */
 #define MEMP_NUM_TCP_SEG 20
@@ -74,10 +79,12 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* ---------- Pbuf options ---------- */
 /* PBUF_POOL_SIZE: the number of buffers in the pbuf pool. */
-#define PBUF_POOL_SIZE 20
+/*20* 2018-9-19 13:25:34*/
+#define PBUF_POOL_SIZE 7
 
 /* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. */
-#define PBUF_POOL_BUFSIZE 500
+/*500* 2018-9-19 14:19:31*/
+#define PBUF_POOL_BUFSIZE 512
 
 /* ---------- TCP options ---------- */
 #define LWIP_TCP 1
@@ -111,7 +118,7 @@ a lot of data that needs to be copied, this should be set high. */
 #define LWIP_DHCP 0
 
 /* ---------- UDP options ---------- */
-#define LWIP_UDP 1
+#define LWIP_UDP 0
 #define UDP_TTL 255
 
 /* ---------- Statistics options ---------- */
@@ -197,7 +204,7 @@ The STM32F2x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums
 #define LWIP_DEBUG 0
 
 /*add 2018-9-18 16:08:47*/
-#define LWIP_DNS 1
+#define LWIP_DNS 0
 #define LWIP_SO_RCVTIMEO 1
 #define LWIP_TIMEVAL_PRIVATE 0
 #define PPP_SUPPORT 1

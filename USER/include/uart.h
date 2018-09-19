@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 /*串口驱动缓存*/
-#define BUF_SIZE 0x3FF
+#define BUF_SIZE 0xFF
 
 struct ucbuf
 {
@@ -40,6 +40,5 @@ extern uint32_t uwBuf_UnReadLen(const struct ucbuf *buf);
 extern bool blBufchr(struct ucbuf *uc_buf, uint8_t chr, uint16_t ln);
 extern bool blBufcmp(struct ucbuf *uc_buf, char *ptchr, uint8_t ln);
 extern void vBuf_Clear(struct ucbuf *buf);
-
 
 #endif
