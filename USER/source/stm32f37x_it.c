@@ -35,6 +35,11 @@
 #include "uart.h"
 #include "sim800.h"
 #include "gps.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
+extern SemaphoreHandle_t xSemGprsRsvd;
+extern void vTaskPPPRead(void);
 /** @addtogroup Template_Project
   * @{
   */
@@ -253,6 +258,11 @@ void USART3_IRQHandler(void)
         pUartGPRS->pSndbuf->rd = (++pUartGPRS->pSndbuf->rd) % BUF_SIZE;
         if (uwBuf_UnReadLen(pUartGPRS->pSndbuf) == 0)
             USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
+    }
+    if (USART_GetITStatus(USART3, USART_IT_IDLE) != RESET)
+    {
+        USART_ClearITPendingBit(USART3, USART_IT_IDLE);
+        xSemaphoreGiveFromISR(xSemGprsRsvd, vTaskPPPRead);
     }
 }
 

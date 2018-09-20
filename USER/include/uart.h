@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 /*串口驱动缓存*/
-#define BUF_SIZE 0xFF
+#define BUF_SIZE 0x3FF
 
 struct ucbuf
 {

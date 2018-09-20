@@ -58,18 +58,18 @@ a lot of data that needs to be copied, this should be set high. */
    sends a lot of data out of ROM (or other static memory), this
    should be set high. */
 /*100* 2018-9-19 13:23:40*/
-#define MEMP_NUM_PBUF 100
+#define MEMP_NUM_PBUF 50
 /* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
    per active UDP "connection". */
 #define MEMP_NUM_UDP_PCB 6
 /* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP
    connections. */
 /*10* 2018-9-19 13:24:28*/
-#define MEMP_NUM_TCP_PCB 10
+#define MEMP_NUM_TCP_PCB 2
 /* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
    connections. */
 /*5 2018-9-19 13:24:49*/
-#define MEMP_NUM_TCP_PCB_LISTEN 10
+#define MEMP_NUM_TCP_PCB_LISTEN 5
 /* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP
    segments. */
 #define MEMP_NUM_TCP_SEG 20
