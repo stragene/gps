@@ -39,9 +39,9 @@ void vSim800_PPPInit(void)
             pSim800GPRS->SendCmd("AT+CSQ\r\n", "", 500, 3) &&
             pSim800GPRS->SendCmd("AT+CGATT?\r\n", "", 500, 3) &&
             /*pSim800GPRS->SendCmd("AT+CIPSHUT\r\n", "SHUT OK", 2000, 3) &&*/
-            pSim800GPRS->SendCmd("AT+CGDCONT=1,\"IP\",\"CMNET\"\r\n", "OK", 1000, 3) &&
-            pSim800GPRS->SendCmd("ATD*99#\r\n", "CONNECT", 2000, 3) &&
-            pSim800GPRS->SendCmd("AT+CIFSR\r\n", "", 2000, 3))
+            pSim800GPRS->SendCmd("AT+CGDCONT=1,\"IP\",\"CMNET\"\r\n", "OK", 1000, 3)) // &&
+            /*pSim800GPRS->SendCmd("ATD*99#\r\n", "CONNECT", 2000, 3) &&*/
+            /*pSim800GPRS->SendCmd("AT+CIFSR\r\n", "", 2000, 3))*/
             break;
         ;
     }
@@ -52,11 +52,9 @@ int main(void)
     vBoardInit();
     vSim800_PPPInit();
     vSim800_PPP();
-
     vSemaphoreCreateBinary(xSemGprsRsvd);
     //handQueueU1Frame =xQueueCreate(2, sizeof(uint8_t));
     xTaskCreate((void *)vTaskRunLed, "RunLed", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate((void *)(vTaskPPPRead), "ppp_read", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
 
     //xTaskCreate((void *)vTaskComInit, "ComInit", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     vTaskStartScheduler();
@@ -99,26 +97,30 @@ void vTaskPPPRead(void)
         vTaskDelay(500 / portTICK_RATE_MS);
     }
 }
+/*************************************************
+*创建PPPGPRS接收任务,传递给内核:pppos_input_tcpip();
+*发送ATD*99
+*tcpip_init(NULL,NULL);
+*pppos_create()
+*ppp_connect()
+*ppp_set_default()
+*************************************************/
 void vSim800_PPP(void)
 {
     uint8_t ctx = 0;
     uint16_t holdoff;
-    //struct tcp_pcb *pcb;
-    //ip4_addr_t ipaddr;
-
+    pSim800GPRS->AutoReadEn();
+    xTaskCreate((void *)(vTaskPPPRead), "ppp_read", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    output_cb(pppGprs, (uint8_t *)"ATD*99#\r\n", 9, &ctx);
     tcpip_init(NULL, NULL);
     pppGprs = pppos_create(&pppGprs_netif, output_cb, status_cb, &ctx);
-    ppp_connect(pppGprs, holdoff);
-    ppp_set_default(pppGprs);
     /*ppp_set_auth(pppGprs, PPPAUTHTYPE_ANY, "card", "card");*/
-    /*
-    *创建PPPGPRS接收任务,传递给内核:pppos_input_tcpip();
-    *发送ATD*99
-    *tcpip_init(NULL,NULL);
-    *pppos_create()
-    *ppp_connect()
-    *ppp_set_default()
-    */
+    if (ERR_OK != ppp_connect(pppGprs, holdoff))
+    {
+        while (1)
+            ;
+    }
+    ppp_set_default(pppGprs);
 }
 static void status_cb(ppp_pcb *pcb, int err_code, void *ctx)
 {

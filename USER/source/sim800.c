@@ -19,6 +19,7 @@ struct gprs_dev Sim800GPRS = {.Init = vSim800_HardInit,
                               .OnOff = vSim800_OnOff,
                               .SendCmd = blSim800SendCmd,
                               .Send = dwSim800Send,
+                              .AutoReadEn = vSim800AutoReadEn,
                               .delay = vDelay_Ms};
 struct gprs_dev *pSim800GPRS = &Sim800GPRS;
 
@@ -209,4 +210,16 @@ uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len)
 {
     uint32_t sendlen;
     sendlen = Uart_OnceWrite(pUartGPRS, pbuf, len, 500);
+}
+
+/********************************************************************
+* 功    能：vSim800Send
+* 输    入：
+* 输    出：
+* 编 写 人：stragen
+* 编写日期：
+**********************************************************************/
+void vSim800AutoReadEn(void)
+{
+    USART_ITConfig(pUartGPRS->handle, USART_IT_IDLE, ENABLE);
 }
