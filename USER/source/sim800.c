@@ -12,6 +12,7 @@ static void vSim800_pEn(void);
 static void vSim800_PDen(void);
 static void vSim800_OnOff(void);
 static bool blSim800SendCmd(char *pcmd, char *response, uint32_t timeout, uint32_t retry);
+static void vSim800AutoReadEn(void);
 static uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len);
 struct gprs_dev Sim800GPRS = {.Init = vSim800_HardInit,
                               .PowerEn = vSim800_pEn,
@@ -176,13 +177,13 @@ bool blSim800SendCmd(char *pcmd, char *pExpectAns, uint32_t timeout, uint32_t re
         readlen = Uart_OnceRead(pUartGPRS, &buf[0], 50, timeout);
         buf[readlen] = '\0';
         pAns = (char *)buf;
-        if (pExpectAns == NULL)
+        if (pExpectAns == "")
         {
-            if (0 == strcmp(pcmd, "AT+CSQ"))
+            if (0 == strcmp(pcmd, "AT+CSQ\r\n"))
             {
-                result = ((buf[8] - '0') * 10 + (buf[9] - '0') >= 16);
+                result = ((buf[9] - '0') * 10 + (buf[10] - '0') >= 16);
             }
-            else if (0 == strcmp(pcmd, "AT+CGATT?"))
+            else if (0 == strcmp(pcmd, "AT+CGATT?\r\n"))
             {
                 result = ((buf[10] - '0') == 1);
             }
@@ -221,5 +222,6 @@ uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len)
 **********************************************************************/
 void vSim800AutoReadEn(void)
 {
-    USART_ITConfig(pUartGPRS->handle, USART_IT_IDLE, ENABLE);
+    USART_ClearITPendingBit(USART3, USART_IT_IDLE);
+    USART_ITConfig(pUartGPRS->handler, USART_IT_IDLE, ENABLE);
 }

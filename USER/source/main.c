@@ -16,6 +16,7 @@ void vSim800_PPPInit(void);
 void vRunLed_Init(void);
 void vTaskRunLed(void);
 void vTaskPPPRead(void);
+void vTaskTcpIpInit(void);
 SemaphoreHandle_t xSemGprsRsvd;
 //QueueHandle_t handQueueU1Frame;
 static void status_cb(ppp_pcb *pcb, int err_code, void *ctx);
@@ -51,13 +52,13 @@ int main(void)
 {
     vBoardInit();
     vSim800_PPPInit();
-    vSim800_PPP();
     vSemaphoreCreateBinary(xSemGprsRsvd);
-    //handQueueU1Frame =xQueueCreate(2, sizeof(uint8_t));
+    xTaskCreate((void *)vTaskTcpIpInit, "TcpipInit", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate((void *)vTaskRunLed, "RunLed", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    vTaskStartScheduler();
+    //handQueueU1Frame =xQueueCreate(2, sizeof(uint8_t));
 
     //xTaskCreate((void *)vTaskComInit, "ComInit", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    vTaskStartScheduler();
     while (1)
         ;
 }
@@ -105,22 +106,29 @@ void vTaskPPPRead(void)
 *ppp_connect()
 *ppp_set_default()
 *************************************************/
-void vSim800_PPP(void)
+void vTaskTcpIpInit(void)
 {
     uint8_t ctx = 0;
     uint16_t holdoff;
     pSim800GPRS->AutoReadEn();
     xTaskCreate((void *)(vTaskPPPRead), "ppp_read", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    output_cb(pppGprs, (uint8_t *)"ATD*99#\r\n", 9, &ctx);
+    vTaskDelay(10 / portTICK_RATE_MS);
+    pSim800GPRS->SendCmd("ATD*99***1#\r\n", "CONNECT", 2000, 3);
+    vTaskDelay(10 / portTICK_RATE_MS);
     tcpip_init(NULL, NULL);
     pppGprs = pppos_create(&pppGprs_netif, output_cb, status_cb, &ctx);
     /*ppp_set_auth(pppGprs, PPPAUTHTYPE_ANY, "card", "card");*/
+    //output_cb(pppGprs, (uint8_t *)"ATD*99#\r\n", 9, &ctx);
     if (ERR_OK != ppp_connect(pppGprs, holdoff))
     {
         while (1)
             ;
     }
     ppp_set_default(pppGprs);
+    for (;;;)
+    {
+        vTaskDelay(1000 / portTICK_RATE_MS);
+    }
 }
 static void status_cb(ppp_pcb *pcb, int err_code, void *ctx)
 {
