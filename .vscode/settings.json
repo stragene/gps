@@ -8,6 +8,9 @@
         "flash.h": "c",
         "ppp_opts.h": "c",
         "opt.h": "c",
-        "lwipopts.h": "c"
+        "lwipopts.h": "c",
+        "xutility": "c",
+        "pppapi.h": "c",
+        "dns.h": "c"
     }
 }

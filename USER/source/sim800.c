@@ -6,13 +6,13 @@
 #include "task.h"
 
 static void vSysTickInit_1ms(void);
+static void vSysTickInit_Freertos(void);
 static void vDelay_Ms(uint32_t delay);
 static void vSim800_HardInit(void);
 static void vSim800_pEn(void);
 static void vSim800_PDen(void);
 static void vSim800_OnOff(void);
 static bool blSim800SendCmd(char *pcmd, char *response, uint32_t timeout, uint32_t retry);
-static void vSim800AutoReadEn(void);
 static uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len);
 struct gprs_dev Sim800GPRS = {.Init = vSim800_HardInit,
                               .PowerEn = vSim800_pEn,
@@ -20,7 +20,6 @@ struct gprs_dev Sim800GPRS = {.Init = vSim800_HardInit,
                               .OnOff = vSim800_OnOff,
                               .SendCmd = blSim800SendCmd,
                               .Send = dwSim800Send,
-                              .AutoReadEn = vSim800AutoReadEn,
                               .delay = vDelay_Ms};
 struct gprs_dev *pSim800GPRS = &Sim800GPRS;
 
@@ -74,7 +73,8 @@ void vSim800_HardInit(void)
     NVIC_Init(&NVIC_Initstruc);
     USART_Cmd(USART3, ENABLE);
 
-    vSysTickInit_1ms();
+    //vSysTickInit_1ms();
+    vSysTickInit_Freertos();
 }
 
 /********************************************************************
@@ -137,6 +137,23 @@ void vSysTickInit_1ms(void)
                     //SysTick_CTRL_TICKINT_Msk   |
                     SysTick_CTRL_ENABLE_Msk; /* Enable SysTick IRQ and SysTick Timer */
 }
+/********************************************************************
+* 功    能：Enable  Systick , no interrupt
+* 输    入：none
+* 输    出：none
+* 编 写 人：stragen
+* 编写日期：
+**********************************************************************/
+void vSysTickInit_Freertos(void)
+{
+    uint32_t ticks = SystemCoreClock / configTICK_RATE_HZ;
+    SysTick->LOAD = (ticks & SysTick_LOAD_RELOAD_Msk) - 1;       /* set reload register */
+    NVIC_SetPriority(SysTick_IRQn, (1 << __NVIC_PRIO_BITS) - 1); /* set Priority for Systick Interrupt */
+    SysTick->VAL = 0;                                            /* Load the SysTick Counter Value */
+    SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk |
+                    //SysTick_CTRL_TICKINT_Msk   |
+                    SysTick_CTRL_ENABLE_Msk; /* Enable SysTick IRQ and SysTick Timer */
+}
 
 /********************************************************************
 * 功    能：delayms
@@ -149,6 +166,7 @@ void vDelay_Ms(uint32_t ms)
 {
     if (ms != 0xFFFFFFFF)
         ms++;
+    ms = ms / portTICK_RATE_MS;
     while (ms)
     {
         if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) != 0U)
@@ -167,7 +185,7 @@ void vDelay_Ms(uint32_t ms)
 **********************************************************************/
 bool blSim800SendCmd(char *pcmd, char *pExpectAns, uint32_t timeout, uint32_t retry)
 {
-    uint8_t buf[50];
+    uint8_t buf[30];
     uint32_t readlen;
     bool result;
     char *pAns;
@@ -211,17 +229,4 @@ uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len)
 {
     uint32_t sendlen;
     sendlen = Uart_OnceWrite(pUartGPRS, pbuf, len, 500);
-}
-
-/********************************************************************
-* 功    能：vSim800Send
-* 输    入：
-* 输    出：
-* 编 写 人：stragen
-* 编写日期：
-**********************************************************************/
-void vSim800AutoReadEn(void)
-{
-    USART_ClearITPendingBit(USART3, USART_IT_IDLE);
-    USART_ITConfig(pUartGPRS->handler, USART_IT_IDLE, ENABLE);
 }

@@ -52,13 +52,13 @@
 /* MEM_SIZE: the size of the heap memory. If the application will send
 a lot of data that needs to be copied, this should be set high. */
 /*5* 2018-9-19 13:23:40*/
-#define MEM_SIZE (4 * 1024)
+#define MEM_SIZE (2 * 1024)
 
 /* MEMP_NUM_PBUF: the number of memp struct pbufs. If the application
    sends a lot of data out of ROM (or other static memory), this
    should be set high. */
 /*100* 2018-9-19 13:23:40*/
-#define MEMP_NUM_PBUF 50
+#define MEMP_NUM_PBUF 20
 /* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
    per active UDP "connection". */
 #define MEMP_NUM_UDP_PCB 6
@@ -69,7 +69,7 @@ a lot of data that needs to be copied, this should be set high. */
 /* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
    connections. */
 /*5 2018-9-19 13:24:49*/
-#define MEMP_NUM_TCP_PCB_LISTEN 5
+#define MEMP_NUM_TCP_PCB_LISTEN 1
 /* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP
    segments. */
 #define MEMP_NUM_TCP_SEG 20
@@ -209,6 +209,7 @@ The STM32F2x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums
 #define LWIP_TIMEVAL_PRIVATE 0
 #define PPP_SUPPORT 1
 #define PPPOS_SUPPORT 1
+#define PAP_SUPPORT 1
 /*
    ---------------------------------
    ---------- OS options ----------

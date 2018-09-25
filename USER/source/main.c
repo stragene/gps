@@ -7,7 +7,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
-#include "netif/ppp/pppos.h"
 #include "netif/ppp/pppapi.h"
 #include "lwip/tcpip.h"
 
@@ -17,12 +16,13 @@ void vRunLed_Init(void);
 void vTaskRunLed(void);
 void vTaskPPPRead(void);
 void vTaskTcpIpInit(void);
-SemaphoreHandle_t xSemGprsRsvd;
-//QueueHandle_t handQueueU1Frame;
+//SemaphoreHandle_t xSemGprsRsvd;
 static void status_cb(ppp_pcb *pcb, int err_code, void *ctx);
 static u32_t output_cb(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx);
 ppp_pcb *pppGprs;
 struct netif pppGprs_netif;
+uint8_t databuf[BUF_SIZE];
+uint8_t *pdatabuf = databuf;
 
 void vSim800_PPPInit(void)
 {
@@ -52,9 +52,9 @@ int main(void)
 {
     vBoardInit();
     vSim800_PPPInit();
-    vSemaphoreCreateBinary(xSemGprsRsvd);
+    //vSemaphoreCreateBinary(xSemGprsRsvd);
     xTaskCreate((void *)vTaskTcpIpInit, "TcpipInit", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate((void *)vTaskRunLed, "RunLed", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    //xTaskCreate((void *)vTaskRunLed, "RunLed", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     vTaskStartScheduler();
     //handQueueU1Frame =xQueueCreate(2, sizeof(uint8_t));
 
@@ -85,17 +85,40 @@ void vTaskRunLed(void)
 
 void vTaskPPPRead(void)
 {
-    uint8_t databuf[BUF_SIZE];
-    uint8_t *pdatabuf = databuf;
-    uint32_t datalen;
+    volatile uint32_t readlen = 0;
+    volatile uint32_t datalen = 0;
+    uint8_t count7e = 0;
+    USART_ITConfig(pUartGPRS->handler, USART_IT_RXNE, ENABLE);
     for (;;)
     {
-        if (pdTRUE == xSemaphoreTake(xSemGprsRsvd, portMAX_DELAY))
+        readlen = uwBuf_UnReadLen(pUartGPRS->pRsvbuf);
+        if (readlen == 0)
+            continue;
+        else
         {
-            datalen = Uart_Read(pUartGPRS, pdatabuf, BUF_SIZE);
-            pppos_input_tcpip(pppGprs, pdatabuf, datalen);
+            *pdatabuf = pUartGPRS->pRsvbuf->data[pUartGPRS->pRsvbuf->rd];
+            pUartGPRS->pRsvbuf->rd = (++pUartGPRS->pRsvbuf->rd) % BUF_SIZE;
+            if (*pdatabuf == 0x7e)
+            {
+                count7e++;
+            }
+            /*had 1 0x7e*/
+            if (count7e & 0x1)
+            {
+                pdatabuf++;
+                datalen++;
+            }
+            /* no 0x7e or had 2 0x7e*/
+            else
+            {
+                pdatabuf = &databuf[0];
+                if (datalen > 0)
+                {
+                    pppos_input_tcpip(pppGprs, pdatabuf, readlen);
+                    datalen = 0;
+                }
+            }
         }
-        vTaskDelay(500 / portTICK_RATE_MS);
     }
 }
 /*************************************************
@@ -110,22 +133,20 @@ void vTaskTcpIpInit(void)
 {
     uint8_t ctx = 0;
     uint16_t holdoff;
-    pSim800GPRS->AutoReadEn();
     xTaskCreate((void *)(vTaskPPPRead), "ppp_read", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    vTaskDelay(10 / portTICK_RATE_MS);
-    pSim800GPRS->SendCmd("ATD*99***1#\r\n", "CONNECT", 2000, 3);
-    vTaskDelay(10 / portTICK_RATE_MS);
+    Uart_OnceWrite(pUartGPRS, (uint8_t *)"ATD*99***1#\r\n", 13, 100);
     tcpip_init(NULL, NULL);
     pppGprs = pppos_create(&pppGprs_netif, output_cb, status_cb, &ctx);
-    /*ppp_set_auth(pppGprs, PPPAUTHTYPE_ANY, "card", "card");*/
-    //output_cb(pppGprs, (uint8_t *)"ATD*99#\r\n", 9, &ctx);
+    //vTaskDelay(10 / portTICK_RATE_MS);
+    vTaskDelay(10 / portTICK_RATE_MS);
+    ppp_set_auth(pppGprs, PPPAUTHTYPE_ANY, "card", "card");
     if (ERR_OK != ppp_connect(pppGprs, holdoff))
     {
         while (1)
             ;
     }
     ppp_set_default(pppGprs);
-    for (;;;)
+    while (1)
     {
         vTaskDelay(1000 / portTICK_RATE_MS);
     }
@@ -139,10 +160,9 @@ static void status_cb(ppp_pcb *pcb, int err_code, void *ctx)
     case PPPERR_NONE:
     {
         return;
-#if 0
 #if LWIP_DNS
         const ip_addr_t *ns;
-#endif /* LWIP_DNS */
+#endif  /* LWIP_DNS */
         /*printf("status_cb: Connected\n");*/
 #if PPP_IPV4_SUPPORT
 /*
@@ -159,7 +179,6 @@ static void status_cb(ppp_pcb *pcb, int err_code, void *ctx)
 #if PPP_IPV6_SUPPORT
         /*printf("   our6_ipaddr = %s\n", ip6addr_ntoa(netif_ip6_addr(pppif, 0)));*/
 #endif /* PPP_IPV6_SUPPORT */
-#endif
         break;
     }
     case PPPERR_PARAM:

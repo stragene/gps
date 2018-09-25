@@ -38,8 +38,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
-extern SemaphoreHandle_t xSemGprsRsvd;
-extern void vTaskPPPRead(void);
+//extern SemaphoreHandle_t xSemGprsRsvd;
+//extern void vTaskPPPRead(void);
 /** @addtogroup Template_Project
   * @{
   */
@@ -259,11 +259,13 @@ void USART3_IRQHandler(void)
         if (uwBuf_UnReadLen(pUartGPRS->pSndbuf) == 0)
             USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
     }
+#if 0
     if (USART_GetITStatus(USART3, USART_IT_IDLE) != RESET)
     {
         USART_ClearITPendingBit(USART3, USART_IT_IDLE);
         xSemaphoreGiveFromISR(xSemGprsRsvd, vTaskPPPRead);
     }
+#endif
 }
 
 /********************************************************************

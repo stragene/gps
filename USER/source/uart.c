@@ -3,7 +3,7 @@
 #include "uart.h"
 #include "stm32f37x.h"
 #include "stm32f37x_it.h"
-//#include "FreeRTOS.h"
+#include "FreeRTOS.h"
 //#include "task.h"
 
 static struct ucbuf Uart1_Rsvbuf, Uart1_Sndbuf, Uart3_Rsvbuf, Uart3_Sndbuf;
@@ -11,10 +11,8 @@ static struct ucbuf Uart1_Rsvbuf, Uart1_Sndbuf, Uart3_Rsvbuf, Uart3_Sndbuf;
 static UartDef UartGPS = {USART1, &Uart1_Rsvbuf, &Uart1_Sndbuf};
 static UartDef UartGPRS = {USART3, &Uart3_Rsvbuf, &Uart3_Sndbuf};
 
-UartDef * pUartGPS = &UartGPS;
-UartDef * pUartGPRS = &UartGPRS;
-
-
+UartDef *pUartGPS = &UartGPS;
+UartDef *pUartGPRS = &UartGPRS;
 
 /************************************************************
 * 函数名称: Uart_Write
@@ -38,6 +36,7 @@ int32_t Uart_OnceWrite(UartDef *puart, const uint8_t *pbuf, uint32_t count, uint
     sendlen = puart->pSndbuf->rd;
     //LL_USART_EnableIT_TXE(puart->handler);
     USART_ITConfig(puart->handler, USART_IT_TXE, ENABLE);
+    delay = delay / portTICK_RATE_MS;
     while (delay)
     {
         /*发送完成*/
@@ -72,6 +71,7 @@ uint32_t Uart_IdleRead(UartDef *puart, uint8_t *buf, uint32_t count, uint32_t id
     {
         return 0;
     }
+    idleMs = idleMs / portTICK_RATE_MS;
     /*保证最小延时*/
     if (idleMs < 0xFFFFFFFF)
     {
@@ -126,6 +126,7 @@ uint32_t Uart_OnceRead(UartDef *puart, uint8_t *buf, uint32_t count, uint32_t de
     }
     USART_ITConfig(puart->handler, USART_IT_RXNE, ENABLE);
     readlen = uwBuf_UnReadLen(puart->pRsvbuf);
+    delay = delay / portTICK_RATE_MS;
     while (delay)
     {
         readlen = uwBuf_UnReadLen(puart->pRsvbuf);
@@ -193,7 +194,7 @@ uint32_t Uart_Read(UartDef *puart, uint8_t *buf, uint32_t count)
     {
         /*实际读到的长度*/
         readlen = (readlen < count ? readlen : count);
-        
+
         for (i = 0; i < readlen; i++)
         {
             *(buf + i) = puart->pRsvbuf->data[puart->pRsvbuf->rd];
