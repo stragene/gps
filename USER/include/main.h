@@ -14,6 +14,8 @@ APIKey：reC6LwIXkj6j9=AV5CCo8g6qijg=
 设备API地址：http://api.heclouds.com/devices/44325523
 server Addr:183.230.40.39
 port:6002
+
+https://open.iot.10086.cn/doc/art448.html#109
 */
 
 #endif
