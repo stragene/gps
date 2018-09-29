@@ -9,6 +9,7 @@ SOURCES_DIR = \
 cmsis/source \
 stdperiph/source \
 user/source \
+Mqtt/source \
 FreeRTOS
 # 固件库
 PERIFLIB_PATH = 
@@ -53,8 +54,7 @@ C_INCLUDES = \
 -Istdperiph/include \
 -IFreeRTOS/include \
 -IFreeRTOS/Source/portable/GCC/ARM_CM4_MPU \
--Ilwip/include\
--Ilwip/include/arch \
+-IMqtt/include \
 -Iuser/include
 # ASFLAGS
 ASFLAGS = 
