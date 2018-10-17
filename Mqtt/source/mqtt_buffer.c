@@ -1,8 +1,8 @@
-#include "mqtt/mqtt_buffer.h"
+#include "mqtt_buffer.h"
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include "mqtt/mqtt.h"
+#include "mqtt.h"
 
 static const uint32_t MQTT_MIN_EXTENT_SIZE = 1024;
 
@@ -41,7 +41,7 @@ struct MqttExtent *MqttBuffer_AllocExtent(struct MqttBuffer *buf, uint32_t bytes
     uint32_t aligned_bytes = bytes + sizeof(struct MqttExtent);
     aligned_bytes = aligned_bytes + (MQTT_DEFAULT_ALIGNMENT -
         (aligned_bytes % MQTT_DEFAULT_ALIGNMENT)) % MQTT_DEFAULT_ALIGNMENT;
-
+    
     if(buf->available_bytes < aligned_bytes) {
         uint32_t alloc_bytes;
         char *chunk;
@@ -54,7 +54,7 @@ struct MqttExtent *MqttBuffer_AllocExtent(struct MqttBuffer *buf, uint32_t bytes
             }
 
             memset(tmp, 0, max_count * sizeof(char**));
-            memcpy(tmp, buf->allocations, buf->alloc_max_count * sizeof(char**));
+            memcpy(tmp, buf->allocations, buf->alloc_max_count);
             free(buf->allocations);
 
             buf->alloc_max_count = max_count;
@@ -73,8 +73,8 @@ struct MqttExtent *MqttBuffer_AllocExtent(struct MqttBuffer *buf, uint32_t bytes
         buf->first_available = chunk;
     }
 
-    assert(buf->available_bytes >= bytes);
-    assert(buf->alloc_count > 0);
+    //assert(buf->available_bytes >= bytes);
+    //assert(buf->alloc_count > 0);
 
     ext = (struct MqttExtent*)(buf->first_available);
     ext->len = bytes;
@@ -91,7 +91,6 @@ int MqttBuffer_Append(struct MqttBuffer *buf, char *payload, uint32_t size, int 
 {
     const uint32_t bytes = own ? size : sizeof(struct MqttExtent);
 
-   
     struct MqttExtent *ext = MqttBuffer_AllocExtent(buf, bytes);
     if(NULL == ext) {
         return MQTTERR_OUTOFMEMORY;
@@ -119,8 +118,8 @@ void MqttBuffer_AppendExtent(struct MqttBuffer *buf, struct MqttExtent *ext)
         buf->last_ext = ext;
     }
     else {
-        assert(NULL == buf->first_ext);
-        assert(1 <= buf->alloc_count);
+        //assert(NULL == buf->first_ext);
+        //assert(1 <= buf->alloc_count);
 
         buf->first_ext = ext;
         buf->last_ext = ext;

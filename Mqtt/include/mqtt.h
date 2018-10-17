@@ -11,9 +11,6 @@ extern "C" {
 #include "config.h"
 #include "mqtt_buffer.h"
 
-#define MQTTSAVEDPTOPICNAME "$dp"
-#define PAYLOADWITHTIME(T) ((T&0xFF)|0x80)
-#define PAYLOADWITHOUTTIME(T) (T&0x7F)
 
 /** MQTT错误码 */
 enum MqttError {
@@ -73,7 +70,7 @@ enum MqttConnectFlag {
 
 /** 连接确认标志位 */
 enum MqttConnAckFlag {
-    MQTT_CONNACK_SP = 0x01 /**< 保留原来会话，以原会话登陆 */
+    MQTT_CONNACK_SP = 0x01 /**< 会话建立 */
 };
 
 /** MQTT 返回码 */
@@ -93,24 +90,11 @@ enum MqttRetCode {
 
 /** 数据点类型，内部使用 */
 enum MqttDataPointType {
-    MQTT_DPTYPE_JSON = 1,
     MQTT_DPTYPE_TRIPLE = 2,  /**< 包含数据流名称、时间戳和数据点值 */
     MQTT_DPTYPE_BINARY = 4,   /**< 包含二进制数据的数据点 */
     MQTT_DPTYPE_FLOAT = 7
 };
 
-/* 上报数据点，消息支持的格式类型 */
-enum MqttSaveDataType{
-    kTypeFullJson = 0x01,
-    kTypeBin = 0x02,
-    kTypeSimpleJsonWithoutTime = 0x03,
-    kTypeSimpleJsonWithTime = 0x04,
-    kTypeString = 0x05,
-    kTypeStringWithTime = 0x06,
-    kTypeFloat  = 0x07
-};
-
-    
 /** MQTT 运行时上下文 */
 struct MqttContext {
     char *bgn;
@@ -200,27 +184,24 @@ struct MqttContext {
  * @remark ctx初始化成功后，不再使用时调用@see Mqtt_DestroyContext销毁
  */
 int Mqtt_InitContext(struct MqttContext *ctx, uint32_t buf_size);
-
 /**
  * 销毁MQTT运行时上下文
  * @param ctx 将要被销毁的MQTT运行时上下文
  */
-    void Mqtt_DestroyContext(struct MqttContext *ctx);
-
+void Mqtt_DestroyContext(struct MqttContext *ctx);
 /**
  * 接收数据包，并调用ctx中响应的数据处理函数
  * @param ctx MQTT运行时上下文
  * @return 成功则返回MQTTERR_NOERROR
  */
-    int Mqtt_RecvPkt(struct MqttContext *ctx);
-
+int Mqtt_RecvPkt(struct MqttContext *ctx);
 /**
  * 发送数据包
  * @param buf 保存将要发送数据包的缓冲区对象
  * @param offset 从缓冲区的offset字节处开始发送
  * @return 成功则返回MQTTERR_NOERROR
  */
-    int Mqtt_SendPkt(struct MqttContext *ctx, const struct MqttBuffer *buf, uint32_t offset);
+int Mqtt_SendPkt(struct MqttContext *ctx, const struct MqttBuffer *buf, uint32_t offset);
 
 
 /**
@@ -262,7 +243,6 @@ int Mqtt_PackConnectPkt(struct MqttBuffer *buf, uint16_t keep_alive, const char 
 int Mqtt_PackPublishPkt(struct MqttBuffer *buf, uint16_t pkt_id, const char *topic,
                         const char *payload, uint32_t size,
                         enum MqttQosLevel qos, int retain, int own);
-
 /**
  * 设置发布数据数据包为重发的发布数据数据包
  * @param buf 存储有PUBLISH数据包的缓冲区
@@ -281,7 +261,6 @@ int Mqtt_SetPktDup(struct MqttBuffer *buf);
  */
 int Mqtt_PackSubscribePkt(struct MqttBuffer *buf, uint16_t pkt_id,
                           enum MqttQosLevel qos, const char *topics[], int topics_len);
-
 /**
  * 添加需要订阅的Topic到已有的订阅数据包中
  * @param buf 存储订阅数据包的缓冲区对象
@@ -289,8 +268,7 @@ int Mqtt_PackSubscribePkt(struct MqttBuffer *buf, uint16_t pkt_id,
  * @param qos QoS等级
  * @return 成功返回MQTTERR_NOERROR
  */
-
-    int Mqtt_AppendSubscribeTopic(struct MqttBuffer *buf, const char *topic, enum MqttQosLevel qos);
+int Mqtt_AppendSubscribeTopic(struct MqttBuffer *buf, const char *topic, enum MqttQosLevel qos);
 /**
  * 封装取消订阅数据包
  * @param buf 存储数据包的缓冲区对象
@@ -299,23 +277,20 @@ int Mqtt_PackSubscribePkt(struct MqttBuffer *buf, uint16_t pkt_id,
  * @param topics_len
  * @return 成功返回MQTTERR_NOERROR
  */
-    int Mqtt_PackUnsubscribePkt(struct MqttBuffer *buf, uint16_t pkt_id, const char *topics[], int topics_len);
-
+int Mqtt_PackUnsubscribePkt(struct MqttBuffer *buf, uint16_t pkt_id, const char *topics[], int topics_len);
 /**
  * 添加需要取消订阅的Topic到已有的取消订阅数据包中
  * @param buf 存储取消订阅数据包的缓冲区对象
  * @param topic 需要取消的Topic
  * @return 成功返回MQTTERR_NOERROR
  */
-    int Mqtt_AppendUnsubscribeTopic(struct MqttBuffer *buf, const char *topic);
-
+int Mqtt_AppendUnsubscribeTopic(struct MqttBuffer *buf, const char *topic);
 /**
  * 封装ping数据包
  * @param buf 存储数据包的缓冲区对象
  * @return 成功返回MQTTERR_NOERROR
  */
-    int Mqtt_PackPingReqPkt(struct MqttBuffer *buf);
-
+int Mqtt_PackPingReqPkt(struct MqttBuffer *buf);
 /**
  * 封装断开连接数据包
  * @param buf 存储数据包的缓冲区对象
@@ -336,9 +311,120 @@ int Mqtt_PackDisconnectPkt(struct MqttBuffer *buf);
  */
 int Mqtt_PackCmdRetPkt(struct MqttBuffer *buf, uint16_t pkt_id, const char *cmdid,
                        const char *ret, uint32_t ret_len,  enum MqttQosLevel qos, int own);
-
 /**
- * 封装二进制类型数据点（OneNet扩展）,支持数据类型type=2
+ * 开始封装@see MQTT_PKT_TRIPLE类型的数据点（OneNet扩展）
+ * @param buf 用于存储数据包的缓冲区对象
+ * @param pkt_id 数据包ID，非0
+ * @param qos QoS等级
+ * @param retain 非0时，服务器将该publish消息保存到topic下，并替换已有的publish消息
+ * @param topic 非0时，$dp，否则 $crsp
+ * @return 成功返回MQTTERR_NOERROR
+ * @remark 当完成数据点的数据添加后需调用@see Mqtt_PackDataPointFinish，
+ *         重发时，调用@see Mqtt_SetPktDup 设置数据包为重发状态
+ */
+int Mqtt_PackDataPointStart(struct MqttBuffer *buf, uint16_t pkt_id,
+                            enum MqttQosLevel qos, int retain, int topic);
+/**
+ * 添加空值数据点，用于清除retain的数据
+ * @param buf 存储MQTT_DPTYPE_TRIPLE类型的数据包的缓冲区对象
+ * @param dsid 数据流id
+ * @return 成功返回MQTTERR_NOERROR
+ * @remark 调用Mqtt_PackDataPointStart开始封装数据点时，retain需设置为0，
+ *         然后通过添加空值数据点的方式可以清除已retain的消息
+ */
+int Mqtt_AppendDPNull(struct MqttBuffer *buf, const char *dsid);
+/**
+ * 添加整数类型数据到@see MQTT_PKT_TRIPLE类型的数据包中
+ * @param buf 存储MQTT_DPTYPE_TRIPLE类型的数据包的缓冲区对象
+ * @param dsid 数据流ID
+ * @param ts  格林威治时间，从1970-01-01T00:00:00.000开始的毫秒时间戳，
+ *            为0或负数时，系统取默认时间
+ * @param value 数据点的值
+ * @return 成功返回MQTTERR_NOERROR
+ */
+int Mqtt_AppendDPInt(struct MqttBuffer *buf, const char *dsid, int64_t ts, int value);
+/**
+ * 添加字符串类型数据到@see MQTT_PKT_TRIPLE类型的数据包中
+ * @param buf 存储MQTT_DPTYPE_TRIPLE类型的数据包的缓冲区对象
+ * @param dsid 数据流ID
+ * @param ts  格林威治时间，从1970-01-01T00:00:00.000开始的毫秒时间戳，
+ *            为0或负数时，系统取默认时间
+ * @param value 数据点的值
+ * @return 成功返回MQTTERR_NOERROR
+ */
+int Mqtt_AppendDPString(struct MqttBuffer *buf, const char *dsid, int64_t ts, const char *value);
+/**
+ * 添加浮点数类型数据到@see MQTT_PKT_TRIPLE类型的数据包中
+ * @param buf 存储MQTT_DPTYPE_TRIPLE类型的数据包的缓冲区对象
+ * @param dsid 数据流ID
+ * @param ts  格林威治时间，从1970-01-01T00:00:00.000开始的毫秒时间戳，
+ *            为0或负数时，系统取默认时间
+ * @param value 数据点的值
+ * @return 成功返回MQTTERR_NOERROR
+ */
+int Mqtt_AppendDPDouble(struct MqttBuffer *buf, const char *dsid, int64_t ts, double value);
+/**
+ * 添加复合类型数据到@see MQTT_PKT_TRIPLE类型的数据包中
+ * @param buf 存储MQTT_DPTYPE_TRIPLE类型的数据包的缓冲区对象
+ * @param dsid 数据流ID
+ * @param ts  格林威治时间，从1970-01-01T00:00:00.000开始的毫秒时间戳，
+ *            为0或负数时，系统取默认时间
+ * @return 成功返回MQTTERR_NOERROR
+ * @remark 完成复合对象的数据添加后，需调用 @see Mqtt_AppendDPFinishObject
+ */
+int Mqtt_AppendDPStartObject(struct MqttBuffer *buf, const char *dsid, int64_t ts);
+/**
+ * 添加整数类型数据段到数据点的复合类型对象中
+ * @param buf 存储MQTT_DPTYPE_TRIPLE类型的数据包的缓冲区对象
+ * @param name 数据段的名字
+ * @param value 数据段的值
+ * @return 成功返回MQTTERR_NOERROR
+ */
+int Mqtt_AppendDPSubvalueInt(struct MqttBuffer *buf, const char *name, int value);
+/**
+ * 添加字符串类型数据段到数据点的复合类型对象中
+ * @param buf 存储MQTT_DPTYPE_TRIPLE类型的数据包的缓冲区对象
+ * @param name 数据段的名字
+ * @param value 数据段的值
+ * @return 成功返回MQTTERR_NOERROR
+ */
+int Mqtt_AppendDPSubvalueString(struct MqttBuffer *buf, const char *name, const char *value);
+/**
+ * 添加浮点数类型数据段到数据点的复合类型对象中
+ * @param buf 存储MQTT_DPTYPE_TRIPLE类型的数据包的缓冲区对象
+ * @param name 数据段的名字
+ * @param value 数据段的值
+ * @return 成功返回MQTTERR_NOERROR
+ */
+int Mqtt_AppendDPSubvalueDouble(struct MqttBuffer *buf, const char *name, double value);
+/**
+ * 开始添加子复合类型的数据
+ * @param buf 存储MQTT_DPTYPE_TRIPLE类型的数据包的缓冲区对象
+ * @param name 子复合类型的名字
+ * @return 成功返回MQTTERR_NOERROR
+ * @remark 完成子复合类型数据的添加后，需调用 @see  Mqtt_AppendDPFinishSubobject
+ */
+int Mqtt_AppendDPStartSubobject(struct MqttBuffer *buf, const char *name);
+/**
+ * 完成子复合类型数据的添加，@see Mqtt_AppendDPStartSubobject
+ * @param buf 存储MQTT_DPTYPE_TRIPLE类型的数据包的缓冲区对象
+ * @return 成功返回MQTTERR_NOERROR
+ */
+int Mqtt_AppendDPFinishSubobject(struct MqttBuffer *buf);
+/**
+ * 完成复合类型数据的添加， @see Mqtt_AppendDPStartObject
+ * @param buf 存储MQTT_DPTYPE_TRIPLE类型的数据包的缓冲区对象
+ * @return 成功返回MQTTERR_NOERROR
+ */
+int Mqtt_AppendDPFinishObject(struct MqttBuffer *buf);
+/**
+ * 结束封装数据点
+ * @param buf 存储@see MqttDataPointType类型数据包的缓冲区对象
+ * @return 成功返回MQTTERR_NOERROR
+ */
+int Mqtt_PackDataPointFinish(struct MqttBuffer *buf);
+/**
+ * 封装二进制类型数据点（OneNet扩展）
  * @param buf 存储数据包的缓冲区对象
  * @param pkt_id 数据包ID，非0
  * @param dsid 数据流ID
@@ -350,32 +436,13 @@ int Mqtt_PackCmdRetPkt(struct MqttBuffer *buf, uint16_t pkt_id, const char *cmdi
  * @param qos QoS等级
  * @param retain 非0时，服务器将该publish消息保存到topic下，并替换已有的publish消息
  * @param own 非0时，拷贝bin到缓冲区
+ * @param save 非0时，服务器将存储数据，否则不存
  * @return 成功返回MQTTERR_NOERROR
  * @remark 当own为0时，bin必须在buf被销毁或重置前保持有效
  */
 int Mqtt_PackDataPointByBinary(struct MqttBuffer *buf, uint16_t pkt_id, const char *dsid,
                                const char *desc, int64_t time, const char *bin,
-                               uint32_t size, enum MqttQosLevel qos, int retain, int own);
-
-
-/**
- * 封装字符串类型数据点（OneNet扩展）,支持数据类型type=1,3,4,5,6,7
- * @param buf 存储数据包的缓冲区对象
- * @param pkt_id 数据包ID，非0
- * @param time 格林威治时间，从1970-01-01T00:00:00.000开始的毫秒时间戳，
- *             为0或负数时，系统取默认时间
- * @param type 上传数据点的类型
- * @param str 数据的起始地址
- * @param size 数据的字节数
- * @param qos QoS等级
- * @param retain 非0时，服务器将该publish消息保存到topic下，并替换已有的publish消息
- * @param own 非0时，拷贝bin到缓冲区
- * @return 成功返回MQTTERR_NOERROR
- * @remark 当own为0时，bin必须在buf被销毁或重置前保持有效
- */
-int Mqtt_PackDataPointByString(struct MqttBuffer *buf, uint16_t pkt_id, int64_t time,
-                                   int32_t type, const char *str, uint32_t size,
-                                   enum MqttQosLevel qos, int retain, int own);
+                               uint32_t size, enum MqttQosLevel qos, int retain, int own, int save);
 
 #ifdef __cplusplus
 } // extern "C"

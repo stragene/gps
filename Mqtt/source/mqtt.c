@@ -2,18 +2,19 @@
 base on
 v2.0 2016/4/19
  */
-#include "mqtt/mqtt.h"
-#include "mqtt/cJSON.h"
+#include "mqtt.h"
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
 
+#define DATA_POINT_TOPIC_PREFIX "$dp"
+#define GET_PRODUCT_TOPIC_PREFIX "$GetProductTopics"
 #define CMD_TOPIC_PREFIX "$creq"
 #define CMD_TOPIC_PREFIX_LEN 5 // strlen(CMD_TOPIC_PREFIX)
 #define RESP_CMD_TOPIC_PREFIX "$crsp/"
-#define RESP_CMD_TOPIC_PREFIX_LEN 6
+#define RESP_CMD_TOPIC_PREFIX_LEN strlen(RESP_CMD_TOPIC_PREFIX)
 #define FORMAT_TIME_STRING_SIZE 23
 
 // range of int: (-2147483648  2147483648), and 1 byte for terminating null byte.
@@ -72,13 +73,13 @@ static int Mqtt_PackPubRelPkt(struct MqttBuffer *buf, uint16_t pkt_id);
  */
 static int Mqtt_PackPubCompPkt(struct MqttBuffer *buf, uint16_t pkt_id);
 
-inline uint16_t Mqtt_RB16(const char *v)
+uint16_t Mqtt_RB16(const char *v)
 {
     const uint8_t *uv = (const uint8_t*)v;
     return (((uint16_t)(uv[0])) << 8) | uv[1];
 }
 
-inline uint64_t Mqtt_RB64(const char *v)
+uint64_t Mqtt_RB64(const char *v)
 {
     const uint8_t *uv = (const uint8_t*)v;
     return ((((uint64_t)(uv[0])) << 56) |
@@ -91,15 +92,19 @@ inline uint64_t Mqtt_RB64(const char *v)
             uv[7]);
 
 }
+void Mqtt_WB8(uint8_t v, char *out)
+{
+    *out = v;
+}
 
-inline void Mqtt_WB16(uint16_t v, char *out)
+void Mqtt_WB16(uint16_t v, char *out)
 {
     uint8_t *uo = (uint8_t*)out;
     uo[0] = (uint8_t)(v >> 8);
     uo[1] = (uint8_t)(v);
 }
 
-inline void Mqtt_WB32(uint32_t v, char *out)
+void Mqtt_WB32(uint32_t v, char *out)
 {
     uint8_t *uo = (uint8_t*)out;
     uo[0] = (uint8_t)(v >> 24);
@@ -108,7 +113,7 @@ inline void Mqtt_WB32(uint32_t v, char *out)
     uo[3] = (uint8_t)(v);
 }
 
-inline int Mqtt_ReadLength(const char *stream, int size, uint32_t *len)
+int Mqtt_ReadLength(const char *stream, int size, uint32_t *len)
 {
     int i;
     const uint8_t *in = (const uint8_t*)stream;
@@ -131,7 +136,7 @@ inline int Mqtt_ReadLength(const char *stream, int size, uint32_t *len)
     return -1; // not complete
 }
 
-inline int Mqtt_DumpLength(size_t len, char *buf)
+int Mqtt_DumpLength(size_t len, char *buf)
 {
     int i;
     for(i = 1; i <= 4; ++i) {
@@ -149,12 +154,12 @@ inline int Mqtt_DumpLength(size_t len, char *buf)
     return -1;
 }
 
-inline int Mqtt_AppendLength(struct MqttBuffer *buf, uint32_t len)
+int Mqtt_AppendLength(struct MqttBuffer *buf, uint32_t len)
 {
     struct MqttExtent *fix_head = buf->first_ext;
     uint32_t pkt_len;
 
-    assert(fix_head);
+    //assert(fix_head);
 
     if(Mqtt_ReadLength(fix_head->payload + 1, 4, &pkt_len) < 0) {
         return MQTTERR_INVALID_PARAMETER;
@@ -170,12 +175,12 @@ inline int Mqtt_AppendLength(struct MqttBuffer *buf, uint32_t len)
     return MQTTERR_NOERROR;
 }
 
-inline int Mqtt_EraseLength(struct MqttBuffer *buf, uint32_t len)
+int Mqtt_EraseLength(struct MqttBuffer *buf, uint32_t len)
 {
     struct MqttExtent *fix_head = buf->first_ext;
     uint32_t pkt_len;
 
-    assert(fix_head);
+    //assert(fix_head);
 
     if(Mqtt_ReadLength(fix_head->payload + 1, 4, &pkt_len) < 0) {
         return MQTTERR_INVALID_PARAMETER;
@@ -190,19 +195,19 @@ inline int Mqtt_EraseLength(struct MqttBuffer *buf, uint32_t len)
     buf->buffered_bytes -= len;
 
     fix_head->len = Mqtt_DumpLength(pkt_len, fix_head->payload + 1) + 1;
-    assert(fix_head->len >= 2);
+    //assert(fix_head->len >= 2);
 
     return MQTTERR_NOERROR;
 }
 
-inline void Mqtt_PktWriteString(char **buf, const char *str, uint16_t len)
+void Mqtt_PktWriteString(char **buf, const char *str, uint16_t len)
 {
     Mqtt_WB16(len, *buf);
     memcpy(*buf + 2, str, len);
     *buf += 2 + len;
 }
 
-inline int Mqtt_CheckClentIdentifier(const char *id)
+int Mqtt_CheckClentIdentifier(const char *id)
 {
     int len;
     for(len = 0; '\0' != id[len]; ++len) {
@@ -301,7 +306,7 @@ static int Mqtt_CheckUtf8(const char *str, size_t len)
     return (int)i;
 }
 
-inline struct DataPointPktInfo *Mqtt_GetDataPointPktInfo(struct MqttBuffer *buf)
+struct DataPointPktInfo *Mqtt_GetDataPointPktInfo(struct MqttBuffer *buf)
 {
     struct MqttExtent *fix_head = buf->first_ext;
     struct MqttExtent *first_payload;
@@ -332,13 +337,13 @@ inline struct DataPointPktInfo *Mqtt_GetDataPointPktInfo(struct MqttBuffer *buf)
     return info;
 }
 
-inline int Mqtt_HasIllegalCharacter(const char *str, size_t len)
+int Mqtt_HasIllegalCharacter(const char *str, size_t len)
 {
     // TODO:
     return 0;
 }
 
-inline int Mqtt_FormatTime(int64_t ts, char *out)
+int Mqtt_FormatTime(int64_t ts, char *out)
 {
     int64_t millisecond = ts % 1000;
     struct tm *t;
@@ -356,7 +361,7 @@ inline int Mqtt_FormatTime(int64_t ts, char *out)
     return FORMAT_TIME_STRING_SIZE;
 }
 
-inline int Mqtt_HandlePingResp(struct MqttContext *ctx, char flags,
+int Mqtt_HandlePingResp(struct MqttContext *ctx, char flags,
                                char *pkt, size_t size)
 {
     if((0 != flags) || (0 != size)) {
@@ -366,7 +371,7 @@ inline int Mqtt_HandlePingResp(struct MqttContext *ctx, char flags,
     return ctx->handle_ping_resp(ctx->handle_ping_resp_arg);
 }
 
-inline int Mqtt_HandleConnAck(struct MqttContext *ctx, char flags,
+int Mqtt_HandleConnAck(struct MqttContext *ctx, char flags,
                               char *pkt, size_t size)
 {
     char ack_flags, ret_code;
@@ -392,14 +397,10 @@ static int Mqtt_HandlePublish(struct MqttContext *ctx, char flags,
     const char qos = ((uint8_t)flags & 0x06) >> 1;
     const char retain = flags & 0x01;
     uint16_t topic_len, pkt_id = 0;
-    size_t payload_len, arg_len;
-    char *payload, *arg ;
+    size_t payload_len;
+    char *payload;
     char *topic, *cursor;
     int err = MQTTERR_NOERROR;
-    int64_t ts = 0;
-    char *desc = "";
-    const char *cmdid;
-    int i;
 
     if(size < 2) {
         return MQTTERR_ILLEGAL_PKT;
@@ -446,7 +447,7 @@ static int Mqtt_HandlePublish(struct MqttContext *ctx, char flags,
         return MQTTERR_ILLEGAL_PKT;
     }
 
-    assert(NULL != topic);
+    //assert(NULL != topic);
     topic[topic_len] = '\0';
 
     if(Mqtt_CheckUtf8(topic, topic_len) != topic_len) {
@@ -461,10 +462,17 @@ static int Mqtt_HandlePublish(struct MqttContext *ctx, char flags,
         ++cursor;
     }
 
-    if('$' == *topic) {
-        if(topic == strstr(topic, CMD_TOPIC_PREFIX)) {
+	
+	if('$' == *topic) {		/* 若是系统topic */
+        if(topic == strstr(topic, CMD_TOPIC_PREFIX)) {		/* 若是命令下发 */
             //$creq/cmdid
-            i=CMD_TOPIC_PREFIX_LEN + 1; //Topicname=$creq字符串’\0’结尾
+            int i=CMD_TOPIC_PREFIX_LEN + 1; //Topicname=$creq字符串’\0’结尾
+            const char *cmdid;
+            char *arg = payload;
+            size_t arg_len = payload_len;
+            int64_t ts = 0;
+            char *desc = "";
+
             cmdid = topic + i;
 
             /*
@@ -479,8 +487,7 @@ static int Mqtt_HandlePublish(struct MqttContext *ctx, char flags,
                 return MQTTERR_ILLEGAL_PKT;
             */
 
-            arg = payload;
-            arg_len = payload_len;
+            
 
             /*
             if((payload_len < 1) || ((*payload & 0x1f) != 0x5)) {
@@ -522,8 +529,13 @@ static int Mqtt_HandlePublish(struct MqttContext *ctx, char flags,
                                   (enum MqttQosLevel)qos);
 
         }
+#if 0
+		else if(topic == strstr(topic, GET_PRODUCT_TOPIC_PREFIX)) {		/* 若是获取产品主题列表 */
+			
+		}
+#endif		
     }
-    else {
+    else {		/* 自定义topic */
         err = ctx->handle_publish(ctx->handle_publish_arg, pkt_id, topic,
                                   payload, payload_len, dup,
                                   (enum MqttQosLevel)qos);
@@ -536,12 +548,12 @@ static int Mqtt_HandlePublish(struct MqttContext *ctx, char flags,
 
         switch(qos) {
         case MQTT_QOS_LEVEL2:
-            assert(0 != pkt_id);
+            //assert(0 != pkt_id);
             err = Mqtt_PackPubRecPkt(response, pkt_id);
             break;
 
         case MQTT_QOS_LEVEL1:
-            assert(0 != pkt_id);
+            //assert(0 != pkt_id);
             err = Mqtt_PackPubAckPkt(response, pkt_id);
             break;
 
@@ -564,7 +576,7 @@ static int Mqtt_HandlePublish(struct MqttContext *ctx, char flags,
     return err;
 }
 
-inline int Mqtt_HandlePubAck(struct MqttContext *ctx, char flags,
+int Mqtt_HandlePubAck(struct MqttContext *ctx, char flags,
                              char *pkt, size_t size)
 {
     uint16_t pkt_id;
@@ -581,7 +593,7 @@ inline int Mqtt_HandlePubAck(struct MqttContext *ctx, char flags,
     return ctx->handle_pub_ack(ctx->handle_pub_ack_arg, pkt_id);
 }
 
-inline int Mqtt_HandlePubRec(struct MqttContext *ctx, char flags,
+int Mqtt_HandlePubRec(struct MqttContext *ctx, char flags,
                              char *pkt, size_t size)
 {
     uint16_t pkt_id;
@@ -614,7 +626,7 @@ inline int Mqtt_HandlePubRec(struct MqttContext *ctx, char flags,
     return err;
 }
 
-inline int Mqtt_HandlePubRel(struct MqttContext *ctx, char flags,
+int Mqtt_HandlePubRel(struct MqttContext *ctx, char flags,
                              char *pkt, size_t size)
 {
     uint16_t pkt_id;
@@ -645,7 +657,7 @@ inline int Mqtt_HandlePubRel(struct MqttContext *ctx, char flags,
     return err;
 }
 
-inline int Mqtt_HandlePubComp(struct MqttContext *ctx, char flags,
+int Mqtt_HandlePubComp(struct MqttContext *ctx, char flags,
                               char *pkt, size_t size)
 {
     uint16_t pkt_id;
@@ -662,7 +674,7 @@ inline int Mqtt_HandlePubComp(struct MqttContext *ctx, char flags,
     return ctx->handle_pub_comp(ctx->handle_pub_comp_arg, pkt_id);
 }
 
-inline int Mqtt_HandleSubAck(struct MqttContext *ctx, char flags,
+int Mqtt_HandleSubAck(struct MqttContext *ctx, char flags,
                              char *pkt, size_t size)
 {
     uint16_t pkt_id;
@@ -686,7 +698,7 @@ inline int Mqtt_HandleSubAck(struct MqttContext *ctx, char flags,
     return ctx->handle_sub_ack(ctx->handle_sub_ack_arg, pkt_id, pkt + 2, size - 2);
 }
 
-inline int Mqtt_HandleUnsubAck(struct MqttContext *ctx, char flags,
+int Mqtt_HandleUnsubAck(struct MqttContext *ctx, char flags,
                                char *pkt, size_t size)
 {
     uint16_t pkt_id;
@@ -779,6 +791,8 @@ int Mqtt_RecvPkt(struct MqttContext *ctx)
     if(bytes < 0) {
         return MQTTERR_IO;
     }
+    
+    printf("<%s>: rcv %d data from OneNET\r\n", __FUNCTION__, bytes);
 
     ctx->pos += bytes;
     if(ctx->pos > ctx->end) {
@@ -822,7 +836,7 @@ int Mqtt_RecvPkt(struct MqttContext *ctx)
         memmove(ctx->bgn, cursor, movebytes);
         ctx->pos -= movebytes;
 
-        assert(ctx->pos >= ctx->bgn);
+        //assert(ctx->pos >= ctx->bgn);
     }
 
     return MQTTERR_NOERROR;
@@ -858,7 +872,7 @@ int Mqtt_SendPkt(struct MqttContext *ctx, const struct MqttBuffer *buf, uint32_t
         return 0;
     }
 
-    assert(first_ext);
+    //assert(first_ext);
 
     iov = (struct iovec*)malloc(sizeof(struct iovec) * ext_count);
     if(!iov) {
@@ -875,6 +889,7 @@ int Mqtt_SendPkt(struct MqttContext *ctx, const struct MqttBuffer *buf, uint32_t
         ++i;
     }
 
+	printf("before send\r\n");
     i = ctx->writev_func(ctx->writev_func_arg, iov, ext_count);
     free(iov);
 
@@ -1033,144 +1048,6 @@ int Mqtt_PackConnectPkt(struct MqttBuffer *buf, uint16_t keep_alive, const char 
     return MQTTERR_NOERROR;
 }
 
-/*
-int Mqtt_PackConnectPkt(struct MqttBuffer *buf, uint16_t keep_alive, const char *id,
-                        int clean_session, const char *will_topic,
-                        const char *will_msg, uint16_t msg_len,
-                        enum MqttQosLevel qos, int will_retain, const char *user,
-                        const char *password, uint16_t pswd_len)
-{
-    int ret;
-    uint16_t id_len, wt_len, user_len;
-    size_t total_len;
-    char flags = 0;
-    struct MqttExtent *fix_head, *variable_head, *payload;
-    char *cursor;
-
-    fix_head = MqttBuffer_AllocExtent(buf, 5);
-    if(NULL == fix_head) {
-        return MQTTERR_OUTOFMEMORY;
-    }
-
-    variable_head = MqttBuffer_AllocExtent(buf, 10);
-    if(NULL == variable_head) {
-        return MQTTERR_OUTOFMEMORY;
-    }
-
-    total_len = 10; // length of the variable header
-    id_len = Mqtt_CheckClentIdentifier(id);
-    if(id_len < 0) {
-        return MQTTERR_ILLEGAL_CHARACTER;
-    }
-    total_len += id_len + 2;
-
-    if(clean_session) {
-        flags |= MQTT_CONNECT_CLEAN_SESSION;
-    }
-
-    if(will_msg && !will_topic) {
-        return MQTTERR_INVALID_PARAMETER;
-    }
-
-    wt_len = 0;
-    if(will_topic) {
-        flags |= MQTT_CONNECT_WILL_FLAG;
-        wt_len = strlen(will_topic);
-        if(Mqtt_CheckUtf8(will_topic, wt_len) != wt_len) {
-            return MQTTERR_NOT_UTF8;
-        }
-    }
-
-    switch(qos) {
-    case MQTT_QOS_LEVEL0:
-        flags |= MQTT_CONNECT_WILL_QOS0;
-        break;
-    case MQTT_QOS_LEVEL1:
-        flags |= (MQTT_CONNECT_WILL_FLAG | MQTT_CONNECT_WILL_QOS1);
-        break;
-    case MQTT_QOS_LEVEL2:
-        flags |= (MQTT_CONNECT_WILL_FLAG | MQTT_CONNECT_WILL_QOS2);
-        break;
-    default:
-        return MQTTERR_INVALID_PARAMETER;
-    }
-
-    if(will_retain) {
-        flags |= (MQTT_CONNECT_WILL_FLAG | MQTT_CONNECT_WILL_RETAIN);
-    }
-
-    if(flags & MQTT_CONNECT_WILL_FLAG) {
-        total_len += 4 + wt_len + msg_len;
-    }
-
-    if(!user && password) {
-        return MQTTERR_INVALID_PARAMETER;
-    }
-
-    user_len = 0;
-    if(user) {
-        flags |= MQTT_CONNECT_USER_NAME;
-        user_len = strlen(user);
-        ret = Mqtt_CheckUtf8(user, user_len);
-        if(user_len != ret) {
-            return MQTTERR_NOT_UTF8;
-        }
-
-        total_len += user_len + 2;
-    }
-
-    if(password) {
-        flags |= MQTT_CONNECT_PASSORD;
-        total_len += pswd_len + 2;
-    }
-
-    payload = MqttBuffer_AllocExtent(buf, total_len - 10);
-    fix_head->payload[0] = MQTT_PKT_CONNECT << 4;
-
-    ret = Mqtt_DumpLength(total_len, fix_head->payload + 1);
-    if(ret < 0) {
-        return MQTTERR_PKT_TOO_LARGE;
-    }
-    fix_head->len = ret + 1; // ajust the length of the extent
-
-    variable_head->payload[0] = 0;
-    variable_head->payload[1] = 4;
-    variable_head->payload[2] = 'M';
-    variable_head->payload[3] = 'Q';
-    variable_head->payload[4] = 'T';
-    variable_head->payload[5] = 'T';
-    variable_head->payload[6] = 4; // protocol level 4
-    variable_head->payload[7] = flags;
-    Mqtt_WB16(keep_alive, variable_head->payload + 8);
-
-    cursor = payload->payload;
-    Mqtt_PktWriteString(&cursor, id, id_len);
-
-    if(flags & MQTT_CONNECT_WILL_FLAG) {
-        if(!will_msg) {
-            will_msg = "";
-            msg_len = 0;
-        }
-
-        Mqtt_PktWriteString(&cursor, will_topic, wt_len);
-        Mqtt_PktWriteString(&cursor, will_msg, msg_len);
-    }
-
-    if(flags & MQTT_CONNECT_USER_NAME) {
-        Mqtt_PktWriteString(&cursor, user, user_len);
-    }
-
-    if(flags & MQTT_CONNECT_PASSORD) {
-        Mqtt_PktWriteString(&cursor, password, pswd_len);
-    }
-
-    MqttBuffer_AppendExtent(buf, fix_head);
-    MqttBuffer_AppendExtent(buf, variable_head);
-    MqttBuffer_AppendExtent(buf, payload);
-
-    return MQTTERR_NOERROR;
-}
-*/
 
 
 int Mqtt_PackPublishPkt(struct MqttBuffer *buf, uint16_t pkt_id, const char *topic,
@@ -1345,7 +1222,7 @@ static int Mqtt_PackPubCompPkt(struct MqttBuffer *buf, uint16_t pkt_id)
 int Mqtt_PackSubscribePkt(struct MqttBuffer *buf, uint16_t pkt_id,
                           enum MqttQosLevel qos, const char *topics[], int topics_len)
 {
-
+    int i=0;
     int ret;
     size_t topic_len, remaining_len;
     struct MqttExtent *fixed_head, *ext;
@@ -1357,7 +1234,7 @@ int Mqtt_PackSubscribePkt(struct MqttBuffer *buf, uint16_t pkt_id,
         return MQTTERR_INVALID_PARAMETER;
     }
 
-    int i=0;
+    
     for(i=0; i<topics_len; ++i){
         topic = topics[i];
         if(!topic)
@@ -1375,7 +1252,7 @@ int Mqtt_PackSubscribePkt(struct MqttBuffer *buf, uint16_t pkt_id,
     }
     fixed_head->payload[0] = (char)((MQTT_PKT_SUBSCRIBE << 4) | 0x00);
 
-    remaining_len = 2 + 2*topics_len + topic_total_len + topics_len*1;  // 2 bytes packet id, 2 bytes topic length + topic + 1 byte reserve
+    remaining_len = 2 + 2*topics_len+ topic_total_len + topics_len;  // 2 bytes packet id, 2 bytes topic length + topic + reserve
     ext = MqttBuffer_AllocExtent(buf, remaining_len);
     if(NULL == ext) {
         return MQTTERR_OUTOFMEMORY;
@@ -1396,11 +1273,13 @@ int Mqtt_PackSubscribePkt(struct MqttBuffer *buf, uint16_t pkt_id,
         topic = topics[i];
         topic_len = strlen(topic);
         Mqtt_PktWriteString(&cursor, topic, topic_len);
-        cursor[0] = qos & 0xFF;
-        cursor += 1;
+        
+        //write request qos		add by jw
+        Mqtt_WB8((char)qos, cursor);
+        cursor++;
     }
-
     
+
     MqttBuffer_AppendExtent(buf, fixed_head);
     MqttBuffer_AppendExtent(buf, ext);
 
@@ -1586,6 +1465,8 @@ int Mqtt_PackCmdRetPkt(struct MqttBuffer *buf, uint16_t pkt_id, const char *cmdi
     memcpy(ext->payload, RESP_CMD_TOPIC_PREFIX, RESP_CMD_TOPIC_PREFIX_LEN);
     strcpy(ext->payload + RESP_CMD_TOPIC_PREFIX_LEN, cmdid);
 
+	printf("test!!!!!!!Qos: %d\r\n", qos);
+
     return (MQTT_QOS_LEVEL1 == qos)?
         Mqtt_PackPublishPkt(buf, pkt_id, ext->payload, ret, ret_len,
                             MQTT_QOS_LEVEL1, 0, own):
@@ -1597,25 +1478,24 @@ int Mqtt_PackDataPointStart(struct MqttBuffer *buf, uint16_t pkt_id,
                             enum MqttQosLevel qos, int retain, int topic)
 {
     int err;
-    //struct MqttExtent *ext;
+    struct MqttExtent *ext;
 
     if(buf->first_ext) {
         return MQTTERR_INVALID_PARAMETER;
     }
 
-
     if(topic) {
         err = Mqtt_PackPublishPkt(buf, pkt_id, "$dp", NULL, 0, qos, retain, 0);
     }
     else {
-        err = Mqtt_PackPublishPkt(buf, pkt_id, "$crsp/", NULL, 0, qos, retain, 0);
+        err = Mqtt_PackPublishPkt(buf, pkt_id, "$crsp", NULL, 0, qos, retain, 0);
     }
 
     if(err != MQTTERR_NOERROR) {
         return err;
     }
 
-/*
+    /*
     ext = MqttBuffer_AllocExtent(buf, 2 + sizeof(struct DataPointPktInfo));
     if(!ext) {
         return MQTTERR_OUTOFMEMORY;
@@ -1633,8 +1513,8 @@ int Mqtt_PackDataPointStart(struct MqttBuffer *buf, uint16_t pkt_id,
     }
 
     MqttBuffer_AppendExtent(buf, ext);
+    */
 
-*/
 
     return MQTTERR_NOERROR;
 }
@@ -2030,225 +1910,112 @@ int Mqtt_PackDataPointFinish(struct MqttBuffer *buf)
     return MQTTERR_NOERROR;
 }
 
-
-
-int Mqtt_PackDataPointByString(struct MqttBuffer *buf, uint16_t pkt_id, int64_t ts,
-                               int32_t type, const char *str, uint32_t size,
-                               enum MqttQosLevel qos, int retain, int own){
-    char *payload = NULL;
-    int32_t payload_size = 0;
-    struct tm *t = NULL;
-    int64_t now;
-    time_t tt;
-    int32_t offset = 0;
-    int ret = 0;
-
-    if(kTypeFullJson == type ||
-       kTypeBin == type ||
-       kTypeSimpleJsonWithoutTime == type ||
-       kTypeSimpleJsonWithTime == type ||
-       kTypeString == type){
-        //payload total len
-        payload_size = 1 + 2 + size;
-        payload = (char*)malloc(payload_size);
-        if(NULL == payload){
-            return MQTTERR_OUTOFMEMORY;
-        }
-
-        //填充payload
-        payload[0] = type & 0xFF;
-        payload[1] = (size>>8)&0xFF;
-        payload[2] = size&0xFF;
-        memcpy(payload+3, str, size);
-
-        ret = Mqtt_PackPublishPkt(buf, pkt_id, MQTTSAVEDPTOPICNAME, payload, payload_size, qos, retain, own);
-    }else if(kTypeStringWithTime == (type & 0x7F) ||
-             kTypeFloat == (type & 0x7F)){
-        if(kTypeFloat == (type & 0x7F)){
-            payload_size = 1 + size;
-        }else{
-            payload_size = 1 + 2 + size;
-        }
-        if(type & 0x80){
-            payload_size += 6;
-        }
-        payload = (char*)malloc(payload_size);
-        if(NULL == payload){
-            return MQTTERR_OUTOFMEMORY;
-        }
-
-        //填充payload
-        payload[0] = type & 0xFF;
-        if(ts <= 0){
-            time(&now);
-        }
-        tt = (time_t)now;
-        t = gmtime(&tt);
-        if(!t) {
-            free(payload);
-            return MQTTERR_INTERNAL;
-        }
-        if(type & 0x80){
-            payload[1] = (t->tm_year+1900)%100;
-            payload[2] = (t->tm_mon+1)&0xFF;
-            payload[3] = (t->tm_mday)&0xFF;
-            payload[4] = (t->tm_hour)&0xFF;
-            payload[5] = (t->tm_min)&0xFF;
-            payload[6] = (t->tm_sec)&0xFF;
-            offset = 6;
-        }
-        else{
-            offset = 0;
-        }
-        if(kTypeStringWithTime == (type & 0x7F)){
-            payload[offset + 1] = (size>>8)&0xFF;
-            payload[offset + 2] = size&0xFF;
-            offset += 2;
-        }
-        memcpy(payload + offset + 1, str, size);
-        ret = Mqtt_PackPublishPkt(buf, pkt_id, MQTTSAVEDPTOPICNAME, payload, payload_size, qos, retain, own);
-    }else{
-        return MQTTERR_INVALID_PARAMETER;
-    }
-
-    free(payload);
-    return ret;
-}
-
-
 int Mqtt_PackDataPointByBinary(struct MqttBuffer *buf, uint16_t pkt_id, const char *dsid,
-                               const char *desc, int64_t ts, const char *bin, uint32_t size,
-                               enum MqttQosLevel qos, int retain, int own)
+                               const char *desc, int64_t time, const char *bin, uint32_t size,
+                               enum MqttQosLevel qos, int retain, int own, int save)
 {
-    char dp_type = kTypeBin & 0xFF;
-    uint32_t ds_info_len = 0;
-    char *ds_info_str = NULL;
-    cJSON *ds_info = cJSON_CreateObject();
-    uint32_t bin_offset = 0;
-    char time_buff[20];
-    int ret = MQTTERR_NOERROR;
-    
-    cJSON_AddStringToObject(ds_info, "ds_id", dsid);
-    if(ts <= 0){
-        time(&ts);
-    }
-        strftime(time_buff, 20, "%Y-%m-%d %H:%M:%S", localtime(&ts));
-        
-    cJSON_AddStringToObject(ds_info, "at", time_buff);
-    cJSON_AddStringToObject(ds_info, "desc", desc);
-    ds_info_str = cJSON_Print(ds_info);
-    ds_info_len = strlen(ds_info_str);
-#ifdef _debug
-    printf("save data type 2(binary),length:%d,\njson:%s\n", ds_info_len, ds_info_str);
-#endif
-    
-    //payload的总长度
-    int32_t payload_size = 1 + 2 + ds_info_len + 4 + size;
-    char payload[payload_size];
-    //填充payload
-    payload[0] = dp_type;
-    payload[1] = (ds_info_len>>8)&0xFF;
-    payload[2] = ds_info_len & 0xFF;
-    memcpy(payload+3, ds_info_str, ds_info_len);
-    bin_offset = 1 + 2 + ds_info_len;
-    payload[bin_offset] = (size>>24) & 0xFF;
-    payload[bin_offset+1] = (size>>16) & 0xFF;
-    payload[bin_offset+2] = (size>>8) & 0xFF;
-    payload[bin_offset+3] = size & 0xFF;
-    memcpy(payload + bin_offset + 4,
-           bin, size);
-    ret = Mqtt_PackPublishPkt(buf, pkt_id, MQTTSAVEDPTOPICNAME, payload, payload_size, qos, retain, own);
-    free(ds_info_str);
-    return ret;
-}
+    int err, pack_time;
+    struct MqttExtent *header_ext, *binary_ext;
+    size_t dsid_len, desc_len, header_len;
+    char *cursor;
 
-
-int Mqtt_AppendPayload(struct MqttBuffer *buf, int64_t* ts, int32_t type, const char* data, size_t len){
-    struct MqttExtent *ext;
-    if(kTypeFullJson == type ||
-       kTypeSimpleJsonWithoutTime == type ||
-       kTypeSimpleJsonWithTime == type ||
-       kTypeString == type){
-        ext = MqttBuffer_AllocExtent(buf, 1 + 2 + len);
-        if(!ext){
-            return MQTTERR_OUTOFMEMORY;
-        }
-
-        ext->payload[0] = MQTT_DPTYPE_JSON & 0xFF;
-        ext->payload[1] = (len>>8) & 0xFF;
-        ext->payload[2] = len & 0xFF;
-        memcpy(ext->payload + 3, data, len);
-    }else if(kTypeStringWithTime == type){
-        ext = MqttBuffer_AllocExtent(buf, 1 + 6 + len);
-        if(!ext){return MQTTERR_OUTOFMEMORY;}
-
-        ext->payload[0] = (MQTT_DPTYPE_FLOAT & 0xFF) | 0x80;
-        //time
-        if(0 == *ts){
-            time(ts);
-        }
-        struct tm *t;
-        time_t tt = (time_t)(*ts) ;
-        t = gmtime(&tt);
-        if(!t) {
-            return MQTTERR_INTERNAL;
-        }
-        ext->payload[1] = (t->tm_year+1900)%100;
-        ext->payload[2] = (t->tm_mon+1)&0xFF;
-        ext->payload[3] = (t->tm_mday)&0xFF;
-        ext->payload[4] = (t->tm_hour)&0xFF;
-        ext->payload[5] = (t->tm_min)&0xFF;
-        ext->payload[6] = (t->tm_sec)&0xFF;
-        memcpy(ext->payload + 7, data, len);
-    }
-    else if(kTypeFloat == type){
-        if(NULL == ts){
-            ext = MqttBuffer_AllocExtent(buf, 1 + len);
-            if(!ext){return MQTTERR_OUTOFMEMORY;}
-
-            ext->payload[0] = MQTT_DPTYPE_FLOAT & 0xFF;
-            memcpy(ext->payload+1, data, len);
-
-        }else{
-            ext = MqttBuffer_AllocExtent(buf, 1 + 6 + len);
-            if(!ext){return MQTTERR_OUTOFMEMORY;}
-
-            ext->payload[0] = (MQTT_DPTYPE_FLOAT & 0xFF) | 0x80;
-            //time
-            if(0 == *ts){
-                time(ts);
-            }
-            struct tm *t;
-            time_t  tt = (time_t)(*ts) ;
-            t = gmtime(&tt);
-            if(!t) {
-                return MQTTERR_INTERNAL;
-            }
-            ext->payload[1] = (t->tm_year+1900)%100;
-            ext->payload[2] = (t->tm_mon+1)&0xFF;
-            ext->payload[3] = (t->tm_mday)&0xFF;
-            ext->payload[4] = (t->tm_hour)&0xFF;
-            ext->payload[5] = (t->tm_min)&0xFF;
-            ext->payload[6] = (t->tm_sec)&0xFF;
-            memcpy(ext->payload + 7, data, len);
-
-        }
-   
-    }else{
-#ifdef _debug
-        printf("not support type :%d\n", type);
-#endif
+    if(buf->first_ext || !dsid || !bin || (0 == size)) {
         return MQTTERR_INVALID_PARAMETER;
     }
 
+    if(save) {
+        err = Mqtt_PackPublishPkt(buf, pkt_id, "$SAVEDATA", NULL, 0, qos, retain, 0);
+    }
+    else {
+        err = Mqtt_PackPublishPkt(buf, pkt_id, "$PASSDATA", NULL, 0, qos, retain, 0);
+    }
 
-    int err;
-    if(MQTTERR_NOERROR != (err = Mqtt_AppendLength(buf, ext->len))) {
+    if(err != MQTTERR_NOERROR) {
         return err;
     }
 
-    MqttBuffer_AppendExtent(buf, ext);
+    dsid_len = strlen(dsid);
+    header_len = dsid_len + 2 + 1; // 2 bytes for the length of the header, 1 byte for type
+
+    if(Mqtt_CheckUtf8(dsid, dsid_len) != dsid_len) {
+        return MQTTERR_NOT_UTF8;
+    }
+
+    pack_time = 0;
+    desc_len = 0;
+    if(desc) {
+        desc_len = strlen(desc);
+        header_len += desc_len + 1; // 1 byte for privous split ','
+
+        if(Mqtt_CheckUtf8(desc, desc_len) != desc_len) {
+            return MQTTERR_NOT_UTF8;
+        }
+
+        pack_time = 1;
+    }
+
+    if(time > 0) {
+        pack_time = 1;
+        header_len += FORMAT_TIME_STRING_SIZE + 1; // 1 byte for privous split ','
+    }
+    else if(pack_time){
+        header_len += 1;
+    }
+
+    header_len += 4; // 4 bytes is the length of the binary
+
+    header_ext = MqttBuffer_AllocExtent(buf, header_len);
+    if(!header_ext) {
+        return MQTTERR_OUTOFMEMORY;
+    }
+
+    cursor = header_ext->payload;
+    *(cursor++) = MQTT_DPTYPE_BINARY;
+    Mqtt_WB16(header_len - 7, cursor);
+    cursor += 2;
+    memcpy(cursor, dsid, dsid_len);
+    cursor += dsid_len;
+
+    if(pack_time) {
+        *(cursor++) = ',';
+        if(time > 0) {
+            Mqtt_FormatTime(time, cursor);
+            cursor += FORMAT_TIME_STRING_SIZE;
+        }
+    }
+
+    if(desc) {
+        *(cursor++) = ',';
+        memcpy(cursor, desc, desc_len);
+        cursor += desc_len;
+    }
+
+    Mqtt_WB32(size, cursor);
+
+    if(own) {
+        binary_ext = MqttBuffer_AllocExtent(buf, size);
+        if(!binary_ext) {
+            return MQTTERR_OUTOFMEMORY;
+        }
+
+        memcpy(binary_ext->payload, bin, size);
+    }
+    else {
+        binary_ext = MqttBuffer_AllocExtent(buf, 0);
+        if(!binary_ext) {
+            return MQTTERR_OUTOFMEMORY;
+        }
+
+        binary_ext->payload = (char*)bin;
+        binary_ext->len = (uint32_t)size;
+    }
+
+    err = Mqtt_AppendLength(buf, header_len + size);
+    if(MQTTERR_NOERROR != err) {
+        return err;
+    }
+
+    MqttBuffer_AppendExtent(buf, header_ext);
+    MqttBuffer_AppendExtent(buf, binary_ext);
     return MQTTERR_NOERROR;
-
 }
-
