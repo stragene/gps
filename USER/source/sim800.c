@@ -13,12 +13,13 @@ static void vSim800_PDen(void);
 static void vSim800_OnOff(void);
 static bool blSim800SendCmd(char *pcmd, char *response, uint32_t timeout, uint32_t retry);
 static uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len);
-struct gprs_dev Sim800GPRS = {.Init = vSim800_HardInit,
+struct gprs_dev Sim800GPRS = {.Interface = pUartGPRS,
+                              .Init = vSim800_HardInit,
                               .PowerEn = vSim800_pEn,
                               .PowerDen = vSim800_PDen,
                               .OnOff = vSim800_OnOff,
                               .SendCmd = blSim800SendCmd,
-                              .Send = dwSim800Send,
+                              .SendData = dwSim800Send,
                               .AutoReadEn = vSim800AutoReadEn,
                               .delay = vDelay_Ms};
 struct gprs_dev *pSim800GPRS = &Sim800GPRS;
@@ -172,8 +173,8 @@ bool blSim800SendCmd(char *pcmd, char *pExpectAns, uint32_t timeout, uint32_t re
     char *pAns;
     do
     {
-        Uart_OnceWrite(pUartGPRS, (uint8_t *)pcmd, strlen(pcmd), 500);
-        readlen = Uart_OnceRead(pUartGPRS, &buf[0], 50, timeout);
+        Uart_OnceWrite(pSim800GPRS->Interface, (uint8_t *)pcmd, strlen(pcmd), 500);
+        readlen = Uart_OnceRead(pSim800GPRS->Interface, &buf[0], 50, timeout);
         buf[readlen] = '\0';
         pAns = (char *)buf;
         if (pExpectAns == NULL)
@@ -209,7 +210,7 @@ bool blSim800SendCmd(char *pcmd, char *pExpectAns, uint32_t timeout, uint32_t re
 uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len)
 {
     uint32_t sendlen;
-    sendlen = Uart_OnceWrite(pUartGPRS, pbuf, len, 500);
+    sendlen = Uart_OnceWrite(pSim800GPRS->Interface->pRsvbuf, pbuf, len, 500);
 }
 
 /********************************************************************
@@ -221,5 +222,5 @@ uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len)
 **********************************************************************/
 void vSim800AutoReadEn(void)
 {
-    USART_ITConfig(pUartGPRS->handle, USART_IT_IDLE, ENABLE);
+    USART_ITConfig(pSim800GPRS->Interface->handler, USART_IT_IDLE, ENABLE);
 }

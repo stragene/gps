@@ -12,18 +12,23 @@
 //#include "lwip/tcpip.h"
 
 void vBoardInit(void);
-void vSim800_PPPInit(void);
+void vSim800_TCPInit(void);
 void vRunLed_Init(void);
 void vTaskRunLed(void);
 void vTaskPPPRead(void);
 SemaphoreHandle_t xSemGprsRsvd;
-//QueueHandle_t handQueueU1Frame;
-//static void status_cb(ppp_pcb *pcb, int err_code, void *ctx);
-//static u32_t output_cb(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx);
-//ppp_pcb *pppGprs;
-//struct netif pppGprs_netif;
+/*QueueHandle_t handQueueU1Frame;*/
 
-void vSim800_PPPInit(void)
+void vBoardInit(void)
+{
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+    vInnerFlash_Init();
+    vRunLed_Init();
+    //pSim800GPRS->Init();
+    pSim800GPS->Init();
+}
+
+void vSim800_TCPInit(void)
 {
     pSim800GPRS->Init();
     pSim800GPRS->PowerEn();
@@ -41,21 +46,18 @@ void vSim800_PPPInit(void)
             pSim800GPRS->SendCmd("AT+CIPSHUT\r\n", "SHUT OK", 2000, 3) &&
             pSim800GPRS->SendCmd("AT+CSTT=\"CMNET\"\r\n", "OK", 2000, 3) &&
             pSim800GPRS->SendCmd("AT+CIICR\r\n", "OK", 90000, 3) &&
-            /*pSim800GPRS->SendCmd("AT+CGDCONT=1,\"IP\",\"CMNET\"\r\n", "OK", 1000, 3))&&*/
-            /*pSim800GPRS->SendCmd("ATD*99#\r\n", "CONNECT", 2000, 3) &&*/
-            pSim800GPRS->SendCmd("AT+CIFSR\r\n", "", 2000, 3))
+            pSim800GPRS->SendCmd("AT+CIFSR\r\n", "", 2000, 3)) && 
             pSim800GPRS->SendCmd("AT+CIPSTART=\"TCP\",\"116.247.119.165\",9336\r\n", "CONNECT", 2000, 3))
-
-            break;
-        ;
+            {
+                break;
+            }
     }
 }
 
 int main(void)
 {
     vBoardInit();
-    vSim800_PPPInit();
-    vSim800_PPP();
+    vSim800_TCPInit();
     vSemaphoreCreateBinary(xSemGprsRsvd);
     //handQueueU1Frame =xQueueCreate(2, sizeof(uint8_t));
     xTaskCreate((void *)vTaskRunLed, "RunLed", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
@@ -64,15 +66,6 @@ int main(void)
     vTaskStartScheduler();
     while (1)
         ;
-}
-
-void vBoardInit(void)
-{
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-    vInnerFlash_Init();
-    vRunLed_Init();
-    //pSim800GPRS->Init();
-    pSim800GPS->Init();
 }
 
 void vTaskRunLed(void)
