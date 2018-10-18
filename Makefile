@@ -52,9 +52,9 @@ AS_INCLUDES =
 C_INCLUDES = \
 -Icmsis/include \
 -Istdperiph/include \
--IFreeRTOS/include \
--IFreeRTOS/Source/portable/GCC/ARM_CM4_MPU \
--IMqtt/include \
+-Ifreertos/include \
+-Ifreertos/Source/portable/GCC/ARM_CM4_MPU \
+-Imqtt/include \
 -Iuser/include
 # ASFLAGS
 ASFLAGS = 
