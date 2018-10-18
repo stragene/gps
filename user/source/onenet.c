@@ -1,49 +1,11 @@
-
 #include "uart.h"
 #include "utils.h"
-//#include "sht20.h"
-
-#define PROD_ID "173278" //修改为自己的产品ID
-//#define SN "201608160002"           //修改为自己的设备唯一序列号
-#define REG_CODE "6TM7OkhNsTjATvFx" //修改为自己的产品注册码
-#define API_ADDR "api.heclouds.com"
-#define API_KEY "reC6LwIXkj6j9=AV5CCo8g6qijg="
-
-#define DEVICE_NAME "Sim800"
-
-#define REG_PKT_HEAD "POST http://" API_ADDR "/devices HTTP/1.1\r\n" \
-                     "api-key: reC6LwIXkj6j9=AV5CCo8g6qijg="         \
-                     "Host: " API_ADDR "\r\n"
-
-#define REG_PKT_BODY "{\"title\":\"" DEVICE_NAME "\"}"
-
 #include "mqtt.h"
+#include "onenet.h"
+#include "sim800.h"
 
-#define STRLEN 64
 char g_cmdid[STRLEN];
-
-struct MqttSampleContext
-{
-    //    int epfd;
-    //    int mqttfd;
-    uint32_t sendedbytes;
-    struct MqttContext mqttctx[1];
-    struct MqttBuffer mqttbuf[1];
-
-    const char *host;
-    unsigned short port;
-
-    const char *proid;
-    const char *devid;
-    const char *apikey;
-
-    int dup;
-    enum MqttQosLevel qos;
-    int retain;
-
-    uint16_t pkt_to_ack;
-    char cmdid[70];
-};
+char *topics[] = {"gps", "test2"};
 
 void sendHttpPkt(char *phead, char *pbody)
 {
@@ -52,15 +14,9 @@ void sendHttpPkt(char *phead, char *pbody)
 
     sprintf(sendBuf1, "%s%d\r\n\r\n%s", phead, strlen(pbody), pbody);
     printf("send HTTP pkt:\r\n%s\r\n", sendBuf1);
-
-    /*sprintf(sendBuf0, "AT+CIPSEND=%d\r\n", strlen(sendBuf1));*/
-    /*SendCmd(sendBuf0, ">", 500);*/
     pSim800GPRS->SendCmd("AT+CIPSEND=%d\r\n", ">", 500, 1);
-    /*USART2_Clear();*/
-
-    /* MQTT设备ID注册包，发送 */
-    /*USART2_Write(USART2, (uint8_t *)sendBuf1, strlen(sendBuf1));*/
-    pSim800GPRS->Send((uint8_t *)sendBuf1, strlen(sendBuf1));
+    pSim800GPRS->AutoReadEn();
+    pSim800GPRS->SendData((uint8_t *)sendBuf1, strlen(sendBuf1));
 }
 
 /**
@@ -143,9 +99,9 @@ static int MqttSample_RecvPkt(void *arg, void *buf, uint32_t count)
     int rcv_len = 0, onenetdata_len = 0;
     uint8_t buffer[128] = {0};
     char *p = NULL;
-    if (uwBuf_UnReadLen(pSim800GPRS->Interface->pRsvbuf))
+    if (uwBuf_UnReadLen(pUartGPRS->pRsvbuf))
     {
-        onenetdata_len = Uart_Read(pSim800GPRS->Interface, buf, count);
+        onenetdata_len = Uart_Read(pUartGPRS, buf, count);
     }
     return onenetdata_len;
 }
@@ -178,7 +134,6 @@ static int MqttSample_SendPkt(void *arg, const struct iovec *iov, int iovcnt)
 //------------------------------- packet handlers -------------------------------------------
 static int MqttSample_HandleConnAck(void *arg, char flags, char ret_code)
 {
-    LED_4_ON;
     printf("Success to connect to the server, flags(%0x), code(%d).\n",
            flags, ret_code);
     return 0;
@@ -323,7 +278,7 @@ static int MqttSample_HandleCmd(void *arg, uint16_t pkt_id, const char *cmdid,
 
     /* add your execution code here */
     /* 执行示例 -- 点亮led灯 */
-    LED_7_ON;
+    //LED_7_ON;
 
     return 0;
 }
@@ -331,55 +286,18 @@ static int MqttSample_HandleCmd(void *arg, uint16_t pkt_id, const char *cmdid,
 static int MqttSample_Subscribe(struct MqttSampleContext *ctx, char **topic, int num)
 {
     int err;
-    //    char **topics;
-    //    int topics_len = 0;
-
-    //    topics = str_split(buf, ' ', &topics_len);
-
-    //    if (topics){
-    //        int i;
-    //        for (i = 0; *(topics + i); i++){
-    //                    printf("%s\n", *(topics + i));
-    //        }
-    //        printf("\n");
-    //     }
-
-    //sprintf(topic, "%s/%s/45523/test-1", ctx->proid, ctx->apikey);
     err = Mqtt_PackSubscribePkt(ctx->mqttbuf, 2, MQTT_QOS_LEVEL0, topic, num);
     if (err != MQTTERR_NOERROR)
     {
         printf("Critical bug: failed to pack the subscribe packet.\n");
         return -1;
     }
-
-    /*
-    sprintf(topic, "%s/%s/45523/test-2", ctx->proid, ctx->apikey);
-    err = Mqtt_AppendSubscribeTopic(ctx->mqttbuf, topic, MQTT_QOS_LEVEL1);
-    if (err != MQTTERR_NOERROR) {
-        printf("Critical bug: failed to pack the subscribe packet.\n");
-        return -1;
-    }
-    */
-
     return 0;
 }
 
 static int MqttSample_Unsubscribe(struct MqttSampleContext *ctx, char **topics, int num)
 {
     int err;
-    //     char **topics;
-    //     int topics_len = 0;
-    //     topics = str_split(buf, ' ', &topics_len);
-
-    //     printf("topic len %d\n", topics_len);
-    //     if (topics){
-    //         int i;
-    //         for (i = 0; *(topics + i); i++){
-    //                     printf("%s\n", *(topics + i));
-    //         }
-    //         printf("\n");
-    //     }
-
     err = Mqtt_PackUnsubscribePkt(ctx->mqttbuf, 3, topics, num);
     if (err != MQTTERR_NOERROR)
     {
@@ -471,36 +389,10 @@ static int MqttSample_Publish(struct MqttSampleContext *ctx, int temp, int humi)
 
     sprintf(payload, payload1, temp, humi);
     printf("<%s>: public %s : %s\r\n", __FUNCTION__, topic, payload);
-
-    /*??????????
-
-    topics = str_split(buf, ' ', &topics_len);
-
-	printf("topics_len: %d\r\n", topics_len);
-
-    if (topics){
-        int i;
-        for (i = 0; *(topics + i); i++){
-                    printf("%s\n", *(topics + i));
-        }
-        printf("\n");
-    }
-    if(4 != topics_len){
-        printf("usage:push_dp topicname payload pkg_id");
-        return err;
-    }
-
- */
     if (ctx->mqttbuf->first_ext)
     {
         return MQTTERR_INVALID_PARAMETER;
     }
-
-    /*
-    std::string pkg_id_s(topics+3);
-    int pkg_id = std::stoi(pkg_id_s);
-    */
-
     err = Mqtt_PackPublishPkt(ctx->mqttbuf, pkg_id, topic, payload, strlen(payload), MQTT_QOS_LEVEL1, 0, 1);
 
     if (err != MQTTERR_NOERROR)
@@ -583,106 +475,29 @@ static int MqttSample_Init(struct MqttSampleContext *ctx)
     ctx->mqttctx->handle_cmd_arg = ctx;
 
     MqttBuffer_Init(ctx->mqttbuf);
-
-    //     ctx->epfd = epoll_create(10);
-    //     if(ctx->epfd < 0) {
-    //         printf("Failed to create the epoll instance.\n");
-    //         return -1;
-    //     }
-
-    //     if(fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK) < 0) {
-    //         printf("Failed to set the stdin to nonblock mode, errcode is %d.\n", errno);
-    //         return -1;
-    //     }
-
-    //     event.data.fd = STDIN_FILENO;
-    //     event.events = EPOLLIN;
-    //     if(epoll_ctl(ctx->epfd, EPOLL_CTL_ADD, STDIN_FILENO, &event) < 0) {
-    //         printf("Failed to add the stdin to epoll, errcode is %d.\n", errno);
-    //         return -1;
-    //     }
-
     return 0;
 }
-
-void KEY_Init(void)
+int oneNet_GetDevID(struct MqttSampleContext *ctx)
 {
-    GPIO_InitTypeDef GPIO_InitStructure;
-
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE); //使能GPIOC时钟
-
-    /* 功能键 SW2--PC11 SW3--PC12 */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; //50M
-    GPIO_Init(GPIOC, &GPIO_InitStructure);            //初始化PC11 PC12
-
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE); //使能GPIOC时钟
-    /* 功能键 SW4--PD2  */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; //50M
-    GPIO_Init(GPIOC, &GPIO_InitStructure);            //初始化PD2
-}
-
-int KEY2_Scan(void)
-{
-    if (KEY2_UP == 0)
-    {
-        mDelay(10); //去抖动
-        if (KEY2_UP == 0)
-            return 0;
-    }
-
-    return 1;
-}
-
-int KEY3_Scan(void)
-{
-    if (KEY3_UP == 0)
-    {
-        mDelay(10); //去抖动
-        if (KEY3_UP == 0)
-            return 0;
-    }
-    return 1;
-}
-int oneNet_GetDevID(void)
-{
-    char sendBuf0[20];
-    char sendBuf1[500];
-    sprintf(sendBuf1, "%s%d\r\n\r\n%s", phead, strlen(pbody), pbody);
-    printf("send HTTP pkt:\r\n%s\r\n", sendBuf1);
-    pSim800GPRS->SendCmd("AT+CIPSEND=%d\r\n", ">", 500, 1);
-    /* MQTT设备ID注册包，发送 */
-    pSim800GPRS->AutoReadEn();
-    pSim800GPRS->SendData((uint8_t *)sendBuf1, strlen(sendBuf1));
+    char device_id[20] = {0};
+    char *p = NULL, *pend = NULL;
+    sendHttpPkt(REG_PKT_HEAD, REG_PKT_BODY);
     mDelay(3000);
     /* 分析设备注册返回信息，获取设备id */
-    if (0 != uwBuf_UnReadLen(pSim800GPRS->Interface->pRsvbuf))
-    //if (usart2_rcv_len > 0)
+    if (0 != uwBuf_UnReadLen(pUartGPRS->pRsvbuf))
     {
-        char *p = NULL, *pend = NULL;
-        printf("rcv response:\r\n%s\r\n", usart2_rcv_buf);
-
+        pSim800GPRS->Read((uint8_t *)device_id, 20);
         /* 获取 设备ID */
-        if ((p = strstr(usart2_rcv_buf, "device_id")) != NULL)
+        if ((p = strstr(device_id, "device_id")) != NULL)
         {
             p += strlen("device_id\":\"");
             if ((pend = strstr(p, "\",")) != NULL)
             {
                 memcpy(device_id, p, pend - p);
                 printf("get device id: %s\r\n", device_id);
-                ctx->devid = device_id;
+                *ctx->devid = device_id;
             }
         }
-    }
-
-    else if (usart2_rcv_len == 0)
-    {
-        printf("device regist over time!\r\n");
-        while (1)
-            ;
     }
     else if (ctx->devid == NULL)
     {
@@ -691,112 +506,62 @@ int oneNet_GetDevID(void)
             ;
     }
 }
-
-/**
-  * @brief     实现EDP连接，心跳包保持在线，接收透传消息并返回
-  * @attention 使用UART2连接ESP8266模块，使用非透传模式发送和接收数据
-  *			   使用UART1作为调试打印串口，使用printf将从该接口打印消息
-  *			   Recv_Thread_Func函数是调用的官方edp_sdk中提供的函数，在其上加以修改
-  *			   其中提供了所有的EDP包的解析函数
-  */
-void oneNetInit(void)
+/*连接mqtt主站*/
+int oneNetConnect(struct MqttSampleContext *ctx)
 {
-    uint16_t temp, humi; //温湿度
-    uint32_t timeCount = 0;
-    uint32_t saveDataCount = 0, publishCount = 0;
-    int num = 0, err;
-    char buf[100];
-    char device_id[20] = {0};
-    char *topics[] = {"test_topic", "test_topic2"};
-
-    /* MQTT 相关 */
-    struct MqttSampleContext ctx;
-    int bytes;
-
-    /* mqtt连接参数 */
-    int keep_alive = 120;
-    int clean_session = 0;
-    //   ctx->devid = "3264518";  //device_id
-
+    int err, bytes;
     /* MQTTcontext 初始化 */
     if (MqttSample_Init(ctx) < 0)
     {
         return -1;
     }
-    oneNet_GetDevID();
+    oneNet_GetDevID(ctx);
     /****************初始化完成******************/
     /* mqtt连接 */
-    MqttSample_Connect(ctx, PROD_ID, API_KEY, ctx->devid, keep_alive, clean_session);
+    MqttSample_Connect(ctx, PROD_ID, API_KEY, ctx->devid, KEEP_ALIVE, CLEAN_SESSION);
     bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
     MqttBuffer_Reset(ctx->mqttbuf);
     mDelay(1000);
     err = Mqtt_RecvPkt(ctx->mqttctx);
-    USART2_Clear();
+    return err;
+}
 
+int onenetSubscribe(struct MqttSampleContext *ctx, char **topic, int num)
+{
+    int bytes;
     /* mqtt订阅 */
     MqttSample_Subscribe(ctx, topics, 1); //可一次订阅多个，本例只用只订阅一个topic
     bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
     MqttBuffer_Reset(ctx->mqttbuf);
-    mDelay(1000);
-#endif
-    while (1)
-    {
-        if (KEY2_Scan() == 0)
-        {
-            printf("key2 pressed\r\n");
-            LED_5_ON;
-            mDelay(1000);
-
-            /* 发布消息 */
-            MqttSample_Publish(ctx, temp, humi);
-            //           bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
-            //           MqttBuffer_Reset(ctx->mqttbuf);
-            bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
-            MqttBuffer_Reset(ctx->mqttbuf);
-            LED_5_OFF;
-        }
-        if (KEY3_Scan() == 0)
-        {
-            printf("key3 pressed\r\n");
-            if (ctx->cmdid[0] != '\0') //若已经接收到命令
-            {
-                /* 回复命令 */
-                MqttSample_RespCmd(ctx, "cmd received");
-                bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
-                MqttBuffer_Reset(ctx->mqttbuf);
-
-                ctx->cmdid[0] = '\0';
-            }
-        }
-
-        if (saveDataCount >= 300)
-        {
-            LED_6_ON;
-            saveDataCount = 0;
-
-            /*  */
-            SHT2x_MeasureHM(SHT20_Measurement_T_HM, &temp);
-            SHT2x_MeasureHM(SHT20_Measurement_RH_HM, &humi);
-            printf("temp: %d, humi: %d\r\n", temp, humi);
-
-            /* 上传数据 */
-            MqttSample_Savedata(ctx, temp, humi);
-            //            bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
-            //            MqttBuffer_Reset(ctx->mqttbuf);
-            bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
-            MqttBuffer_Reset(ctx->mqttbuf);
-
-            LED_6_OFF;
-        }
-
-        err = Mqtt_RecvPkt(ctx->mqttctx);
-        USART2_Clear();
-        timeCount++;
-        saveDataCount++;
-        publishCount++;
-        mDelay(100);
-        //printf(".");
-    }
+    return bytes;
 }
+int onenetPublish(struct MqttSampleContext *ctx, int temp, int humi)
+{
+    int bytes;
+    /*mqtt发布*/
+    MqttSample_Publish(ctx, temp, humi);
+    bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
+    MqttBuffer_Reset(ctx->mqttbuf);
+    return bytes;
+}
+int onenetResCmd(struct MqttSampleContext *ctx, char *resp)
+{
+    int bytes;
+    /* mqtt回复命令 */
+    MqttSample_RespCmd(ctx, resp);
+    bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
+    MqttBuffer_Reset(ctx->mqttbuf);
+}
+int onenetSendData(struct MqttSampleContext *ctx, int temp, int humi)
+{
+    int bytes;
+    /*mqtt上传数据 */
+    MqttSample_Savedata(ctx, temp, humi);
+    bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
+    MqttBuffer_Reset(ctx->mqttbuf);
+    return bytes;
+}
+/*mqtt接收数据*/
+//err = Mqtt_RecvPkt(ctx->mqttctx);
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

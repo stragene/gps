@@ -39,7 +39,6 @@
 #include "task.h"
 #include "semphr.h"
 extern SemaphoreHandle_t xSemGprsRsvd;
-extern void vTaskPPPRead(void);
 /** @addtogroup Template_Project
   * @{
   */
@@ -262,7 +261,7 @@ void USART3_IRQHandler(void)
     if (USART_GetITStatus(USART3, USART_IT_IDLE) != RESET)
     {
         USART_ClearITPendingBit(USART3, USART_IT_IDLE);
-        xSemaphoreGiveFromISR(xSemGprsRsvd, vTaskPPPRead);
+        //xSemaphoreGiveFromISR(xSemGprsRsvd, vTaskPPPRead);
     }
 }
 

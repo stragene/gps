@@ -13,14 +13,16 @@ static void vSim800_PDen(void);
 static void vSim800_OnOff(void);
 static bool blSim800SendCmd(char *pcmd, char *response, uint32_t timeout, uint32_t retry);
 static uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len);
-struct gprs_dev Sim800GPRS = {.Interface = pUartGPRS,
-                              .Init = vSim800_HardInit,
+static void vSim800AutoReadEn(void);
+static uint32_t Sim800Read(uint8_t *buf, uint32_t count);
+struct gprs_dev Sim800GPRS = {.Init = vSim800_HardInit,
                               .PowerEn = vSim800_pEn,
                               .PowerDen = vSim800_PDen,
                               .OnOff = vSim800_OnOff,
                               .SendCmd = blSim800SendCmd,
                               .SendData = dwSim800Send,
                               .AutoReadEn = vSim800AutoReadEn,
+                              .Read = Sim800Read,
                               .delay = vDelay_Ms};
 struct gprs_dev *pSim800GPRS = &Sim800GPRS;
 
@@ -223,4 +225,8 @@ uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len)
 void vSim800AutoReadEn(void)
 {
     USART_ITConfig(pSim800GPRS->Interface->handler, USART_IT_IDLE, ENABLE);
+}
+uint32_t Sim800Read(uint8_t *buf, uint32_t count)
+{
+    Uart_Read(pSim800GPRS->Interface, buf, count);
 }

@@ -46,11 +46,11 @@ void vSim800_TCPInit(void)
             pSim800GPRS->SendCmd("AT+CIPSHUT\r\n", "SHUT OK", 2000, 3) &&
             pSim800GPRS->SendCmd("AT+CSTT=\"CMNET\"\r\n", "OK", 2000, 3) &&
             pSim800GPRS->SendCmd("AT+CIICR\r\n", "OK", 90000, 3) &&
-            pSim800GPRS->SendCmd("AT+CIFSR\r\n", "", 2000, 3)) && 
+            pSim800GPRS->SendCmd("AT+CIFSR\r\n", "", 2000, 3) &&
             pSim800GPRS->SendCmd("AT+CIPSTART=\"TCP\",\"116.247.119.165\",9336\r\n", "CONNECT", 2000, 3))
-            {
-                break;
-            }
+        {
+            break;
+        }
     }
 }
 

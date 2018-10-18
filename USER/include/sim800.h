@@ -13,6 +13,7 @@ struct gprs_dev
     bool (*SendCmd)(char *pcmd, char *response, uint32_t timeout, uint32_t retry);
     uint32_t (*SendData)(uint8_t *pbuf, uint32_t len);
     void (*AutoReadEn)(void);
+    uint32_t (*Read)(uint8_t *buf, uint32_t count);
     void (*delay)(uint32_t);
 };
 
