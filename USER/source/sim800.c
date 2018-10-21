@@ -15,16 +15,8 @@ static bool blSim800SendCmd(char *pcmd, char *response, uint32_t timeout, uint32
 static uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len);
 static void vSim800AutoReadEn(void);
 static uint32_t Sim800Read(uint8_t *buf, uint32_t count);
-struct gprs_dev Sim800GPRS = {.Init = vSim800_HardInit,
-                              .PowerEn = vSim800_pEn,
-                              .PowerDen = vSim800_PDen,
-                              .OnOff = vSim800_OnOff,
-                              .SendCmd = blSim800SendCmd,
-                              .SendData = dwSim800Send,
-                              .AutoReadEn = vSim800AutoReadEn,
-                              .Read = Sim800Read,
-                              .delay = vDelay_Ms};
-struct gprs_dev *pSim800GPRS = &Sim800GPRS;
+static struct gprs_dev Sim800GPRS;
+static struct gprs_dev *pSim800GPRS = &Sim800GPRS;
 
 /********************************************************************
 * 功    能：SIM800初始化
@@ -78,14 +70,26 @@ void vSim800_HardInit(void)
 
     vSysTickInit_1ms();
 }
-
 /********************************************************************
-* 功    能：Sim800 Power On or Powen Off
+* 功    能：Sim800_GPRS Init
 * 输    入：none
 * 输    出：none
 * 编 写 人：stragen
 * 编写日期：
 **********************************************************************/
+void vSim800GPRSInit(struct gprs_dev *pGPRS)
+{
+    pGPRS.Interface = pUartGPRS;
+    pGPRS.Init = vSim800_HardInit;
+    pGPRS.PowerEn = vSim800_pEn;
+    pGPRS.PowerDen = vSim800_PDen;
+    pGPRS.OnOff = vSim800_OnOff;
+    pGPRS.SendCmd = blSim800SendCmd;
+    pGPRS.SendData = dwSim800Send;
+    pGPRS.AutoReadEn = vSim800AutoReadEn;
+    pGPRS.Read = Sim800Read;
+    pGPRS.delay = vDelay_Ms;
+}
 void vSim800_OnOff(void)
 {
     /*引脚拉高*/

@@ -1,6 +1,8 @@
 #ifndef _ONENET_H
 #define _ONENET_H
 #include "stm32f37x.h"
+#include "utils.h"
+#include "mqtt.h"
 
 #define PROD_ID "173278" //修改为自己的产品ID
 //#define SN "201608160002"           //修改为自己的设备唯一序列号
@@ -39,6 +41,10 @@ struct MqttSampleContext
     uint16_t pkt_to_ack;
     char cmdid[70];
 };
-extern char *topics[];
-extern int oneNetConnect(struct MqttSampleContext *pctx);
+extern int onenetGetDevID(struct MqttSampleContext *ctx);
+extern int onenetConnect(void);
+extern int onenetSubscribe(char **topic, int num);
+extern int onenetPublish(int temp, int humi);
+extern int onenetResCmd(char *resp);
+extern int onenetSendData(int temp, int humi);
 #endif

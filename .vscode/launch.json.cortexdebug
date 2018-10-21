@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/GPS_GPRS.elf",
+            "name": "Debug (J-Link)",
+            "device": "STM32F373CB",
+            "interface": "swd",
+            "ipAddress": null,
+            "serialNumber": null
+        }
+    ]
+}

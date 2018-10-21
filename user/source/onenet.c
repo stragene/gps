@@ -1,12 +1,11 @@
 #include "uart.h"
-#include "utils.h"
-#include "mqtt.h"
 #include "onenet.h"
 #include "sim800.h"
 
 char g_cmdid[STRLEN];
-char *topics[] = {"gps", "test2"};
-
+static char *topics[] = {"gps", "test2"};
+static struct MqttSampleContext onenetContex;
+static struct MqttSampleContext *onenetCtx = &onenetContex;
 void sendHttpPkt(char *phead, char *pbody)
 {
     char sendBuf0[20];
@@ -375,19 +374,19 @@ static int MqttSample_Savedata(struct MqttSampleContext *ctx, int temp, int humi
     MqttSample_Savedata11(ctx, temp, humi); // qos=1 type=1
 }
 
-static int MqttSample_Publish(struct MqttSampleContext *ctx, int temp, int humi)
+static int MqttSample_Publish(struct MqttSampleContext *ctx, int latitude, int longitude)
 {
     int err;
     int topics_len = 0;
     struct MqttExtent *ext;
     int i = 0;
 
-    char *topic = "key_press";
-    char *payload1 = "key pressed, temp: %d, humi: %d";
+    char *topic = "gps";
+    char *payload1 = "%d, %d";
     char payload[100] = {0};
     int pkg_id = 1;
 
-    sprintf(payload, payload1, temp, humi);
+    sprintf(payload, payload1, latitude, longitude);
     printf("<%s>: public %s : %s\r\n", __FUNCTION__, topic, payload);
     if (ctx->mqttbuf->first_ext)
     {
@@ -477,7 +476,7 @@ static int MqttSample_Init(struct MqttSampleContext *ctx)
     MqttBuffer_Init(ctx->mqttbuf);
     return 0;
 }
-int oneNet_GetDevID(struct MqttSampleContext *ctx)
+int onenetGetDevID(struct MqttSampleContext *ctx)
 {
     char device_id[20] = {0};
     char *p = NULL, *pend = NULL;
@@ -507,58 +506,58 @@ int oneNet_GetDevID(struct MqttSampleContext *ctx)
     }
 }
 /*连接mqtt主站*/
-int oneNetConnect(struct MqttSampleContext *ctx)
+int onenetConnect()
 {
     int err, bytes;
     /* MQTTcontext 初始化 */
-    if (MqttSample_Init(ctx) < 0)
+    if (MqttSample_Init(onenetCtx) < 0)
     {
         return -1;
     }
-    oneNet_GetDevID(ctx);
+    onenetGetDevID(onenetCtx);
     /****************初始化完成******************/
     /* mqtt连接 */
-    MqttSample_Connect(ctx, PROD_ID, API_KEY, ctx->devid, KEEP_ALIVE, CLEAN_SESSION);
-    bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
-    MqttBuffer_Reset(ctx->mqttbuf);
+    MqttSample_Connect(onenetCtx, PROD_ID, API_KEY, onenetCtx->devid, KEEP_ALIVE, CLEAN_SESSION);
+    bytes = Mqtt_SendPkt(onenetCtx->mqttctx, onenetCtx->mqttbuf, 0);
+    MqttBuffer_Reset(onenetCtx->mqttbuf);
     mDelay(1000);
-    err = Mqtt_RecvPkt(ctx->mqttctx);
+    err = Mqtt_RecvPkt(onenetCtx->mqttctx);
     return err;
 }
 
-int onenetSubscribe(struct MqttSampleContext *ctx, char **topic, int num)
+int onenetSubscribe(char **topic, int num)
 {
     int bytes;
     /* mqtt订阅 */
-    MqttSample_Subscribe(ctx, topics, 1); //可一次订阅多个，本例只用只订阅一个topic
-    bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
-    MqttBuffer_Reset(ctx->mqttbuf);
+    MqttSample_Subscribe(onenetCtx, topics, 1); //可一次订阅多个，本例只用只订阅一个topic
+    bytes = Mqtt_SendPkt(onenetCtx->mqttctx, onenetCtx->mqttbuf, 0);
+    MqttBuffer_Reset(onenetCtx->mqttbuf);
     return bytes;
 }
-int onenetPublish(struct MqttSampleContext *ctx, int temp, int humi)
+int onenetPublish(int latitude, int longtitude)
 {
     int bytes;
     /*mqtt发布*/
-    MqttSample_Publish(ctx, temp, humi);
-    bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
-    MqttBuffer_Reset(ctx->mqttbuf);
+    MqttSample_Publish(onenetCtx, latitude, longtitude);
+    bytes = Mqtt_SendPkt(onenetCtx->mqttctx, onenetCtx->mqttbuf, 0);
+    MqttBuffer_Reset(onenetCtx->mqttbuf);
     return bytes;
 }
-int onenetResCmd(struct MqttSampleContext *ctx, char *resp)
+int onenetResCmd(char *resp)
 {
     int bytes;
     /* mqtt回复命令 */
-    MqttSample_RespCmd(ctx, resp);
-    bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
-    MqttBuffer_Reset(ctx->mqttbuf);
+    MqttSample_RespCmd(onenetCtx, resp);
+    bytes = Mqtt_SendPkt(onenetCtx->mqttctx, onenetCtx->mqttbuf, 0);
+    MqttBuffer_Reset(onenetCtx->mqttbuf);
 }
-int onenetSendData(struct MqttSampleContext *ctx, int temp, int humi)
+int onenetSendData(int temp, int humi)
 {
     int bytes;
     /*mqtt上传数据 */
-    MqttSample_Savedata(ctx, temp, humi);
-    bytes = Mqtt_SendPkt(ctx->mqttctx, ctx->mqttbuf, 0);
-    MqttBuffer_Reset(ctx->mqttbuf);
+    MqttSample_Savedata(onenetCtx, temp, humi);
+    bytes = Mqtt_SendPkt(onenetCtx->mqttctx, onenetCtx->mqttbuf, 0);
+    MqttBuffer_Reset(onenetCtx->mqttbuf);
     return bytes;
 }
 /*mqtt接收数据*/

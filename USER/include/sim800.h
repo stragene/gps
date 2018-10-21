@@ -6,7 +6,7 @@
 struct gprs_dev
 {
     UartDef *Interface;
-    void (*Init)(void);
+    //void (*Init)(void);
     void (*OnOff)(void);
     void (*PowerEn)(void);
     void (*PowerDen)(void);
@@ -17,5 +17,6 @@ struct gprs_dev
     void (*delay)(uint32_t);
 };
 
-extern struct gprs_dev *pSim800GPRS;
+//extern struct gprs_dev *pSim800GPRS;
+extern void vSim800GPRSInit(struct gprs_dev *pGPRS);
 #endif

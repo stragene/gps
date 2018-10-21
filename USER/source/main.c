@@ -4,12 +4,10 @@
 #include "flash.h"
 #include "sim800.h"
 #include "gps.h"
+#include "onenet.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
-//#include "netif/ppp/pppos.h"
-//#include "netif/ppp/pppapi.h"
-//#include "lwip/tcpip.h"
 
 void vBoardInit(void);
 void vSim800_TCPInit(void);
@@ -24,13 +22,12 @@ void vBoardInit(void)
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
     vInnerFlash_Init();
     vRunLed_Init();
-    //pSim800GPRS->Init();
+    Sim800GPRSInit();
     pSim800GPS->Init();
 }
 
 void vSim800_TCPInit(void)
 {
-    pSim800GPRS->Init();
     pSim800GPRS->PowerEn();
     pSim800GPRS->delay(1000);
     pSim800GPRS->OnOff();
@@ -58,6 +55,9 @@ int main(void)
 {
     vBoardInit();
     vSim800_TCPInit();
+    onenetConnect();
+    onenetPublish(1111,2222);
+    
     vSemaphoreCreateBinary(xSemGprsRsvd);
     //handQueueU1Frame =xQueueCreate(2, sizeof(uint8_t));
     xTaskCreate((void *)vTaskRunLed, "RunLed", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
@@ -78,3 +78,4 @@ void vTaskRunLed(void)
         vTaskDelay(1000 / portTICK_RATE_MS);
     }
 }
+
