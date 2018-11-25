@@ -1,0 +1,822 @@
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 1
+   4              		.eabi_attribute 28, 1
+   5              		.fpu fpv4-sp-d16
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.thumb
+  16              		.syntax unified
+  17              		.file	"stm32f37x_syscfg.c"
+  18              		.text
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.section	.text.SYSCFG_DeInit,"ax",%progbits
+  22              		.align	2
+  23              		.global	SYSCFG_DeInit
+  24              		.thumb
+  25              		.thumb_func
+  27              	SYSCFG_DeInit:
+  28              	.LFB111:
+  29              		.file 1 "./stdperiph/source/stm32f37x_syscfg.c"
+   1:./stdperiph/source/stm32f37x_syscfg.c **** /**
+   2:./stdperiph/source/stm32f37x_syscfg.c ****   ******************************************************************************
+   3:./stdperiph/source/stm32f37x_syscfg.c ****   * @file    stm32f37x_syscfg.c
+   4:./stdperiph/source/stm32f37x_syscfg.c ****   * @author  MCD Application Team
+   5:./stdperiph/source/stm32f37x_syscfg.c ****   * @version V1.0.0
+   6:./stdperiph/source/stm32f37x_syscfg.c ****   * @date    20-September-2012
+   7:./stdperiph/source/stm32f37x_syscfg.c ****   * @brief   This file provides firmware functions to manage the following 
+   8:./stdperiph/source/stm32f37x_syscfg.c ****   *          functionalities of the SYSCFG peripheral:
+   9:./stdperiph/source/stm32f37x_syscfg.c ****   *           + Remapping the memory mapped at 0x00000000  
+  10:./stdperiph/source/stm32f37x_syscfg.c ****   *           + Remapping the DMA channels
+  11:./stdperiph/source/stm32f37x_syscfg.c ****   *           + Enabling I2C fast mode plus driving capability for I2C pins   
+  12:./stdperiph/source/stm32f37x_syscfg.c ****   *           + Configuring the EXTI lines connection to the GPIO port
+  13:./stdperiph/source/stm32f37x_syscfg.c ****   *           + Configuring the CLASSB requirements
+  14:./stdperiph/source/stm32f37x_syscfg.c ****   *   
+  15:./stdperiph/source/stm32f37x_syscfg.c ****   *  @verbatim
+  16:./stdperiph/source/stm32f37x_syscfg.c ****  ===============================================================================
+  17:./stdperiph/source/stm32f37x_syscfg.c ****                      ##### How to use this driver #####
+  18:./stdperiph/source/stm32f37x_syscfg.c ****  ===============================================================================
+  19:./stdperiph/source/stm32f37x_syscfg.c ****     [..]
+  20:./stdperiph/source/stm32f37x_syscfg.c ****   
+  21:./stdperiph/source/stm32f37x_syscfg.c ****                The SYSCFG registers can be accessed only when the SYSCFG 
+  22:./stdperiph/source/stm32f37x_syscfg.c ****                interface APB clock is enabled.
+  23:./stdperiph/source/stm32f37x_syscfg.c ****                To enable SYSCFG APB clock use:
+  24:./stdperiph/source/stm32f37x_syscfg.c ****                RCC_APB2PeriphClockCmd(RCC_APBPeriph_SYSCFG, ENABLE).
+  25:./stdperiph/source/stm32f37x_syscfg.c ****   *  @endverbatim
+  26:./stdperiph/source/stm32f37x_syscfg.c ****   *
+  27:./stdperiph/source/stm32f37x_syscfg.c ****   ******************************************************************************
+  28:./stdperiph/source/stm32f37x_syscfg.c ****   * @attention
+  29:./stdperiph/source/stm32f37x_syscfg.c ****   *
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 2
+
+
+  30:./stdperiph/source/stm32f37x_syscfg.c ****   * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
+  31:./stdperiph/source/stm32f37x_syscfg.c ****   *
+  32:./stdperiph/source/stm32f37x_syscfg.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  33:./stdperiph/source/stm32f37x_syscfg.c ****   * You may not use this file except in compliance with the License.
+  34:./stdperiph/source/stm32f37x_syscfg.c ****   * You may obtain a copy of the License at:
+  35:./stdperiph/source/stm32f37x_syscfg.c ****   *
+  36:./stdperiph/source/stm32f37x_syscfg.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  37:./stdperiph/source/stm32f37x_syscfg.c ****   *
+  38:./stdperiph/source/stm32f37x_syscfg.c ****   * Unless required by applicable law or agreed to in writing, software 
+  39:./stdperiph/source/stm32f37x_syscfg.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  40:./stdperiph/source/stm32f37x_syscfg.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  41:./stdperiph/source/stm32f37x_syscfg.c ****   * See the License for the specific language governing permissions and
+  42:./stdperiph/source/stm32f37x_syscfg.c ****   * limitations under the License.
+  43:./stdperiph/source/stm32f37x_syscfg.c ****   *
+  44:./stdperiph/source/stm32f37x_syscfg.c ****   ******************************************************************************
+  45:./stdperiph/source/stm32f37x_syscfg.c ****   */
+  46:./stdperiph/source/stm32f37x_syscfg.c **** 
+  47:./stdperiph/source/stm32f37x_syscfg.c **** /* Includes ------------------------------------------------------------------*/
+  48:./stdperiph/source/stm32f37x_syscfg.c **** #include "stm32f37x_syscfg.h"
+  49:./stdperiph/source/stm32f37x_syscfg.c **** 
+  50:./stdperiph/source/stm32f37x_syscfg.c **** /** @addtogroup STM32F37x_StdPeriph_Driver
+  51:./stdperiph/source/stm32f37x_syscfg.c ****   * @{
+  52:./stdperiph/source/stm32f37x_syscfg.c ****   */
+  53:./stdperiph/source/stm32f37x_syscfg.c **** 
+  54:./stdperiph/source/stm32f37x_syscfg.c **** /** @defgroup SYSCFG 
+  55:./stdperiph/source/stm32f37x_syscfg.c ****   * @brief SYSCFG driver modules
+  56:./stdperiph/source/stm32f37x_syscfg.c ****   * @{
+  57:./stdperiph/source/stm32f37x_syscfg.c ****   */ 
+  58:./stdperiph/source/stm32f37x_syscfg.c **** 
+  59:./stdperiph/source/stm32f37x_syscfg.c **** /* Private typedef -----------------------------------------------------------*/
+  60:./stdperiph/source/stm32f37x_syscfg.c **** /* Private define ------------------------------------------------------------*/
+  61:./stdperiph/source/stm32f37x_syscfg.c **** /* Reset value od SYSCFG_CFGR1 register */
+  62:./stdperiph/source/stm32f37x_syscfg.c **** #define CFGR1_CLEAR_MASK            ((uint32_t)0x7C000000)
+  63:./stdperiph/source/stm32f37x_syscfg.c **** 
+  64:./stdperiph/source/stm32f37x_syscfg.c **** /* Private macro -------------------------------------------------------------*/
+  65:./stdperiph/source/stm32f37x_syscfg.c **** /* Private variables ---------------------------------------------------------*/
+  66:./stdperiph/source/stm32f37x_syscfg.c **** /* Private function prototypes -----------------------------------------------*/
+  67:./stdperiph/source/stm32f37x_syscfg.c **** /* Private functions ---------------------------------------------------------*/
+  68:./stdperiph/source/stm32f37x_syscfg.c **** 
+  69:./stdperiph/source/stm32f37x_syscfg.c **** /** @defgroup SYSCFG_Private_Functions
+  70:./stdperiph/source/stm32f37x_syscfg.c ****   * @{
+  71:./stdperiph/source/stm32f37x_syscfg.c ****   */ 
+  72:./stdperiph/source/stm32f37x_syscfg.c **** 
+  73:./stdperiph/source/stm32f37x_syscfg.c **** /** @defgroup SYSCFG_Group1 SYSCFG Initialization and Configuration functions
+  74:./stdperiph/source/stm32f37x_syscfg.c ****  *  @brief   SYSCFG Initialization and Configuration functions 
+  75:./stdperiph/source/stm32f37x_syscfg.c ****  *
+  76:./stdperiph/source/stm32f37x_syscfg.c **** @verbatim
+  77:./stdperiph/source/stm32f37x_syscfg.c ****  ===============================================================================
+  78:./stdperiph/source/stm32f37x_syscfg.c ****         ##### SYSCFG Initialization and Configuration functions #####
+  79:./stdperiph/source/stm32f37x_syscfg.c ****  ===============================================================================
+  80:./stdperiph/source/stm32f37x_syscfg.c **** 
+  81:./stdperiph/source/stm32f37x_syscfg.c **** @endverbatim
+  82:./stdperiph/source/stm32f37x_syscfg.c ****   * @{
+  83:./stdperiph/source/stm32f37x_syscfg.c ****   */
+  84:./stdperiph/source/stm32f37x_syscfg.c **** 
+  85:./stdperiph/source/stm32f37x_syscfg.c **** /**
+  86:./stdperiph/source/stm32f37x_syscfg.c ****   * @brief  Deinitializes the SYSCFG registers to their default reset values.
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 3
+
+
+  87:./stdperiph/source/stm32f37x_syscfg.c ****   * @param  None
+  88:./stdperiph/source/stm32f37x_syscfg.c ****   * @retval None
+  89:./stdperiph/source/stm32f37x_syscfg.c ****   * @note   MEM_MODE bits are not affected by APB reset.
+  90:./stdperiph/source/stm32f37x_syscfg.c ****   * @note   MEM_MODE bits took the value from the user option bytes.
+  91:./stdperiph/source/stm32f37x_syscfg.c ****   * @note   CFGR2 register is not affected by APB reset.
+  92:./stdperiph/source/stm32f37x_syscfg.c ****   * @note   CLASSB configuration bits are locked when set.
+  93:./stdperiph/source/stm32f37x_syscfg.c ****   * @note   To unlock the configuration, perform a system reset.
+  94:./stdperiph/source/stm32f37x_syscfg.c ****   */
+  95:./stdperiph/source/stm32f37x_syscfg.c **** void SYSCFG_DeInit(void)
+  96:./stdperiph/source/stm32f37x_syscfg.c **** {
+  30              		.loc 1 96 0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  97:./stdperiph/source/stm32f37x_syscfg.c ****   /* Set SYSCFG_CFGR1 register to reset value without affecting MEM_MODE bits */
+  98:./stdperiph/source/stm32f37x_syscfg.c ****   SYSCFG->CFGR1 &= SYSCFG_CFGR1_MEM_MODE;
+  35              		.loc 1 98 0
+  36 0000 074B     		ldr	r3, .L2
+  37 0002 1A68     		ldr	r2, [r3]
+  38 0004 02F00302 		and	r2, r2, #3
+  39 0008 1A60     		str	r2, [r3]
+  99:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 100:./stdperiph/source/stm32f37x_syscfg.c ****   /* Set FPU Interrupt Enable bits to default value */
+ 101:./stdperiph/source/stm32f37x_syscfg.c ****   SYSCFG->CFGR1 |= 0x7C000000;
+  40              		.loc 1 101 0
+  41 000a 1A68     		ldr	r2, [r3]
+  42 000c 42F0F842 		orr	r2, r2, #2080374784
+  43 0010 1A60     		str	r2, [r3]
+ 102:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 103:./stdperiph/source/stm32f37x_syscfg.c ****   /* Set EXTICRx registers to reset value */
+ 104:./stdperiph/source/stm32f37x_syscfg.c ****   SYSCFG->EXTICR[0] = 0;
+  44              		.loc 1 104 0
+  45 0012 0022     		movs	r2, #0
+  46 0014 9A60     		str	r2, [r3, #8]
+ 105:./stdperiph/source/stm32f37x_syscfg.c ****   SYSCFG->EXTICR[1] = 0;
+  47              		.loc 1 105 0
+  48 0016 DA60     		str	r2, [r3, #12]
+ 106:./stdperiph/source/stm32f37x_syscfg.c ****   SYSCFG->EXTICR[2] = 0;
+  49              		.loc 1 106 0
+  50 0018 1A61     		str	r2, [r3, #16]
+ 107:./stdperiph/source/stm32f37x_syscfg.c ****   SYSCFG->EXTICR[3] = 0;
+  51              		.loc 1 107 0
+  52 001a 5A61     		str	r2, [r3, #20]
+ 108:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 109:./stdperiph/source/stm32f37x_syscfg.c ****   /* Set CFGR2 register to reset value */
+ 110:./stdperiph/source/stm32f37x_syscfg.c ****   SYSCFG->CFGR2 = 0;
+  53              		.loc 1 110 0
+  54 001c 9A61     		str	r2, [r3, #24]
+  55 001e 7047     		bx	lr
+  56              	.L3:
+  57              		.align	2
+  58              	.L2:
+  59 0020 00000140 		.word	1073807360
+  60              		.cfi_endproc
+  61              	.LFE111:
+  63              		.section	.text.SYSCFG_MemoryRemapConfig,"ax",%progbits
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 4
+
+
+  64              		.align	2
+  65              		.global	SYSCFG_MemoryRemapConfig
+  66              		.thumb
+  67              		.thumb_func
+  69              	SYSCFG_MemoryRemapConfig:
+  70              	.LFB112:
+ 111:./stdperiph/source/stm32f37x_syscfg.c **** }
+ 112:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 113:./stdperiph/source/stm32f37x_syscfg.c **** /**
+ 114:./stdperiph/source/stm32f37x_syscfg.c ****   * @brief  Configures the memory mapping at address 0x00000000.
+ 115:./stdperiph/source/stm32f37x_syscfg.c ****   * @param  SYSCFG_MemoryRemap: selects the memory remapping.
+ 116:./stdperiph/source/stm32f37x_syscfg.c ****   *          This parameter can be one of the following values:
+ 117:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_MemoryRemap_Flash: Main Flash memory mapped at 0x00000000  
+ 118:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_MemoryRemap_SystemMemory: System Flash memory mapped at 0x00000000
+ 119:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_MemoryRemap_SRAM: Embedded SRAM mapped at 0x00000000
+ 120:./stdperiph/source/stm32f37x_syscfg.c ****   * @retval None
+ 121:./stdperiph/source/stm32f37x_syscfg.c ****   */
+ 122:./stdperiph/source/stm32f37x_syscfg.c **** void SYSCFG_MemoryRemapConfig(uint32_t SYSCFG_MemoryRemap)
+ 123:./stdperiph/source/stm32f37x_syscfg.c **** {
+  71              		.loc 1 123 0
+  72              		.cfi_startproc
+  73              		@ args = 0, pretend = 0, frame = 0
+  74              		@ frame_needed = 0, uses_anonymous_args = 0
+  75              		@ link register save eliminated.
+  76              	.LVL0:
+ 124:./stdperiph/source/stm32f37x_syscfg.c ****   uint32_t tmpctrl = 0;
+ 125:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 126:./stdperiph/source/stm32f37x_syscfg.c ****   /* Check the parameter */
+ 127:./stdperiph/source/stm32f37x_syscfg.c ****   assert_param(IS_SYSCFG_MEMORY_REMAP(SYSCFG_MemoryRemap));
+ 128:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 129:./stdperiph/source/stm32f37x_syscfg.c ****   /* Get CFGR1 register value */
+ 130:./stdperiph/source/stm32f37x_syscfg.c ****   tmpctrl = SYSCFG->CFGR1;
+  77              		.loc 1 130 0
+  78 0000 034A     		ldr	r2, .L5
+  79 0002 1368     		ldr	r3, [r2]
+  80              	.LVL1:
+ 131:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 132:./stdperiph/source/stm32f37x_syscfg.c ****   /* Clear MEM_MODE bits */
+ 133:./stdperiph/source/stm32f37x_syscfg.c ****   tmpctrl &= (uint32_t) (~SYSCFG_CFGR1_MEM_MODE);
+  81              		.loc 1 133 0
+  82 0004 23F00303 		bic	r3, r3, #3
+  83              	.LVL2:
+ 134:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 135:./stdperiph/source/stm32f37x_syscfg.c ****   /* Set the new MEM_MODE bits value */
+ 136:./stdperiph/source/stm32f37x_syscfg.c ****   tmpctrl |= (uint32_t) SYSCFG_MemoryRemap;
+  84              		.loc 1 136 0
+  85 0008 1843     		orrs	r0, r0, r3
+  86              	.LVL3:
+ 137:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 138:./stdperiph/source/stm32f37x_syscfg.c ****   /* Set CFGR1 register with the new memory remap configuration */
+ 139:./stdperiph/source/stm32f37x_syscfg.c ****   SYSCFG->CFGR1 = tmpctrl;
+  87              		.loc 1 139 0
+  88 000a 1060     		str	r0, [r2]
+  89 000c 7047     		bx	lr
+  90              	.L6:
+  91 000e 00BF     		.align	2
+  92              	.L5:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 5
+
+
+  93 0010 00000140 		.word	1073807360
+  94              		.cfi_endproc
+  95              	.LFE112:
+  97              		.section	.text.SYSCFG_DMAChannelRemapConfig,"ax",%progbits
+  98              		.align	2
+  99              		.global	SYSCFG_DMAChannelRemapConfig
+ 100              		.thumb
+ 101              		.thumb_func
+ 103              	SYSCFG_DMAChannelRemapConfig:
+ 104              	.LFB113:
+ 140:./stdperiph/source/stm32f37x_syscfg.c **** }
+ 141:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 142:./stdperiph/source/stm32f37x_syscfg.c **** /**
+ 143:./stdperiph/source/stm32f37x_syscfg.c ****   * @brief  Configure the DMA channels remapping.
+ 144:./stdperiph/source/stm32f37x_syscfg.c ****   * @param  SYSCFG_DMARemap: selects the DMA channels remap.
+ 145:./stdperiph/source/stm32f37x_syscfg.c ****   *          This parameter can be one of the following values:
+ 146:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_DMARemap_TIM17: Remap TIM17 DMA1 requests from channel1 to channel2
+ 147:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_DMARemap_TIM16: Remap TIM16 DMA1 requests from channel3 to channel4
+ 148:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_DMARemap_TIM6DAC1Ch1: Remap TIM6/DAC1 channel1 DMA requests from DMA2 ch
+ 149:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_DMARemap_TIM7DAC1Ch2: Remap TIM7/DAC1 channel2 DMA requests from DMA2 ch
+ 150:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_DMARemap_TIM18DAC2Ch1: Remap TIM18/DAC2 channel1 DMA requests from DMA2 
+ 151:./stdperiph/source/stm32f37x_syscfg.c ****   * @param  NewState: new state of the DMA channel remapping. 
+ 152:./stdperiph/source/stm32f37x_syscfg.c ****   *         This parameter can be: ENABLE or DISABLE.
+ 153:./stdperiph/source/stm32f37x_syscfg.c ****   * @note   When enabled, DMA channel of the selected peripheral is remapped
+ 154:./stdperiph/source/stm32f37x_syscfg.c ****   * @note   When disabled, Default DMA channel is mapped to the selected peripheral
+ 155:./stdperiph/source/stm32f37x_syscfg.c ****   * @note   By default TIM17 DMA requests is mapped to channel 1, 
+ 156:./stdperiph/source/stm32f37x_syscfg.c ****   *         use SYSCFG_DMAChannelRemapConfig(SYSCFG_DMARemap_TIM17, Enable) to remap
+ 157:./stdperiph/source/stm32f37x_syscfg.c ****   *         TIM17 DMA requests to channel 2 and use
+ 158:./stdperiph/source/stm32f37x_syscfg.c ****   *         SYSCFG_DMAChannelRemapConfig(SYSCFG_DMARemap_TIM17, Disable) to map
+ 159:./stdperiph/source/stm32f37x_syscfg.c ****   *         TIM17 DMA requests to channel 1 (default mapping)
+ 160:./stdperiph/source/stm32f37x_syscfg.c ****   * @retval None
+ 161:./stdperiph/source/stm32f37x_syscfg.c ****   */
+ 162:./stdperiph/source/stm32f37x_syscfg.c **** void SYSCFG_DMAChannelRemapConfig(uint32_t SYSCFG_DMARemap, FunctionalState NewState)
+ 163:./stdperiph/source/stm32f37x_syscfg.c **** {
+ 105              		.loc 1 163 0
+ 106              		.cfi_startproc
+ 107              		@ args = 0, pretend = 0, frame = 0
+ 108              		@ frame_needed = 0, uses_anonymous_args = 0
+ 109              		@ link register save eliminated.
+ 110              	.LVL4:
+ 164:./stdperiph/source/stm32f37x_syscfg.c ****   /* Check the parameters */
+ 165:./stdperiph/source/stm32f37x_syscfg.c ****   assert_param(IS_SYSCFG_DMA_REMAP(SYSCFG_DMARemap));
+ 166:./stdperiph/source/stm32f37x_syscfg.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 167:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 168:./stdperiph/source/stm32f37x_syscfg.c ****   if (NewState != DISABLE)
+ 111              		.loc 1 168 0
+ 112 0000 21B1     		cbz	r1, .L8
+ 169:./stdperiph/source/stm32f37x_syscfg.c ****   {
+ 170:./stdperiph/source/stm32f37x_syscfg.c ****     /* Remap the DMA channel */
+ 171:./stdperiph/source/stm32f37x_syscfg.c ****     SYSCFG->CFGR1 |= (uint32_t)SYSCFG_DMARemap;
+ 113              		.loc 1 171 0
+ 114 0002 054B     		ldr	r3, .L10
+ 115 0004 1A68     		ldr	r2, [r3]
+ 116 0006 1043     		orrs	r0, r0, r2
+ 117              	.LVL5:
+ 118 0008 1860     		str	r0, [r3]
+ 119 000a 7047     		bx	lr
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 6
+
+
+ 120              	.LVL6:
+ 121              	.L8:
+ 172:./stdperiph/source/stm32f37x_syscfg.c ****   }
+ 173:./stdperiph/source/stm32f37x_syscfg.c ****   else
+ 174:./stdperiph/source/stm32f37x_syscfg.c ****   {
+ 175:./stdperiph/source/stm32f37x_syscfg.c ****     /* use the default DMA channel mapping */
+ 176:./stdperiph/source/stm32f37x_syscfg.c ****     SYSCFG->CFGR1 &= (uint32_t)(~SYSCFG_DMARemap);
+ 122              		.loc 1 176 0
+ 123 000c 024A     		ldr	r2, .L10
+ 124 000e 1368     		ldr	r3, [r2]
+ 125 0010 23EA0000 		bic	r0, r3, r0
+ 126              	.LVL7:
+ 127 0014 1060     		str	r0, [r2]
+ 128 0016 7047     		bx	lr
+ 129              	.L11:
+ 130              		.align	2
+ 131              	.L10:
+ 132 0018 00000140 		.word	1073807360
+ 133              		.cfi_endproc
+ 134              	.LFE113:
+ 136              		.section	.text.SYSCFG_I2CFastModePlusConfig,"ax",%progbits
+ 137              		.align	2
+ 138              		.global	SYSCFG_I2CFastModePlusConfig
+ 139              		.thumb
+ 140              		.thumb_func
+ 142              	SYSCFG_I2CFastModePlusConfig:
+ 143              	.LFB114:
+ 177:./stdperiph/source/stm32f37x_syscfg.c ****   }
+ 178:./stdperiph/source/stm32f37x_syscfg.c **** }
+ 179:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 180:./stdperiph/source/stm32f37x_syscfg.c **** /**
+ 181:./stdperiph/source/stm32f37x_syscfg.c ****   * @brief  Configure the I2C fast mode plus driving capability.
+ 182:./stdperiph/source/stm32f37x_syscfg.c ****   * @param  SYSCFG_I2CFastModePlus: selects the pin.
+ 183:./stdperiph/source/stm32f37x_syscfg.c ****   *          This parameter can be one of the following values:
+ 184:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_I2CFastModePlus_PB6: Configure fast mode plus driving capability for PB6
+ 185:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_I2CFastModePlus_PB7: Configure fast mode plus driving capability for PB7
+ 186:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_I2CFastModePlus_PB8: Configure fast mode plus driving capability for PB8
+ 187:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_I2CFastModePlus_PB9: Configure fast mode plus driving capability for PB9
+ 188:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_I2CFastModePlus_I2C1: Configure fast mode plus driving capability for I2
+ 189:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_I2CFastModePlus_I2C2: Configure fast mode plus driving capability for I2
+ 190:./stdperiph/source/stm32f37x_syscfg.c ****   * @param  NewState: new state of the DMA channel remapping. 
+ 191:./stdperiph/source/stm32f37x_syscfg.c ****   *         This parameter can be: ENABLE or DISABLE.
+ 192:./stdperiph/source/stm32f37x_syscfg.c ****   * @note   ENABLE: Enable fast mode plus driving capability for selected I2C pin
+ 193:./stdperiph/source/stm32f37x_syscfg.c ****   * @note   DISABLE: Disable fast mode plus driving capability for selected I2C pin
+ 194:./stdperiph/source/stm32f37x_syscfg.c ****   * @note  For I2C1, fast mode plus driving capability can be enabled on all selected
+ 195:./stdperiph/source/stm32f37x_syscfg.c ****   *        I2C1 pins using SYSCFG_I2CFastModePlus_I2C1 parameter or independently
+ 196:./stdperiph/source/stm32f37x_syscfg.c ****   *        on each one of the following pins PB6, PB7, PB8 and PB9.
+ 197:./stdperiph/source/stm32f37x_syscfg.c ****   * @note  For remaining I2C1 pins (PA14, PA15...) fast mode plus driving capability
+ 198:./stdperiph/source/stm32f37x_syscfg.c ****   *        can be enabled only by using SYSCFG_I2CFastModePlus_I2C1 parameter
+ 199:./stdperiph/source/stm32f37x_syscfg.c ****   *        For all I2C2 pins fast mode plus driving capability can be enabled
+ 200:./stdperiph/source/stm32f37x_syscfg.c ****   *        only by using SYSCFG_I2CFastModePlus_I2C2 parameter
+ 201:./stdperiph/source/stm32f37x_syscfg.c ****   * @retval None
+ 202:./stdperiph/source/stm32f37x_syscfg.c ****   */
+ 203:./stdperiph/source/stm32f37x_syscfg.c **** void SYSCFG_I2CFastModePlusConfig(uint32_t SYSCFG_I2CFastModePlus, FunctionalState NewState)
+ 204:./stdperiph/source/stm32f37x_syscfg.c **** {
+ 144              		.loc 1 204 0
+ 145              		.cfi_startproc
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 7
+
+
+ 146              		@ args = 0, pretend = 0, frame = 0
+ 147              		@ frame_needed = 0, uses_anonymous_args = 0
+ 148              		@ link register save eliminated.
+ 149              	.LVL8:
+ 205:./stdperiph/source/stm32f37x_syscfg.c ****   /* Check the parameters */
+ 206:./stdperiph/source/stm32f37x_syscfg.c ****   assert_param(IS_SYSCFG_I2C_FMP(SYSCFG_I2CFastModePlus));
+ 207:./stdperiph/source/stm32f37x_syscfg.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 208:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 209:./stdperiph/source/stm32f37x_syscfg.c ****   if (NewState != DISABLE)
+ 150              		.loc 1 209 0
+ 151 0000 21B1     		cbz	r1, .L13
+ 210:./stdperiph/source/stm32f37x_syscfg.c ****   {
+ 211:./stdperiph/source/stm32f37x_syscfg.c ****     /* Enable fast mode plus driving capability for selected I2C pin */
+ 212:./stdperiph/source/stm32f37x_syscfg.c ****     SYSCFG->CFGR1 |= (uint32_t)SYSCFG_I2CFastModePlus;
+ 152              		.loc 1 212 0
+ 153 0002 054B     		ldr	r3, .L15
+ 154 0004 1A68     		ldr	r2, [r3]
+ 155 0006 1043     		orrs	r0, r0, r2
+ 156              	.LVL9:
+ 157 0008 1860     		str	r0, [r3]
+ 158 000a 7047     		bx	lr
+ 159              	.LVL10:
+ 160              	.L13:
+ 213:./stdperiph/source/stm32f37x_syscfg.c ****   }
+ 214:./stdperiph/source/stm32f37x_syscfg.c ****   else
+ 215:./stdperiph/source/stm32f37x_syscfg.c ****   {
+ 216:./stdperiph/source/stm32f37x_syscfg.c ****     /* Disable fast mode plus driving capability for selected I2C pin */
+ 217:./stdperiph/source/stm32f37x_syscfg.c ****     SYSCFG->CFGR1 &= (uint32_t)(~SYSCFG_I2CFastModePlus);
+ 161              		.loc 1 217 0
+ 162 000c 024A     		ldr	r2, .L15
+ 163 000e 1368     		ldr	r3, [r2]
+ 164 0010 23EA0000 		bic	r0, r3, r0
+ 165              	.LVL11:
+ 166 0014 1060     		str	r0, [r2]
+ 167 0016 7047     		bx	lr
+ 168              	.L16:
+ 169              		.align	2
+ 170              	.L15:
+ 171 0018 00000140 		.word	1073807360
+ 172              		.cfi_endproc
+ 173              	.LFE114:
+ 175              		.section	.text.SYSCFG_VBATMonitoringCmd,"ax",%progbits
+ 176              		.align	2
+ 177              		.global	SYSCFG_VBATMonitoringCmd
+ 178              		.thumb
+ 179              		.thumb_func
+ 181              	SYSCFG_VBATMonitoringCmd:
+ 182              	.LFB115:
+ 218:./stdperiph/source/stm32f37x_syscfg.c ****   }
+ 219:./stdperiph/source/stm32f37x_syscfg.c **** }
+ 220:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 221:./stdperiph/source/stm32f37x_syscfg.c **** /**
+ 222:./stdperiph/source/stm32f37x_syscfg.c ****   * @brief Control the VBAT monitoring
+ 223:./stdperiph/source/stm32f37x_syscfg.c ****   * @param  NewState: new state of the VBAT connection to ADC channel 18. 
+ 224:./stdperiph/source/stm32f37x_syscfg.c ****   *         This parameter can be: ENABLE or DISABLE.
+ 225:./stdperiph/source/stm32f37x_syscfg.c ****   * @note   ENABLE: Enable VBAT monitoring by connecting internally VBAT to ADC channel 18
+ 226:./stdperiph/source/stm32f37x_syscfg.c ****   * @note   DISABLE: Disable VBAT monitoring by disconnecting VBAT from ADC channel 18
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 8
+
+
+ 227:./stdperiph/source/stm32f37x_syscfg.c ****   * @retval None
+ 228:./stdperiph/source/stm32f37x_syscfg.c ****   */
+ 229:./stdperiph/source/stm32f37x_syscfg.c **** void SYSCFG_VBATMonitoringCmd(FunctionalState NewState)
+ 230:./stdperiph/source/stm32f37x_syscfg.c **** {
+ 183              		.loc 1 230 0
+ 184              		.cfi_startproc
+ 185              		@ args = 0, pretend = 0, frame = 0
+ 186              		@ frame_needed = 0, uses_anonymous_args = 0
+ 187              		@ link register save eliminated.
+ 188              	.LVL12:
+ 231:./stdperiph/source/stm32f37x_syscfg.c ****   /* Check the parameters */
+ 232:./stdperiph/source/stm32f37x_syscfg.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 233:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 234:./stdperiph/source/stm32f37x_syscfg.c ****   if (NewState != DISABLE)
+ 189              		.loc 1 234 0
+ 190 0000 28B1     		cbz	r0, .L18
+ 235:./stdperiph/source/stm32f37x_syscfg.c ****   {
+ 236:./stdperiph/source/stm32f37x_syscfg.c ****     /* Enable VBAT monitoring */
+ 237:./stdperiph/source/stm32f37x_syscfg.c ****     SYSCFG->CFGR1 |= SYSCFG_CFGR1_VBAT;
+ 191              		.loc 1 237 0
+ 192 0002 064A     		ldr	r2, .L20
+ 193 0004 1368     		ldr	r3, [r2]
+ 194 0006 43F08073 		orr	r3, r3, #16777216
+ 195 000a 1360     		str	r3, [r2]
+ 196 000c 7047     		bx	lr
+ 197              	.L18:
+ 238:./stdperiph/source/stm32f37x_syscfg.c ****   }
+ 239:./stdperiph/source/stm32f37x_syscfg.c ****   else
+ 240:./stdperiph/source/stm32f37x_syscfg.c ****   {
+ 241:./stdperiph/source/stm32f37x_syscfg.c ****     /* Disable VBAT monitoring */
+ 242:./stdperiph/source/stm32f37x_syscfg.c ****     SYSCFG->CFGR1 &= ((uint32_t)~SYSCFG_CFGR1_VBAT);
+ 198              		.loc 1 242 0
+ 199 000e 034A     		ldr	r2, .L20
+ 200 0010 1368     		ldr	r3, [r2]
+ 201 0012 23F08073 		bic	r3, r3, #16777216
+ 202 0016 1360     		str	r3, [r2]
+ 203 0018 7047     		bx	lr
+ 204              	.L21:
+ 205 001a 00BF     		.align	2
+ 206              	.L20:
+ 207 001c 00000140 		.word	1073807360
+ 208              		.cfi_endproc
+ 209              	.LFE115:
+ 211              		.section	.text.SYSCFG_ITConfig,"ax",%progbits
+ 212              		.align	2
+ 213              		.global	SYSCFG_ITConfig
+ 214              		.thumb
+ 215              		.thumb_func
+ 217              	SYSCFG_ITConfig:
+ 218              	.LFB116:
+ 243:./stdperiph/source/stm32f37x_syscfg.c ****   }
+ 244:./stdperiph/source/stm32f37x_syscfg.c **** }
+ 245:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 246:./stdperiph/source/stm32f37x_syscfg.c **** /**
+ 247:./stdperiph/source/stm32f37x_syscfg.c ****   * @brief  Enables or disables the selected SYSCFG interrupts.
+ 248:./stdperiph/source/stm32f37x_syscfg.c ****   * @param  SYSCFG_IT: specifies the SYSCFG interrupt sources to be enabled or disabled.
+ 249:./stdperiph/source/stm32f37x_syscfg.c ****   *          This parameter can be one of the following values:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 9
+
+
+ 250:./stdperiph/source/stm32f37x_syscfg.c ****   *           @arg SYSCFG_IT_IXC: Inexact Interrupt
+ 251:./stdperiph/source/stm32f37x_syscfg.c ****   *           @arg SYSCFG_IT_IDC: Input denormal Interrupt
+ 252:./stdperiph/source/stm32f37x_syscfg.c ****   *           @arg SYSCFG_IT_OFC: Overflow Interrupt
+ 253:./stdperiph/source/stm32f37x_syscfg.c ****   *           @arg SYSCFG_IT_UFC: Underflow Interrupt
+ 254:./stdperiph/source/stm32f37x_syscfg.c ****   *           @arg SYSCFG_IT_DZC: Divide-by-zero Interrupt
+ 255:./stdperiph/source/stm32f37x_syscfg.c ****   *           @arg SYSCFG_IT_IOC: Invalid operation Interrupt
+ 256:./stdperiph/source/stm32f37x_syscfg.c ****   * @param  NewState: new state of the specified SDADC interrupts.
+ 257:./stdperiph/source/stm32f37x_syscfg.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 258:./stdperiph/source/stm32f37x_syscfg.c ****   * @retval None
+ 259:./stdperiph/source/stm32f37x_syscfg.c ****   */
+ 260:./stdperiph/source/stm32f37x_syscfg.c **** void SYSCFG_ITConfig(uint32_t SYSCFG_IT, FunctionalState NewState)  
+ 261:./stdperiph/source/stm32f37x_syscfg.c **** {
+ 219              		.loc 1 261 0
+ 220              		.cfi_startproc
+ 221              		@ args = 0, pretend = 0, frame = 0
+ 222              		@ frame_needed = 0, uses_anonymous_args = 0
+ 223              		@ link register save eliminated.
+ 224              	.LVL13:
+ 262:./stdperiph/source/stm32f37x_syscfg.c ****   /* Check the parameters */
+ 263:./stdperiph/source/stm32f37x_syscfg.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 264:./stdperiph/source/stm32f37x_syscfg.c ****   assert_param(IS_SYSCFG_IT(SYSCFG_IT)); 
+ 265:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 266:./stdperiph/source/stm32f37x_syscfg.c ****   if (NewState != DISABLE)
+ 225              		.loc 1 266 0
+ 226 0000 21B1     		cbz	r1, .L23
+ 267:./stdperiph/source/stm32f37x_syscfg.c ****   {
+ 268:./stdperiph/source/stm32f37x_syscfg.c ****     /* Enable the selected SYSCFG interrupts */
+ 269:./stdperiph/source/stm32f37x_syscfg.c ****     SYSCFG->CFGR1 |= SYSCFG_IT;
+ 227              		.loc 1 269 0
+ 228 0002 054B     		ldr	r3, .L25
+ 229 0004 1A68     		ldr	r2, [r3]
+ 230 0006 1043     		orrs	r0, r0, r2
+ 231              	.LVL14:
+ 232 0008 1860     		str	r0, [r3]
+ 233 000a 7047     		bx	lr
+ 234              	.LVL15:
+ 235              	.L23:
+ 270:./stdperiph/source/stm32f37x_syscfg.c ****   }
+ 271:./stdperiph/source/stm32f37x_syscfg.c ****   else
+ 272:./stdperiph/source/stm32f37x_syscfg.c ****   {
+ 273:./stdperiph/source/stm32f37x_syscfg.c ****     /* Disable the selected SYSCFG interrupts */
+ 274:./stdperiph/source/stm32f37x_syscfg.c ****     SYSCFG->CFGR1 &= ((uint32_t)~SYSCFG_IT);
+ 236              		.loc 1 274 0
+ 237 000c 024A     		ldr	r2, .L25
+ 238 000e 1368     		ldr	r3, [r2]
+ 239 0010 23EA0000 		bic	r0, r3, r0
+ 240              	.LVL16:
+ 241 0014 1060     		str	r0, [r2]
+ 242 0016 7047     		bx	lr
+ 243              	.L26:
+ 244              		.align	2
+ 245              	.L25:
+ 246 0018 00000140 		.word	1073807360
+ 247              		.cfi_endproc
+ 248              	.LFE116:
+ 250              		.section	.text.SYSCFG_EXTILineConfig,"ax",%progbits
+ 251              		.align	2
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 10
+
+
+ 252              		.global	SYSCFG_EXTILineConfig
+ 253              		.thumb
+ 254              		.thumb_func
+ 256              	SYSCFG_EXTILineConfig:
+ 257              	.LFB117:
+ 275:./stdperiph/source/stm32f37x_syscfg.c ****   }
+ 276:./stdperiph/source/stm32f37x_syscfg.c **** }
+ 277:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 278:./stdperiph/source/stm32f37x_syscfg.c **** /**
+ 279:./stdperiph/source/stm32f37x_syscfg.c ****   * @brief  Selects the GPIO pin used as EXTI Line.
+ 280:./stdperiph/source/stm32f37x_syscfg.c ****   * @param  EXTI_PortSourceGPIOx: selects the GPIO port to be used as source 
+ 281:./stdperiph/source/stm32f37x_syscfg.c ****   *                               for EXTI lines where x can be (A, B, C, D, E or F).
+ 282:./stdperiph/source/stm32f37x_syscfg.c ****   * @param  EXTI_PinSourcex: specifies the EXTI line to be configured.
+ 283:./stdperiph/source/stm32f37x_syscfg.c ****   *          This parameter can be EXTI_PinSourcex where x can be (0..15)
+ 284:./stdperiph/source/stm32f37x_syscfg.c ****   * @retval None
+ 285:./stdperiph/source/stm32f37x_syscfg.c ****   */
+ 286:./stdperiph/source/stm32f37x_syscfg.c **** void SYSCFG_EXTILineConfig(uint8_t EXTI_PortSourceGPIOx, uint8_t EXTI_PinSourcex)
+ 287:./stdperiph/source/stm32f37x_syscfg.c **** {
+ 258              		.loc 1 287 0
+ 259              		.cfi_startproc
+ 260              		@ args = 0, pretend = 0, frame = 0
+ 261              		@ frame_needed = 0, uses_anonymous_args = 0
+ 262              		@ link register save eliminated.
+ 263              	.LVL17:
+ 264 0000 30B4     		push	{r4, r5}
+ 265              	.LCFI0:
+ 266              		.cfi_def_cfa_offset 8
+ 267              		.cfi_offset 4, -8
+ 268              		.cfi_offset 5, -4
+ 269              	.LVL18:
+ 288:./stdperiph/source/stm32f37x_syscfg.c ****   uint32_t tmp = 0x00;
+ 289:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 290:./stdperiph/source/stm32f37x_syscfg.c ****   /* Check the parameters */
+ 291:./stdperiph/source/stm32f37x_syscfg.c ****   assert_param(IS_EXTI_PORT_SOURCE(EXTI_PortSourceGPIOx));
+ 292:./stdperiph/source/stm32f37x_syscfg.c ****   assert_param(IS_EXTI_PIN_SOURCE(EXTI_PinSourcex));
+ 293:./stdperiph/source/stm32f37x_syscfg.c ****   
+ 294:./stdperiph/source/stm32f37x_syscfg.c ****   tmp = ((uint32_t)0x0F) << (0x04 * (EXTI_PinSourcex & (uint8_t)0x03));
+ 270              		.loc 1 294 0
+ 271 0002 01F00303 		and	r3, r1, #3
+ 272 0006 9B00     		lsls	r3, r3, #2
+ 273 0008 0F24     		movs	r4, #15
+ 274 000a 04FA03F5 		lsl	r5, r4, r3
+ 275              	.LVL19:
+ 295:./stdperiph/source/stm32f37x_syscfg.c ****   SYSCFG->EXTICR[EXTI_PinSourcex >> 0x02] &= ~tmp;
+ 276              		.loc 1 295 0
+ 277 000e 8908     		lsrs	r1, r1, #2
+ 278              	.LVL20:
+ 279 0010 074A     		ldr	r2, .L29
+ 280 0012 0231     		adds	r1, r1, #2
+ 281 0014 52F82140 		ldr	r4, [r2, r1, lsl #2]
+ 282 0018 24EA0504 		bic	r4, r4, r5
+ 283 001c 42F82140 		str	r4, [r2, r1, lsl #2]
+ 296:./stdperiph/source/stm32f37x_syscfg.c ****   SYSCFG->EXTICR[EXTI_PinSourcex >> 0x02] |= (((uint32_t)EXTI_PortSourceGPIOx) << (0x04 * (EXTI_Pin
+ 284              		.loc 1 296 0
+ 285 0020 52F82140 		ldr	r4, [r2, r1, lsl #2]
+ 286 0024 9840     		lsls	r0, r0, r3
+ 287              	.LVL21:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 11
+
+
+ 288 0026 2043     		orrs	r0, r0, r4
+ 289 0028 42F82100 		str	r0, [r2, r1, lsl #2]
+ 297:./stdperiph/source/stm32f37x_syscfg.c **** }
+ 290              		.loc 1 297 0
+ 291 002c 30BC     		pop	{r4, r5}
+ 292              	.LCFI1:
+ 293              		.cfi_restore 5
+ 294              		.cfi_restore 4
+ 295              		.cfi_def_cfa_offset 0
+ 296              	.LVL22:
+ 297 002e 7047     		bx	lr
+ 298              	.L30:
+ 299              		.align	2
+ 300              	.L29:
+ 301 0030 00000140 		.word	1073807360
+ 302              		.cfi_endproc
+ 303              	.LFE117:
+ 305              		.section	.text.SYSCFG_BreakConfig,"ax",%progbits
+ 306              		.align	2
+ 307              		.global	SYSCFG_BreakConfig
+ 308              		.thumb
+ 309              		.thumb_func
+ 311              	SYSCFG_BreakConfig:
+ 312              	.LFB118:
+ 298:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 299:./stdperiph/source/stm32f37x_syscfg.c **** /**
+ 300:./stdperiph/source/stm32f37x_syscfg.c ****   * @brief  Connect the selected parameter to the break input of TIM15/TIM16/TIM17.
+ 301:./stdperiph/source/stm32f37x_syscfg.c ****   * @note   The selected configuration is locked and can be unlocked by system reset
+ 302:./stdperiph/source/stm32f37x_syscfg.c ****   * @param  SYSCFG_Break: selects the configuration to be connected to break
+ 303:./stdperiph/source/stm32f37x_syscfg.c ****   *         input of TIM15/TIM16/TIM17
+ 304:./stdperiph/source/stm32f37x_syscfg.c ****   *          This parameter can be any combination of the following values:
+ 305:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_Break_PVD: Connects the PVD event to the Break Input of TIM15/TIM16/TIM1
+ 306:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_Break_SRAMParity: Connects the SRAM_PARITY error signal to the Break Inp
+ 307:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_Break_Lockup: Connects Lockup output of CortexM4 to the break input of T
+ 308:./stdperiph/source/stm32f37x_syscfg.c ****   * @retval None
+ 309:./stdperiph/source/stm32f37x_syscfg.c ****   */
+ 310:./stdperiph/source/stm32f37x_syscfg.c **** void SYSCFG_BreakConfig(uint32_t SYSCFG_Break)
+ 311:./stdperiph/source/stm32f37x_syscfg.c **** {
+ 313              		.loc 1 311 0
+ 314              		.cfi_startproc
+ 315              		@ args = 0, pretend = 0, frame = 0
+ 316              		@ frame_needed = 0, uses_anonymous_args = 0
+ 317              		@ link register save eliminated.
+ 318              	.LVL23:
+ 312:./stdperiph/source/stm32f37x_syscfg.c ****   /* Check the parameter */
+ 313:./stdperiph/source/stm32f37x_syscfg.c ****   assert_param(IS_SYSCFG_LOCK_CONFIG(SYSCFG_Break));
+ 314:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 315:./stdperiph/source/stm32f37x_syscfg.c ****   SYSCFG->CFGR2 |= (uint32_t) SYSCFG_Break;
+ 319              		.loc 1 315 0
+ 320 0000 024A     		ldr	r2, .L32
+ 321 0002 9369     		ldr	r3, [r2, #24]
+ 322 0004 1843     		orrs	r0, r0, r3
+ 323              	.LVL24:
+ 324 0006 9061     		str	r0, [r2, #24]
+ 325 0008 7047     		bx	lr
+ 326              	.L33:
+ 327 000a 00BF     		.align	2
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 12
+
+
+ 328              	.L32:
+ 329 000c 00000140 		.word	1073807360
+ 330              		.cfi_endproc
+ 331              	.LFE118:
+ 333              		.section	.text.SYSCFG_GetFlagStatus,"ax",%progbits
+ 334              		.align	2
+ 335              		.global	SYSCFG_GetFlagStatus
+ 336              		.thumb
+ 337              		.thumb_func
+ 339              	SYSCFG_GetFlagStatus:
+ 340              	.LFB119:
+ 316:./stdperiph/source/stm32f37x_syscfg.c **** }
+ 317:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 318:./stdperiph/source/stm32f37x_syscfg.c **** /**
+ 319:./stdperiph/source/stm32f37x_syscfg.c ****   * @brief  Checks whether the specified SYSCFG flag is set or not.
+ 320:./stdperiph/source/stm32f37x_syscfg.c ****   * @param  SYSCFG_Flag: specifies the SYSCFG flag to check. 
+ 321:./stdperiph/source/stm32f37x_syscfg.c ****   *          This parameter can be one of the following values:
+ 322:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_FLAG_PE: SRAM parity error flag.
+ 323:./stdperiph/source/stm32f37x_syscfg.c ****   * @retval The new state of SYSCFG_Flag (SET or RESET).
+ 324:./stdperiph/source/stm32f37x_syscfg.c ****   */
+ 325:./stdperiph/source/stm32f37x_syscfg.c **** FlagStatus SYSCFG_GetFlagStatus(uint32_t SYSCFG_Flag)
+ 326:./stdperiph/source/stm32f37x_syscfg.c **** {
+ 341              		.loc 1 326 0
+ 342              		.cfi_startproc
+ 343              		@ args = 0, pretend = 0, frame = 0
+ 344              		@ frame_needed = 0, uses_anonymous_args = 0
+ 345              		@ link register save eliminated.
+ 346              	.LVL25:
+ 327:./stdperiph/source/stm32f37x_syscfg.c ****   FlagStatus bitstatus = RESET;
+ 328:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 329:./stdperiph/source/stm32f37x_syscfg.c ****   /* Check the parameter */
+ 330:./stdperiph/source/stm32f37x_syscfg.c ****   assert_param(IS_SYSCFG_FLAG(SYSCFG_Flag));
+ 331:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 332:./stdperiph/source/stm32f37x_syscfg.c ****   /* Check the status of the specified SPI flag */
+ 333:./stdperiph/source/stm32f37x_syscfg.c ****   if ((SYSCFG->CFGR2 & SYSCFG_CFGR2_SRAM_PE) != (uint32_t)RESET)
+ 347              		.loc 1 333 0
+ 348 0000 044B     		ldr	r3, .L37
+ 349 0002 9B69     		ldr	r3, [r3, #24]
+ 350 0004 13F4807F 		tst	r3, #256
+ 351 0008 01D0     		beq	.L36
+ 334:./stdperiph/source/stm32f37x_syscfg.c ****   {
+ 335:./stdperiph/source/stm32f37x_syscfg.c ****     /* SYSCFG_Flag is set */
+ 336:./stdperiph/source/stm32f37x_syscfg.c ****     bitstatus = SET;
+ 352              		.loc 1 336 0
+ 353 000a 0120     		movs	r0, #1
+ 354              	.LVL26:
+ 355 000c 7047     		bx	lr
+ 356              	.LVL27:
+ 357              	.L36:
+ 337:./stdperiph/source/stm32f37x_syscfg.c ****   }
+ 338:./stdperiph/source/stm32f37x_syscfg.c ****   else
+ 339:./stdperiph/source/stm32f37x_syscfg.c ****   {
+ 340:./stdperiph/source/stm32f37x_syscfg.c ****     /* SYSCFG_Flag is reset */
+ 341:./stdperiph/source/stm32f37x_syscfg.c ****     bitstatus = RESET;
+ 358              		.loc 1 341 0
+ 359 000e 0020     		movs	r0, #0
+ 360              	.LVL28:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 13
+
+
+ 342:./stdperiph/source/stm32f37x_syscfg.c ****   }
+ 343:./stdperiph/source/stm32f37x_syscfg.c ****   /* Return the SYSCFG_Flag status */
+ 344:./stdperiph/source/stm32f37x_syscfg.c ****   return  bitstatus;
+ 345:./stdperiph/source/stm32f37x_syscfg.c **** }
+ 361              		.loc 1 345 0
+ 362 0010 7047     		bx	lr
+ 363              	.L38:
+ 364 0012 00BF     		.align	2
+ 365              	.L37:
+ 366 0014 00000140 		.word	1073807360
+ 367              		.cfi_endproc
+ 368              	.LFE119:
+ 370              		.section	.text.SYSCFG_ClearFlag,"ax",%progbits
+ 371              		.align	2
+ 372              		.global	SYSCFG_ClearFlag
+ 373              		.thumb
+ 374              		.thumb_func
+ 376              	SYSCFG_ClearFlag:
+ 377              	.LFB120:
+ 346:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 347:./stdperiph/source/stm32f37x_syscfg.c **** /**
+ 348:./stdperiph/source/stm32f37x_syscfg.c ****   * @brief  Clear the selected SYSCFG flag.
+ 349:./stdperiph/source/stm32f37x_syscfg.c ****   * @param  SYSCFG_Flag: selects the flag to be cleared.
+ 350:./stdperiph/source/stm32f37x_syscfg.c ****   *          This parameter can be any combination of the following values:
+ 351:./stdperiph/source/stm32f37x_syscfg.c ****   *            @arg SYSCFG_FLAG_PE: SRAM parity error flag.
+ 352:./stdperiph/source/stm32f37x_syscfg.c ****   * @retval None
+ 353:./stdperiph/source/stm32f37x_syscfg.c ****   */
+ 354:./stdperiph/source/stm32f37x_syscfg.c **** void SYSCFG_ClearFlag(uint32_t SYSCFG_Flag)
+ 355:./stdperiph/source/stm32f37x_syscfg.c **** {
+ 378              		.loc 1 355 0
+ 379              		.cfi_startproc
+ 380              		@ args = 0, pretend = 0, frame = 0
+ 381              		@ frame_needed = 0, uses_anonymous_args = 0
+ 382              		@ link register save eliminated.
+ 383              	.LVL29:
+ 356:./stdperiph/source/stm32f37x_syscfg.c ****   /* Check the parameter */
+ 357:./stdperiph/source/stm32f37x_syscfg.c ****   assert_param(IS_SYSCFG_FLAG(SYSCFG_Flag));
+ 358:./stdperiph/source/stm32f37x_syscfg.c **** 
+ 359:./stdperiph/source/stm32f37x_syscfg.c ****   SYSCFG->CFGR2 |= (uint32_t) SYSCFG_Flag;
+ 384              		.loc 1 359 0
+ 385 0000 024A     		ldr	r2, .L40
+ 386 0002 9369     		ldr	r3, [r2, #24]
+ 387 0004 1843     		orrs	r0, r0, r3
+ 388              	.LVL30:
+ 389 0006 9061     		str	r0, [r2, #24]
+ 390 0008 7047     		bx	lr
+ 391              	.L41:
+ 392 000a 00BF     		.align	2
+ 393              	.L40:
+ 394 000c 00000140 		.word	1073807360
+ 395              		.cfi_endproc
+ 396              	.LFE120:
+ 398              		.text
+ 399              	.Letext0:
+ 400              		.file 2 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\machine\\_defaul
+ 401              		.file 3 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 402              		.file 4 "cmsis/include/stm32f37x.h"
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 14
+
+
+ 403              		.file 5 "cmsis/include/core_cm4.h"
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cccUbuD5.s 			page 15
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f37x_syscfg.c
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:22     .text.SYSCFG_DeInit:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:27     .text.SYSCFG_DeInit:00000000 SYSCFG_DeInit
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:59     .text.SYSCFG_DeInit:00000020 $d
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:64     .text.SYSCFG_MemoryRemapConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:69     .text.SYSCFG_MemoryRemapConfig:00000000 SYSCFG_MemoryRemapConfig
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:93     .text.SYSCFG_MemoryRemapConfig:00000010 $d
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:98     .text.SYSCFG_DMAChannelRemapConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:103    .text.SYSCFG_DMAChannelRemapConfig:00000000 SYSCFG_DMAChannelRemapConfig
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:132    .text.SYSCFG_DMAChannelRemapConfig:00000018 $d
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:137    .text.SYSCFG_I2CFastModePlusConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:142    .text.SYSCFG_I2CFastModePlusConfig:00000000 SYSCFG_I2CFastModePlusConfig
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:171    .text.SYSCFG_I2CFastModePlusConfig:00000018 $d
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:176    .text.SYSCFG_VBATMonitoringCmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:181    .text.SYSCFG_VBATMonitoringCmd:00000000 SYSCFG_VBATMonitoringCmd
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:207    .text.SYSCFG_VBATMonitoringCmd:0000001c $d
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:212    .text.SYSCFG_ITConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:217    .text.SYSCFG_ITConfig:00000000 SYSCFG_ITConfig
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:246    .text.SYSCFG_ITConfig:00000018 $d
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:251    .text.SYSCFG_EXTILineConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:256    .text.SYSCFG_EXTILineConfig:00000000 SYSCFG_EXTILineConfig
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:301    .text.SYSCFG_EXTILineConfig:00000030 $d
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:306    .text.SYSCFG_BreakConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:311    .text.SYSCFG_BreakConfig:00000000 SYSCFG_BreakConfig
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:329    .text.SYSCFG_BreakConfig:0000000c $d
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:334    .text.SYSCFG_GetFlagStatus:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:339    .text.SYSCFG_GetFlagStatus:00000000 SYSCFG_GetFlagStatus
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:366    .text.SYSCFG_GetFlagStatus:00000014 $d
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:371    .text.SYSCFG_ClearFlag:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:376    .text.SYSCFG_ClearFlag:00000000 SYSCFG_ClearFlag
+C:\Users\strag\AppData\Local\Temp\cccUbuD5.s:394    .text.SYSCFG_ClearFlag:0000000c $d
+                     .debug_frame:00000010 $d
+
+NO UNDEFINED SYMBOLS

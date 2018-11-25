@@ -1,0 +1,1033 @@
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 1
+   4              		.eabi_attribute 28, 1
+   5              		.fpu fpv4-sp-d16
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.thumb
+  16              		.syntax unified
+  17              		.file	"utils.c"
+  18              		.text
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.section	.text.hexdump,"ax",%progbits
+  22              		.align	2
+  23              		.global	hexdump
+  24              		.thumb
+  25              		.thumb_func
+  27              	hexdump:
+  28              	.LFB1:
+  29              		.file 1 "./mqtt/source/utils.c"
+   1:./mqtt/source/utils.c **** #include <stdint.h>
+   2:./mqtt/source/utils.c **** #include <stdio.h>
+   3:./mqtt/source/utils.c **** #include "utils.h"
+   4:./mqtt/source/utils.c **** 
+   5:./mqtt/source/utils.c **** /*
+   6:./mqtt/source/utils.c ****  * buffer按十六进制输出
+   7:./mqtt/source/utils.c ****  */
+   8:./mqtt/source/utils.c **** void hexdump(const unsigned char *buf, uint32_t num)
+   9:./mqtt/source/utils.c **** {
+  30              		.loc 1 9 0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              	.LVL0:
+  35 0000 70B5     		push	{r4, r5, r6, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 16
+  38              		.cfi_offset 4, -16
+  39              		.cfi_offset 5, -12
+  40              		.cfi_offset 6, -8
+  41              		.cfi_offset 14, -4
+  42 0002 0646     		mov	r6, r0
+  43 0004 0D46     		mov	r5, r1
+  44              	.LVL1:
+  10:./mqtt/source/utils.c ****     uint32_t i = 0;
+  45              		.loc 1 10 0
+  46 0006 0024     		movs	r4, #0
+  11:./mqtt/source/utils.c ****     for (; i < num; i++)
+  47              		.loc 1 11 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 2
+
+
+  48 0008 0AE0     		b	.L2
+  49              	.LVL2:
+  50              	.L4:
+  12:./mqtt/source/utils.c ****     {
+  13:./mqtt/source/utils.c ****         printf("%02X ", buf[i]);
+  51              		.loc 1 13 0
+  52 000a 315D     		ldrb	r1, [r6, r4]	@ zero_extendqisi2
+  53 000c 0748     		ldr	r0, .L6
+  54 000e FFF7FEFF 		bl	printf
+  55              	.LVL3:
+  14:./mqtt/source/utils.c ****         if ((i + 1) % 8 == 0)
+  56              		.loc 1 14 0
+  57 0012 0134     		adds	r4, r4, #1
+  58              	.LVL4:
+  59 0014 14F0070F 		tst	r4, #7
+  60 0018 02D1     		bne	.L2
+  15:./mqtt/source/utils.c ****             printf("\r\n");
+  61              		.loc 1 15 0
+  62 001a 0548     		ldr	r0, .L6+4
+  63 001c FFF7FEFF 		bl	puts
+  64              	.LVL5:
+  65              	.L2:
+  11:./mqtt/source/utils.c ****     {
+  66              		.loc 1 11 0 discriminator 1
+  67 0020 AC42     		cmp	r4, r5
+  68 0022 F2D3     		bcc	.L4
+  16:./mqtt/source/utils.c ****     }
+  17:./mqtt/source/utils.c ****     printf("\r\n");
+  69              		.loc 1 17 0
+  70 0024 0248     		ldr	r0, .L6+4
+  71 0026 FFF7FEFF 		bl	puts
+  72              	.LVL6:
+  73 002a 70BD     		pop	{r4, r5, r6, pc}
+  74              	.LVL7:
+  75              	.L7:
+  76              		.align	2
+  77              	.L6:
+  78 002c 00000000 		.word	.LC0
+  79 0030 08000000 		.word	.LC1
+  80              		.cfi_endproc
+  81              	.LFE1:
+  83              		.section	.text.prvucMBBIN2CHAR,"ax",%progbits
+  84              		.align	2
+  85              		.global	prvucMBBIN2CHAR
+  86              		.thumb
+  87              		.thumb_func
+  89              	prvucMBBIN2CHAR:
+  90              	.LFB2:
+  18:./mqtt/source/utils.c **** }
+  19:./mqtt/source/utils.c **** 
+  20:./mqtt/source/utils.c **** unsigned char prvucMBBIN2CHAR(unsigned char ucByte)
+  21:./mqtt/source/utils.c **** {
+  91              		.loc 1 21 0
+  92              		.cfi_startproc
+  93              		@ args = 0, pretend = 0, frame = 0
+  94              		@ frame_needed = 0, uses_anonymous_args = 0
+  95              		@ link register save eliminated.
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 3
+
+
+  96              	.LVL8:
+  22:./mqtt/source/utils.c ****     if (ucByte <= 0x09)
+  97              		.loc 1 22 0
+  98 0000 0928     		cmp	r0, #9
+  99 0002 02D8     		bhi	.L9
+  23:./mqtt/source/utils.c ****     {
+  24:./mqtt/source/utils.c ****         return (unsigned char) ('0' + ucByte);
+ 100              		.loc 1 24 0
+ 101 0004 3030     		adds	r0, r0, #48
+ 102              	.LVL9:
+ 103 0006 C0B2     		uxtb	r0, r0
+ 104 0008 7047     		bx	lr
+ 105              	.LVL10:
+ 106              	.L9:
+  25:./mqtt/source/utils.c ****     }
+  26:./mqtt/source/utils.c ****     else if ((ucByte >= 0x0A) && (ucByte <= 0x0F))
+ 107              		.loc 1 26 0
+ 108 000a A0F10A03 		sub	r3, r0, #10
+ 109 000e DBB2     		uxtb	r3, r3
+ 110 0010 052B     		cmp	r3, #5
+ 111 0012 02D8     		bhi	.L11
+  27:./mqtt/source/utils.c ****     {
+  28:./mqtt/source/utils.c ****         return (unsigned char) (ucByte - 0x0A + 'A');
+ 112              		.loc 1 28 0
+ 113 0014 3730     		adds	r0, r0, #55
+ 114              	.LVL11:
+ 115 0016 C0B2     		uxtb	r0, r0
+ 116 0018 7047     		bx	lr
+ 117              	.LVL12:
+ 118              	.L11:
+  29:./mqtt/source/utils.c ****     }
+  30:./mqtt/source/utils.c ****     else
+  31:./mqtt/source/utils.c ****     {
+  32:./mqtt/source/utils.c ****         /* Programming error. */
+  33:./mqtt/source/utils.c ****         //assert(0);
+  34:./mqtt/source/utils.c ****     }
+  35:./mqtt/source/utils.c ****     return '0';
+ 119              		.loc 1 35 0
+ 120 001a 3020     		movs	r0, #48
+ 121              	.LVL13:
+  36:./mqtt/source/utils.c **** }
+ 122              		.loc 1 36 0
+ 123 001c 7047     		bx	lr
+ 124              		.cfi_endproc
+ 125              	.LFE2:
+ 127 001e 00BF     		.section	.text.usMBCRC16,"ax",%progbits
+ 128              		.align	2
+ 129              		.global	usMBCRC16
+ 130              		.thumb
+ 131              		.thumb_func
+ 133              	usMBCRC16:
+ 134              	.LFB3:
+  37:./mqtt/source/utils.c **** 
+  38:./mqtt/source/utils.c **** static const unsigned char aucCRCHi[] =
+  39:./mqtt/source/utils.c **** {
+  40:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
+  41:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40,
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 4
+
+
+  42:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
+  43:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41,
+  44:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
+  45:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40,
+  46:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40,
+  47:./mqtt/source/utils.c ****     0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40,
+  48:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
+  49:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40,
+  50:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
+  51:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41,
+  52:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
+  53:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41,
+  54:./mqtt/source/utils.c ****     0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41,
+  55:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41,
+  56:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
+  57:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40,
+  58:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
+  59:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41,
+  60:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
+  61:./mqtt/source/utils.c ****     0x00, 0xC1, 0x81, 0x40
+  62:./mqtt/source/utils.c **** };
+  63:./mqtt/source/utils.c **** 
+  64:./mqtt/source/utils.c **** static const unsigned char aucCRCLo[] =
+  65:./mqtt/source/utils.c **** {
+  66:./mqtt/source/utils.c ****     0x00, 0xC0, 0xC1, 0x01, 0xC3, 0x03, 0x02, 0xC2, 0xC6, 0x06, 0x07, 0xC7,
+  67:./mqtt/source/utils.c ****     0x05, 0xC5, 0xC4, 0x04, 0xCC, 0x0C, 0x0D, 0xCD, 0x0F, 0xCF, 0xCE, 0x0E,
+  68:./mqtt/source/utils.c ****     0x0A, 0xCA, 0xCB, 0x0B, 0xC9, 0x09, 0x08, 0xC8, 0xD8, 0x18, 0x19, 0xD9,
+  69:./mqtt/source/utils.c ****     0x1B, 0xDB, 0xDA, 0x1A, 0x1E, 0xDE, 0xDF, 0x1F, 0xDD, 0x1D, 0x1C, 0xDC,
+  70:./mqtt/source/utils.c ****     0x14, 0xD4, 0xD5, 0x15, 0xD7, 0x17, 0x16, 0xD6, 0xD2, 0x12, 0x13, 0xD3,
+  71:./mqtt/source/utils.c ****     0x11, 0xD1, 0xD0, 0x10, 0xF0, 0x30, 0x31, 0xF1, 0x33, 0xF3, 0xF2, 0x32,
+  72:./mqtt/source/utils.c ****     0x36, 0xF6, 0xF7, 0x37, 0xF5, 0x35, 0x34, 0xF4, 0x3C, 0xFC, 0xFD, 0x3D,
+  73:./mqtt/source/utils.c ****     0xFF, 0x3F, 0x3E, 0xFE, 0xFA, 0x3A, 0x3B, 0xFB, 0x39, 0xF9, 0xF8, 0x38,
+  74:./mqtt/source/utils.c ****     0x28, 0xE8, 0xE9, 0x29, 0xEB, 0x2B, 0x2A, 0xEA, 0xEE, 0x2E, 0x2F, 0xEF,
+  75:./mqtt/source/utils.c ****     0x2D, 0xED, 0xEC, 0x2C, 0xE4, 0x24, 0x25, 0xE5, 0x27, 0xE7, 0xE6, 0x26,
+  76:./mqtt/source/utils.c ****     0x22, 0xE2, 0xE3, 0x23, 0xE1, 0x21, 0x20, 0xE0, 0xA0, 0x60, 0x61, 0xA1,
+  77:./mqtt/source/utils.c ****     0x63, 0xA3, 0xA2, 0x62, 0x66, 0xA6, 0xA7, 0x67, 0xA5, 0x65, 0x64, 0xA4,
+  78:./mqtt/source/utils.c ****     0x6C, 0xAC, 0xAD, 0x6D, 0xAF, 0x6F, 0x6E, 0xAE, 0xAA, 0x6A, 0x6B, 0xAB,
+  79:./mqtt/source/utils.c ****     0x69, 0xA9, 0xA8, 0x68, 0x78, 0xB8, 0xB9, 0x79, 0xBB, 0x7B, 0x7A, 0xBA,
+  80:./mqtt/source/utils.c ****     0xBE, 0x7E, 0x7F, 0xBF, 0x7D, 0xBD, 0xBC, 0x7C, 0xB4, 0x74, 0x75, 0xB5,
+  81:./mqtt/source/utils.c ****     0x77, 0xB7, 0xB6, 0x76, 0x72, 0xB2, 0xB3, 0x73, 0xB1, 0x71, 0x70, 0xB0,
+  82:./mqtt/source/utils.c ****     0x50, 0x90, 0x91, 0x51, 0x93, 0x53, 0x52, 0x92, 0x96, 0x56, 0x57, 0x97,
+  83:./mqtt/source/utils.c ****     0x55, 0x95, 0x94, 0x54, 0x9C, 0x5C, 0x5D, 0x9D, 0x5F, 0x9F, 0x9E, 0x5E,
+  84:./mqtt/source/utils.c ****     0x5A, 0x9A, 0x9B, 0x5B, 0x99, 0x59, 0x58, 0x98, 0x88, 0x48, 0x49, 0x89,
+  85:./mqtt/source/utils.c ****     0x4B, 0x8B, 0x8A, 0x4A, 0x4E, 0x8E, 0x8F, 0x4F, 0x8D, 0x4D, 0x4C, 0x8C,
+  86:./mqtt/source/utils.c ****     0x44, 0x84, 0x85, 0x45, 0x87, 0x47, 0x46, 0x86, 0x82, 0x42, 0x43, 0x83,
+  87:./mqtt/source/utils.c ****     0x41, 0x81, 0x80, 0x40
+  88:./mqtt/source/utils.c **** };
+  89:./mqtt/source/utils.c **** 
+  90:./mqtt/source/utils.c **** unsigned short
+  91:./mqtt/source/utils.c **** usMBCRC16( unsigned char * pucFrame, unsigned short usLen )
+  92:./mqtt/source/utils.c **** {
+ 135              		.loc 1 92 0
+ 136              		.cfi_startproc
+ 137              		@ args = 0, pretend = 0, frame = 0
+ 138              		@ frame_needed = 0, uses_anonymous_args = 0
+ 139              		@ link register save eliminated.
+ 140              	.LVL14:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 5
+
+
+ 141 0000 30B4     		push	{r4, r5}
+ 142              	.LCFI1:
+ 143              		.cfi_def_cfa_offset 8
+ 144              		.cfi_offset 4, -8
+ 145              		.cfi_offset 5, -4
+ 146              	.LVL15:
+  93:./mqtt/source/utils.c ****     unsigned char   ucCRCHi = 0xFF;
+  94:./mqtt/source/utils.c ****     unsigned char   ucCRCLo = 0xFF;
+ 147              		.loc 1 94 0
+ 148 0002 FF22     		movs	r2, #255
+  93:./mqtt/source/utils.c ****     unsigned char   ucCRCHi = 0xFF;
+ 149              		.loc 1 93 0
+ 150 0004 1546     		mov	r5, r2
+  95:./mqtt/source/utils.c ****     int             iIndex;
+  96:./mqtt/source/utils.c **** 
+  97:./mqtt/source/utils.c ****     while( usLen-- )
+ 151              		.loc 1 97 0
+ 152 0006 08E0     		b	.L13
+ 153              	.LVL16:
+ 154              	.L14:
+  98:./mqtt/source/utils.c ****     {
+  99:./mqtt/source/utils.c ****         iIndex = ucCRCLo ^ *( pucFrame++ );
+ 155              		.loc 1 99 0
+ 156 0008 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 157 000a 5340     		eors	r3, r3, r2
+ 158              	.LVL17:
+ 100:./mqtt/source/utils.c ****         ucCRCLo = ( unsigned char )( ucCRCHi ^ aucCRCHi[iIndex] );
+ 159              		.loc 1 100 0
+ 160 000c 074A     		ldr	r2, .L16
+ 161              	.LVL18:
+ 162 000e D25C     		ldrb	r2, [r2, r3]	@ zero_extendqisi2
+ 163 0010 6A40     		eors	r2, r2, r5
+ 164              	.LVL19:
+ 101:./mqtt/source/utils.c ****         ucCRCHi = aucCRCLo[iIndex];
+ 165              		.loc 1 101 0
+ 166 0012 0749     		ldr	r1, .L16+4
+ 167 0014 CD5C     		ldrb	r5, [r1, r3]	@ zero_extendqisi2
+ 168              	.LVL20:
+  97:./mqtt/source/utils.c ****     {
+ 169              		.loc 1 97 0
+ 170 0016 2146     		mov	r1, r4
+  99:./mqtt/source/utils.c ****         ucCRCLo = ( unsigned char )( ucCRCHi ^ aucCRCHi[iIndex] );
+ 171              		.loc 1 99 0
+ 172 0018 0130     		adds	r0, r0, #1
+ 173              	.LVL21:
+ 174              	.L13:
+  97:./mqtt/source/utils.c ****     {
+ 175              		.loc 1 97 0
+ 176 001a 4B1E     		subs	r3, r1, #1
+ 177 001c 9CB2     		uxth	r4, r3
+ 178              	.LVL22:
+ 179 001e 0029     		cmp	r1, #0
+ 180 0020 F2D1     		bne	.L14
+ 102:./mqtt/source/utils.c ****     }
+ 103:./mqtt/source/utils.c ****     return ( unsigned short )( ucCRCHi << 8 | ucCRCLo );
+ 104:./mqtt/source/utils.c **** }
+ 181              		.loc 1 104 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 6
+
+
+ 182 0022 42EA0520 		orr	r0, r2, r5, lsl #8
+ 183              	.LVL23:
+ 184 0026 30BC     		pop	{r4, r5}
+ 185              	.LCFI2:
+ 186              		.cfi_restore 5
+ 187              		.cfi_restore 4
+ 188              		.cfi_def_cfa_offset 0
+ 189              	.LVL24:
+ 190 0028 7047     		bx	lr
+ 191              	.L17:
+ 192 002a 00BF     		.align	2
+ 193              	.L16:
+ 194 002c 00000000 		.word	.LANCHOR0
+ 195 0030 00000000 		.word	.LANCHOR1
+ 196              		.cfi_endproc
+ 197              	.LFE3:
+ 199              		.section	.text.mDelay,"ax",%progbits
+ 200              		.align	2
+ 201              		.global	mDelay
+ 202              		.thumb
+ 203              		.thumb_func
+ 205              	mDelay:
+ 206              	.LFB4:
+ 105:./mqtt/source/utils.c **** 
+ 106:./mqtt/source/utils.c **** 
+ 107:./mqtt/source/utils.c **** /*
+ 108:./mqtt/source/utils.c ****  *  @brief 延迟i毫秒
+ 109:./mqtt/source/utils.c ****  */
+ 110:./mqtt/source/utils.c **** void mDelay(uint32_t i)
+ 111:./mqtt/source/utils.c **** {
+ 207              		.loc 1 111 0
+ 208              		.cfi_startproc
+ 209              		@ args = 0, pretend = 0, frame = 0
+ 210              		@ frame_needed = 0, uses_anonymous_args = 0
+ 211              		@ link register save eliminated.
+ 212              	.LVL25:
+ 112:./mqtt/source/utils.c ****     uint32_t j = 0;
+ 113:./mqtt/source/utils.c ****     for(; i > 0; i--)
+ 213              		.loc 1 113 0
+ 214 0000 07E0     		b	.L19
+ 215              	.LVL26:
+ 216              	.L20:
+ 114:./mqtt/source/utils.c ****     {
+ 115:./mqtt/source/utils.c ****         for(j = 0; j < 12000; j++);
+ 217              		.loc 1 115 0 discriminator 3
+ 218 0002 0133     		adds	r3, r3, #1
+ 219              	.LVL27:
+ 220 0004 00E0     		b	.L21
+ 221              	.LVL28:
+ 222              	.L22:
+ 223 0006 0023     		movs	r3, #0
+ 224              	.L21:
+ 225              	.LVL29:
+ 226              		.loc 1 115 0 is_stmt 0 discriminator 1
+ 227 0008 42F6DF62 		movw	r2, #11999
+ 228 000c 9342     		cmp	r3, r2
+ 229 000e F8D9     		bls	.L20
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 7
+
+
+ 113:./mqtt/source/utils.c ****     {
+ 230              		.loc 1 113 0 is_stmt 1
+ 231 0010 0138     		subs	r0, r0, #1
+ 232              	.LVL30:
+ 233              	.L19:
+ 113:./mqtt/source/utils.c ****     {
+ 234              		.loc 1 113 0 is_stmt 0 discriminator 1
+ 235 0012 0028     		cmp	r0, #0
+ 236 0014 F7D1     		bne	.L22
+ 116:./mqtt/source/utils.c ****     }
+ 117:./mqtt/source/utils.c **** }
+ 237              		.loc 1 117 0 is_stmt 1
+ 238 0016 7047     		bx	lr
+ 239              		.cfi_endproc
+ 240              	.LFE4:
+ 242              		.section	.text.uDelay,"ax",%progbits
+ 243              		.align	2
+ 244              		.global	uDelay
+ 245              		.thumb
+ 246              		.thumb_func
+ 248              	uDelay:
+ 249              	.LFB5:
+ 118:./mqtt/source/utils.c **** 
+ 119:./mqtt/source/utils.c **** /*
+ 120:./mqtt/source/utils.c ****  *  @brief 延迟i微秒
+ 121:./mqtt/source/utils.c ****  */
+ 122:./mqtt/source/utils.c **** void uDelay(uint32_t i)
+ 123:./mqtt/source/utils.c **** {
+ 250              		.loc 1 123 0
+ 251              		.cfi_startproc
+ 252              		@ args = 0, pretend = 0, frame = 0
+ 253              		@ frame_needed = 0, uses_anonymous_args = 0
+ 254              	.LVL31:
+ 255 0000 10B5     		push	{r4, lr}
+ 256              	.LCFI3:
+ 257              		.cfi_def_cfa_offset 8
+ 258              		.cfi_offset 4, -8
+ 259              		.cfi_offset 14, -4
+ 260 0002 0446     		mov	r4, r0
+ 124:./mqtt/source/utils.c ****     for(; i > 0; i--)
+ 261              		.loc 1 124 0
+ 262 0004 08E0     		b	.L24
+ 263              	.LVL32:
+ 264              	.L25:
+ 265              	.LBB2:
+ 125:./mqtt/source/utils.c ****     {
+ 126:./mqtt/source/utils.c ****         __nop();
+ 266              		.loc 1 126 0 discriminator 2
+ 267 0006 FFF7FEFF 		bl	__nop
+ 268              	.LVL33:
+ 127:./mqtt/source/utils.c ****         __nop();
+ 269              		.loc 1 127 0 discriminator 2
+ 270 000a FFF7FEFF 		bl	__nop
+ 271              	.LVL34:
+ 128:./mqtt/source/utils.c ****         __nop();
+ 272              		.loc 1 128 0 discriminator 2
+ 273 000e FFF7FEFF 		bl	__nop
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 8
+
+
+ 274              	.LVL35:
+ 129:./mqtt/source/utils.c ****         __nop();
+ 275              		.loc 1 129 0 discriminator 2
+ 276 0012 FFF7FEFF 		bl	__nop
+ 277              	.LVL36:
+ 278              	.LBE2:
+ 124:./mqtt/source/utils.c ****     {
+ 279              		.loc 1 124 0 discriminator 2
+ 280 0016 013C     		subs	r4, r4, #1
+ 281              	.LVL37:
+ 282              	.L24:
+ 124:./mqtt/source/utils.c ****     {
+ 283              		.loc 1 124 0 is_stmt 0 discriminator 1
+ 284 0018 002C     		cmp	r4, #0
+ 285 001a F4D1     		bne	.L25
+ 130:./mqtt/source/utils.c ****     }
+ 131:./mqtt/source/utils.c **** }
+ 286              		.loc 1 131 0 is_stmt 1
+ 287 001c 10BD     		pop	{r4, pc}
+ 288              		.cfi_endproc
+ 289              	.LFE5:
+ 291 001e 00BF     		.section	.rodata.str1.4,"aMS",%progbits,1
+ 292              		.align	2
+ 293              	.LC0:
+ 294 0000 25303258 		.ascii	"%02X \000"
+ 294      2000
+ 295 0006 0000     		.space	2
+ 296              	.LC1:
+ 297 0008 0D00     		.ascii	"\015\000"
+ 298              		.section	.rodata.aucCRCLo,"a",%progbits
+ 299              		.align	2
+ 300              		.set	.LANCHOR1,. + 0
+ 303              	aucCRCLo:
+ 304 0000 00       		.byte	0
+ 305 0001 C0       		.byte	-64
+ 306 0002 C1       		.byte	-63
+ 307 0003 01       		.byte	1
+ 308 0004 C3       		.byte	-61
+ 309 0005 03       		.byte	3
+ 310 0006 02       		.byte	2
+ 311 0007 C2       		.byte	-62
+ 312 0008 C6       		.byte	-58
+ 313 0009 06       		.byte	6
+ 314 000a 07       		.byte	7
+ 315 000b C7       		.byte	-57
+ 316 000c 05       		.byte	5
+ 317 000d C5       		.byte	-59
+ 318 000e C4       		.byte	-60
+ 319 000f 04       		.byte	4
+ 320 0010 CC       		.byte	-52
+ 321 0011 0C       		.byte	12
+ 322 0012 0D       		.byte	13
+ 323 0013 CD       		.byte	-51
+ 324 0014 0F       		.byte	15
+ 325 0015 CF       		.byte	-49
+ 326 0016 CE       		.byte	-50
+ 327 0017 0E       		.byte	14
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 9
+
+
+ 328 0018 0A       		.byte	10
+ 329 0019 CA       		.byte	-54
+ 330 001a CB       		.byte	-53
+ 331 001b 0B       		.byte	11
+ 332 001c C9       		.byte	-55
+ 333 001d 09       		.byte	9
+ 334 001e 08       		.byte	8
+ 335 001f C8       		.byte	-56
+ 336 0020 D8       		.byte	-40
+ 337 0021 18       		.byte	24
+ 338 0022 19       		.byte	25
+ 339 0023 D9       		.byte	-39
+ 340 0024 1B       		.byte	27
+ 341 0025 DB       		.byte	-37
+ 342 0026 DA       		.byte	-38
+ 343 0027 1A       		.byte	26
+ 344 0028 1E       		.byte	30
+ 345 0029 DE       		.byte	-34
+ 346 002a DF       		.byte	-33
+ 347 002b 1F       		.byte	31
+ 348 002c DD       		.byte	-35
+ 349 002d 1D       		.byte	29
+ 350 002e 1C       		.byte	28
+ 351 002f DC       		.byte	-36
+ 352 0030 14       		.byte	20
+ 353 0031 D4       		.byte	-44
+ 354 0032 D5       		.byte	-43
+ 355 0033 15       		.byte	21
+ 356 0034 D7       		.byte	-41
+ 357 0035 17       		.byte	23
+ 358 0036 16       		.byte	22
+ 359 0037 D6       		.byte	-42
+ 360 0038 D2       		.byte	-46
+ 361 0039 12       		.byte	18
+ 362 003a 13       		.byte	19
+ 363 003b D3       		.byte	-45
+ 364 003c 11       		.byte	17
+ 365 003d D1       		.byte	-47
+ 366 003e D0       		.byte	-48
+ 367 003f 10       		.byte	16
+ 368 0040 F0       		.byte	-16
+ 369 0041 30       		.byte	48
+ 370 0042 31       		.byte	49
+ 371 0043 F1       		.byte	-15
+ 372 0044 33       		.byte	51
+ 373 0045 F3       		.byte	-13
+ 374 0046 F2       		.byte	-14
+ 375 0047 32       		.byte	50
+ 376 0048 36       		.byte	54
+ 377 0049 F6       		.byte	-10
+ 378 004a F7       		.byte	-9
+ 379 004b 37       		.byte	55
+ 380 004c F5       		.byte	-11
+ 381 004d 35       		.byte	53
+ 382 004e 34       		.byte	52
+ 383 004f F4       		.byte	-12
+ 384 0050 3C       		.byte	60
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 10
+
+
+ 385 0051 FC       		.byte	-4
+ 386 0052 FD       		.byte	-3
+ 387 0053 3D       		.byte	61
+ 388 0054 FF       		.byte	-1
+ 389 0055 3F       		.byte	63
+ 390 0056 3E       		.byte	62
+ 391 0057 FE       		.byte	-2
+ 392 0058 FA       		.byte	-6
+ 393 0059 3A       		.byte	58
+ 394 005a 3B       		.byte	59
+ 395 005b FB       		.byte	-5
+ 396 005c 39       		.byte	57
+ 397 005d F9       		.byte	-7
+ 398 005e F8       		.byte	-8
+ 399 005f 38       		.byte	56
+ 400 0060 28       		.byte	40
+ 401 0061 E8       		.byte	-24
+ 402 0062 E9       		.byte	-23
+ 403 0063 29       		.byte	41
+ 404 0064 EB       		.byte	-21
+ 405 0065 2B       		.byte	43
+ 406 0066 2A       		.byte	42
+ 407 0067 EA       		.byte	-22
+ 408 0068 EE       		.byte	-18
+ 409 0069 2E       		.byte	46
+ 410 006a 2F       		.byte	47
+ 411 006b EF       		.byte	-17
+ 412 006c 2D       		.byte	45
+ 413 006d ED       		.byte	-19
+ 414 006e EC       		.byte	-20
+ 415 006f 2C       		.byte	44
+ 416 0070 E4       		.byte	-28
+ 417 0071 24       		.byte	36
+ 418 0072 25       		.byte	37
+ 419 0073 E5       		.byte	-27
+ 420 0074 27       		.byte	39
+ 421 0075 E7       		.byte	-25
+ 422 0076 E6       		.byte	-26
+ 423 0077 26       		.byte	38
+ 424 0078 22       		.byte	34
+ 425 0079 E2       		.byte	-30
+ 426 007a E3       		.byte	-29
+ 427 007b 23       		.byte	35
+ 428 007c E1       		.byte	-31
+ 429 007d 21       		.byte	33
+ 430 007e 20       		.byte	32
+ 431 007f E0       		.byte	-32
+ 432 0080 A0       		.byte	-96
+ 433 0081 60       		.byte	96
+ 434 0082 61       		.byte	97
+ 435 0083 A1       		.byte	-95
+ 436 0084 63       		.byte	99
+ 437 0085 A3       		.byte	-93
+ 438 0086 A2       		.byte	-94
+ 439 0087 62       		.byte	98
+ 440 0088 66       		.byte	102
+ 441 0089 A6       		.byte	-90
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 11
+
+
+ 442 008a A7       		.byte	-89
+ 443 008b 67       		.byte	103
+ 444 008c A5       		.byte	-91
+ 445 008d 65       		.byte	101
+ 446 008e 64       		.byte	100
+ 447 008f A4       		.byte	-92
+ 448 0090 6C       		.byte	108
+ 449 0091 AC       		.byte	-84
+ 450 0092 AD       		.byte	-83
+ 451 0093 6D       		.byte	109
+ 452 0094 AF       		.byte	-81
+ 453 0095 6F       		.byte	111
+ 454 0096 6E       		.byte	110
+ 455 0097 AE       		.byte	-82
+ 456 0098 AA       		.byte	-86
+ 457 0099 6A       		.byte	106
+ 458 009a 6B       		.byte	107
+ 459 009b AB       		.byte	-85
+ 460 009c 69       		.byte	105
+ 461 009d A9       		.byte	-87
+ 462 009e A8       		.byte	-88
+ 463 009f 68       		.byte	104
+ 464 00a0 78       		.byte	120
+ 465 00a1 B8       		.byte	-72
+ 466 00a2 B9       		.byte	-71
+ 467 00a3 79       		.byte	121
+ 468 00a4 BB       		.byte	-69
+ 469 00a5 7B       		.byte	123
+ 470 00a6 7A       		.byte	122
+ 471 00a7 BA       		.byte	-70
+ 472 00a8 BE       		.byte	-66
+ 473 00a9 7E       		.byte	126
+ 474 00aa 7F       		.byte	127
+ 475 00ab BF       		.byte	-65
+ 476 00ac 7D       		.byte	125
+ 477 00ad BD       		.byte	-67
+ 478 00ae BC       		.byte	-68
+ 479 00af 7C       		.byte	124
+ 480 00b0 B4       		.byte	-76
+ 481 00b1 74       		.byte	116
+ 482 00b2 75       		.byte	117
+ 483 00b3 B5       		.byte	-75
+ 484 00b4 77       		.byte	119
+ 485 00b5 B7       		.byte	-73
+ 486 00b6 B6       		.byte	-74
+ 487 00b7 76       		.byte	118
+ 488 00b8 72       		.byte	114
+ 489 00b9 B2       		.byte	-78
+ 490 00ba B3       		.byte	-77
+ 491 00bb 73       		.byte	115
+ 492 00bc B1       		.byte	-79
+ 493 00bd 71       		.byte	113
+ 494 00be 70       		.byte	112
+ 495 00bf B0       		.byte	-80
+ 496 00c0 50       		.byte	80
+ 497 00c1 90       		.byte	-112
+ 498 00c2 91       		.byte	-111
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 12
+
+
+ 499 00c3 51       		.byte	81
+ 500 00c4 93       		.byte	-109
+ 501 00c5 53       		.byte	83
+ 502 00c6 52       		.byte	82
+ 503 00c7 92       		.byte	-110
+ 504 00c8 96       		.byte	-106
+ 505 00c9 56       		.byte	86
+ 506 00ca 57       		.byte	87
+ 507 00cb 97       		.byte	-105
+ 508 00cc 55       		.byte	85
+ 509 00cd 95       		.byte	-107
+ 510 00ce 94       		.byte	-108
+ 511 00cf 54       		.byte	84
+ 512 00d0 9C       		.byte	-100
+ 513 00d1 5C       		.byte	92
+ 514 00d2 5D       		.byte	93
+ 515 00d3 9D       		.byte	-99
+ 516 00d4 5F       		.byte	95
+ 517 00d5 9F       		.byte	-97
+ 518 00d6 9E       		.byte	-98
+ 519 00d7 5E       		.byte	94
+ 520 00d8 5A       		.byte	90
+ 521 00d9 9A       		.byte	-102
+ 522 00da 9B       		.byte	-101
+ 523 00db 5B       		.byte	91
+ 524 00dc 99       		.byte	-103
+ 525 00dd 59       		.byte	89
+ 526 00de 58       		.byte	88
+ 527 00df 98       		.byte	-104
+ 528 00e0 88       		.byte	-120
+ 529 00e1 48       		.byte	72
+ 530 00e2 49       		.byte	73
+ 531 00e3 89       		.byte	-119
+ 532 00e4 4B       		.byte	75
+ 533 00e5 8B       		.byte	-117
+ 534 00e6 8A       		.byte	-118
+ 535 00e7 4A       		.byte	74
+ 536 00e8 4E       		.byte	78
+ 537 00e9 8E       		.byte	-114
+ 538 00ea 8F       		.byte	-113
+ 539 00eb 4F       		.byte	79
+ 540 00ec 8D       		.byte	-115
+ 541 00ed 4D       		.byte	77
+ 542 00ee 4C       		.byte	76
+ 543 00ef 8C       		.byte	-116
+ 544 00f0 44       		.byte	68
+ 545 00f1 84       		.byte	-124
+ 546 00f2 85       		.byte	-123
+ 547 00f3 45       		.byte	69
+ 548 00f4 87       		.byte	-121
+ 549 00f5 47       		.byte	71
+ 550 00f6 46       		.byte	70
+ 551 00f7 86       		.byte	-122
+ 552 00f8 82       		.byte	-126
+ 553 00f9 42       		.byte	66
+ 554 00fa 43       		.byte	67
+ 555 00fb 83       		.byte	-125
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 13
+
+
+ 556 00fc 41       		.byte	65
+ 557 00fd 81       		.byte	-127
+ 558 00fe 80       		.byte	-128
+ 559 00ff 40       		.byte	64
+ 560              		.section	.rodata.aucCRCHi,"a",%progbits
+ 561              		.align	2
+ 562              		.set	.LANCHOR0,. + 0
+ 565              	aucCRCHi:
+ 566 0000 00       		.byte	0
+ 567 0001 C1       		.byte	-63
+ 568 0002 81       		.byte	-127
+ 569 0003 40       		.byte	64
+ 570 0004 01       		.byte	1
+ 571 0005 C0       		.byte	-64
+ 572 0006 80       		.byte	-128
+ 573 0007 41       		.byte	65
+ 574 0008 01       		.byte	1
+ 575 0009 C0       		.byte	-64
+ 576 000a 80       		.byte	-128
+ 577 000b 41       		.byte	65
+ 578 000c 00       		.byte	0
+ 579 000d C1       		.byte	-63
+ 580 000e 81       		.byte	-127
+ 581 000f 40       		.byte	64
+ 582 0010 01       		.byte	1
+ 583 0011 C0       		.byte	-64
+ 584 0012 80       		.byte	-128
+ 585 0013 41       		.byte	65
+ 586 0014 00       		.byte	0
+ 587 0015 C1       		.byte	-63
+ 588 0016 81       		.byte	-127
+ 589 0017 40       		.byte	64
+ 590 0018 00       		.byte	0
+ 591 0019 C1       		.byte	-63
+ 592 001a 81       		.byte	-127
+ 593 001b 40       		.byte	64
+ 594 001c 01       		.byte	1
+ 595 001d C0       		.byte	-64
+ 596 001e 80       		.byte	-128
+ 597 001f 41       		.byte	65
+ 598 0020 01       		.byte	1
+ 599 0021 C0       		.byte	-64
+ 600 0022 80       		.byte	-128
+ 601 0023 41       		.byte	65
+ 602 0024 00       		.byte	0
+ 603 0025 C1       		.byte	-63
+ 604 0026 81       		.byte	-127
+ 605 0027 40       		.byte	64
+ 606 0028 00       		.byte	0
+ 607 0029 C1       		.byte	-63
+ 608 002a 81       		.byte	-127
+ 609 002b 40       		.byte	64
+ 610 002c 01       		.byte	1
+ 611 002d C0       		.byte	-64
+ 612 002e 80       		.byte	-128
+ 613 002f 41       		.byte	65
+ 614 0030 00       		.byte	0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 14
+
+
+ 615 0031 C1       		.byte	-63
+ 616 0032 81       		.byte	-127
+ 617 0033 40       		.byte	64
+ 618 0034 01       		.byte	1
+ 619 0035 C0       		.byte	-64
+ 620 0036 80       		.byte	-128
+ 621 0037 41       		.byte	65
+ 622 0038 01       		.byte	1
+ 623 0039 C0       		.byte	-64
+ 624 003a 80       		.byte	-128
+ 625 003b 41       		.byte	65
+ 626 003c 00       		.byte	0
+ 627 003d C1       		.byte	-63
+ 628 003e 81       		.byte	-127
+ 629 003f 40       		.byte	64
+ 630 0040 01       		.byte	1
+ 631 0041 C0       		.byte	-64
+ 632 0042 80       		.byte	-128
+ 633 0043 41       		.byte	65
+ 634 0044 00       		.byte	0
+ 635 0045 C1       		.byte	-63
+ 636 0046 81       		.byte	-127
+ 637 0047 40       		.byte	64
+ 638 0048 00       		.byte	0
+ 639 0049 C1       		.byte	-63
+ 640 004a 81       		.byte	-127
+ 641 004b 40       		.byte	64
+ 642 004c 01       		.byte	1
+ 643 004d C0       		.byte	-64
+ 644 004e 80       		.byte	-128
+ 645 004f 41       		.byte	65
+ 646 0050 00       		.byte	0
+ 647 0051 C1       		.byte	-63
+ 648 0052 81       		.byte	-127
+ 649 0053 40       		.byte	64
+ 650 0054 01       		.byte	1
+ 651 0055 C0       		.byte	-64
+ 652 0056 80       		.byte	-128
+ 653 0057 41       		.byte	65
+ 654 0058 01       		.byte	1
+ 655 0059 C0       		.byte	-64
+ 656 005a 80       		.byte	-128
+ 657 005b 41       		.byte	65
+ 658 005c 00       		.byte	0
+ 659 005d C1       		.byte	-63
+ 660 005e 81       		.byte	-127
+ 661 005f 40       		.byte	64
+ 662 0060 00       		.byte	0
+ 663 0061 C1       		.byte	-63
+ 664 0062 81       		.byte	-127
+ 665 0063 40       		.byte	64
+ 666 0064 01       		.byte	1
+ 667 0065 C0       		.byte	-64
+ 668 0066 80       		.byte	-128
+ 669 0067 41       		.byte	65
+ 670 0068 01       		.byte	1
+ 671 0069 C0       		.byte	-64
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 15
+
+
+ 672 006a 80       		.byte	-128
+ 673 006b 41       		.byte	65
+ 674 006c 00       		.byte	0
+ 675 006d C1       		.byte	-63
+ 676 006e 81       		.byte	-127
+ 677 006f 40       		.byte	64
+ 678 0070 01       		.byte	1
+ 679 0071 C0       		.byte	-64
+ 680 0072 80       		.byte	-128
+ 681 0073 41       		.byte	65
+ 682 0074 00       		.byte	0
+ 683 0075 C1       		.byte	-63
+ 684 0076 81       		.byte	-127
+ 685 0077 40       		.byte	64
+ 686 0078 00       		.byte	0
+ 687 0079 C1       		.byte	-63
+ 688 007a 81       		.byte	-127
+ 689 007b 40       		.byte	64
+ 690 007c 01       		.byte	1
+ 691 007d C0       		.byte	-64
+ 692 007e 80       		.byte	-128
+ 693 007f 41       		.byte	65
+ 694 0080 01       		.byte	1
+ 695 0081 C0       		.byte	-64
+ 696 0082 80       		.byte	-128
+ 697 0083 41       		.byte	65
+ 698 0084 00       		.byte	0
+ 699 0085 C1       		.byte	-63
+ 700 0086 81       		.byte	-127
+ 701 0087 40       		.byte	64
+ 702 0088 00       		.byte	0
+ 703 0089 C1       		.byte	-63
+ 704 008a 81       		.byte	-127
+ 705 008b 40       		.byte	64
+ 706 008c 01       		.byte	1
+ 707 008d C0       		.byte	-64
+ 708 008e 80       		.byte	-128
+ 709 008f 41       		.byte	65
+ 710 0090 00       		.byte	0
+ 711 0091 C1       		.byte	-63
+ 712 0092 81       		.byte	-127
+ 713 0093 40       		.byte	64
+ 714 0094 01       		.byte	1
+ 715 0095 C0       		.byte	-64
+ 716 0096 80       		.byte	-128
+ 717 0097 41       		.byte	65
+ 718 0098 01       		.byte	1
+ 719 0099 C0       		.byte	-64
+ 720 009a 80       		.byte	-128
+ 721 009b 41       		.byte	65
+ 722 009c 00       		.byte	0
+ 723 009d C1       		.byte	-63
+ 724 009e 81       		.byte	-127
+ 725 009f 40       		.byte	64
+ 726 00a0 00       		.byte	0
+ 727 00a1 C1       		.byte	-63
+ 728 00a2 81       		.byte	-127
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 16
+
+
+ 729 00a3 40       		.byte	64
+ 730 00a4 01       		.byte	1
+ 731 00a5 C0       		.byte	-64
+ 732 00a6 80       		.byte	-128
+ 733 00a7 41       		.byte	65
+ 734 00a8 01       		.byte	1
+ 735 00a9 C0       		.byte	-64
+ 736 00aa 80       		.byte	-128
+ 737 00ab 41       		.byte	65
+ 738 00ac 00       		.byte	0
+ 739 00ad C1       		.byte	-63
+ 740 00ae 81       		.byte	-127
+ 741 00af 40       		.byte	64
+ 742 00b0 01       		.byte	1
+ 743 00b1 C0       		.byte	-64
+ 744 00b2 80       		.byte	-128
+ 745 00b3 41       		.byte	65
+ 746 00b4 00       		.byte	0
+ 747 00b5 C1       		.byte	-63
+ 748 00b6 81       		.byte	-127
+ 749 00b7 40       		.byte	64
+ 750 00b8 00       		.byte	0
+ 751 00b9 C1       		.byte	-63
+ 752 00ba 81       		.byte	-127
+ 753 00bb 40       		.byte	64
+ 754 00bc 01       		.byte	1
+ 755 00bd C0       		.byte	-64
+ 756 00be 80       		.byte	-128
+ 757 00bf 41       		.byte	65
+ 758 00c0 00       		.byte	0
+ 759 00c1 C1       		.byte	-63
+ 760 00c2 81       		.byte	-127
+ 761 00c3 40       		.byte	64
+ 762 00c4 01       		.byte	1
+ 763 00c5 C0       		.byte	-64
+ 764 00c6 80       		.byte	-128
+ 765 00c7 41       		.byte	65
+ 766 00c8 01       		.byte	1
+ 767 00c9 C0       		.byte	-64
+ 768 00ca 80       		.byte	-128
+ 769 00cb 41       		.byte	65
+ 770 00cc 00       		.byte	0
+ 771 00cd C1       		.byte	-63
+ 772 00ce 81       		.byte	-127
+ 773 00cf 40       		.byte	64
+ 774 00d0 01       		.byte	1
+ 775 00d1 C0       		.byte	-64
+ 776 00d2 80       		.byte	-128
+ 777 00d3 41       		.byte	65
+ 778 00d4 00       		.byte	0
+ 779 00d5 C1       		.byte	-63
+ 780 00d6 81       		.byte	-127
+ 781 00d7 40       		.byte	64
+ 782 00d8 00       		.byte	0
+ 783 00d9 C1       		.byte	-63
+ 784 00da 81       		.byte	-127
+ 785 00db 40       		.byte	64
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 17
+
+
+ 786 00dc 01       		.byte	1
+ 787 00dd C0       		.byte	-64
+ 788 00de 80       		.byte	-128
+ 789 00df 41       		.byte	65
+ 790 00e0 01       		.byte	1
+ 791 00e1 C0       		.byte	-64
+ 792 00e2 80       		.byte	-128
+ 793 00e3 41       		.byte	65
+ 794 00e4 00       		.byte	0
+ 795 00e5 C1       		.byte	-63
+ 796 00e6 81       		.byte	-127
+ 797 00e7 40       		.byte	64
+ 798 00e8 00       		.byte	0
+ 799 00e9 C1       		.byte	-63
+ 800 00ea 81       		.byte	-127
+ 801 00eb 40       		.byte	64
+ 802 00ec 01       		.byte	1
+ 803 00ed C0       		.byte	-64
+ 804 00ee 80       		.byte	-128
+ 805 00ef 41       		.byte	65
+ 806 00f0 00       		.byte	0
+ 807 00f1 C1       		.byte	-63
+ 808 00f2 81       		.byte	-127
+ 809 00f3 40       		.byte	64
+ 810 00f4 01       		.byte	1
+ 811 00f5 C0       		.byte	-64
+ 812 00f6 80       		.byte	-128
+ 813 00f7 41       		.byte	65
+ 814 00f8 01       		.byte	1
+ 815 00f9 C0       		.byte	-64
+ 816 00fa 80       		.byte	-128
+ 817 00fb 41       		.byte	65
+ 818 00fc 00       		.byte	0
+ 819 00fd C1       		.byte	-63
+ 820 00fe 81       		.byte	-127
+ 821 00ff 40       		.byte	64
+ 822              		.text
+ 823              	.Letext0:
+ 824              		.file 2 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\machine\\_defaul
+ 825              		.file 3 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 826              		.file 4 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\stdio.h"
+ 827              		.file 5 "<built-in>"
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cczktyUj.s 			page 18
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 utils.c
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:22     .text.hexdump:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:27     .text.hexdump:00000000 hexdump
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:78     .text.hexdump:0000002c $d
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:84     .text.prvucMBBIN2CHAR:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:89     .text.prvucMBBIN2CHAR:00000000 prvucMBBIN2CHAR
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:128    .text.usMBCRC16:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:133    .text.usMBCRC16:00000000 usMBCRC16
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:194    .text.usMBCRC16:0000002c $d
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:200    .text.mDelay:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:205    .text.mDelay:00000000 mDelay
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:243    .text.uDelay:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:248    .text.uDelay:00000000 uDelay
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:292    .rodata.str1.4:00000000 $d
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:299    .rodata.aucCRCLo:00000000 $d
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:303    .rodata.aucCRCLo:00000000 aucCRCLo
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:561    .rodata.aucCRCHi:00000000 $d
+C:\Users\strag\AppData\Local\Temp\cczktyUj.s:565    .rodata.aucCRCHi:00000000 aucCRCHi
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+printf
+puts
+__nop

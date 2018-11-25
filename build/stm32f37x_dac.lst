@@ -1,0 +1,1489 @@
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 1
+   4              		.eabi_attribute 28, 1
+   5              		.fpu fpv4-sp-d16
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.thumb
+  16              		.syntax unified
+  17              		.file	"stm32f37x_dac.c"
+  18              		.text
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.section	.text.DAC_DeInit,"ax",%progbits
+  22              		.align	2
+  23              		.global	DAC_DeInit
+  24              		.thumb
+  25              		.thumb_func
+  27              	DAC_DeInit:
+  28              	.LFB111:
+  29              		.file 1 "./stdperiph/source/stm32f37x_dac.c"
+   1:./stdperiph/source/stm32f37x_dac.c **** /**
+   2:./stdperiph/source/stm32f37x_dac.c ****   ******************************************************************************
+   3:./stdperiph/source/stm32f37x_dac.c ****   * @file    stm32f37x_dac.c
+   4:./stdperiph/source/stm32f37x_dac.c ****   * @author  MCD Application Team
+   5:./stdperiph/source/stm32f37x_dac.c ****   * @version V1.0.0
+   6:./stdperiph/source/stm32f37x_dac.c ****   * @date    20-September-2012
+   7:./stdperiph/source/stm32f37x_dac.c ****   * @brief   This file provides firmware functions to manage the following 
+   8:./stdperiph/source/stm32f37x_dac.c ****   *          functionalities of the Digital-to-Analog Converter (DAC) peripheral: 
+   9:./stdperiph/source/stm32f37x_dac.c ****   *           + DAC channels configuration: trigger, output buffer, data format
+  10:./stdperiph/source/stm32f37x_dac.c ****   *           + DMA management
+  11:./stdperiph/source/stm32f37x_dac.c ****   *           + Interrupts and flags management
+  12:./stdperiph/source/stm32f37x_dac.c **** 
+  13:./stdperiph/source/stm32f37x_dac.c ****   * @verbatim
+  14:./stdperiph/source/stm32f37x_dac.c ****   *
+  15:./stdperiph/source/stm32f37x_dac.c ****  ===============================================================================
+  16:./stdperiph/source/stm32f37x_dac.c ****                         ##### DAC Peripheral features #####
+  17:./stdperiph/source/stm32f37x_dac.c ****  ===============================================================================
+  18:./stdperiph/source/stm32f37x_dac.c ****     [..] The device integrates three 12-bit Digital Analog Converters:
+  19:./stdperiph/source/stm32f37x_dac.c ****          (#) DAC1 integrates two DAC channels:
+  20:./stdperiph/source/stm32f37x_dac.c ****              (++) DAC1 channel 1 with DAC1_OUT1 as output
+  21:./stdperiph/source/stm32f37x_dac.c ****              (++) DAC1 channel 2 with DAC1_OUT2 as output
+  22:./stdperiph/source/stm32f37x_dac.c ****              (++) The two channels can be used independently or simultaneously (dual mode)
+  23:./stdperiph/source/stm32f37x_dac.c ****    
+  24:./stdperiph/source/stm32f37x_dac.c ****          (#) DAC2 integrates only one channel DAC2 channel 1 with DAC2_OUT1 as output 
+  25:./stdperiph/source/stm32f37x_dac.c ****    
+  26:./stdperiph/source/stm32f37x_dac.c ****     [..] The Digital to Analog conversion can be non-triggered using DAC_Trigger_None
+  27:./stdperiph/source/stm32f37x_dac.c ****          and DACx_OUTy is available once writing to DHRx register using 
+  28:./stdperiph/source/stm32f37x_dac.c ****          DAC_SetChannel1Data()/DAC_SetChannel2Data.
+  29:./stdperiph/source/stm32f37x_dac.c ****       
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 2
+
+
+  30:./stdperiph/source/stm32f37x_dac.c ****     [..] Digital to Analog conversion can be triggered by:
+  31:./stdperiph/source/stm32f37x_dac.c ****          (#) External event: EXTI Line 9 (any GPIOx_Pin9) using DAC_Trigger_Ext_IT9.
+  32:./stdperiph/source/stm32f37x_dac.c ****              The used pin (GPIOx_Pin9) must be configured in input mode.
+  33:./stdperiph/source/stm32f37x_dac.c ****   
+  34:./stdperiph/source/stm32f37x_dac.c ****          (#) Timers TRGO: TIM2, TIM3, TIM4, TIM5, TIM6, TIM7 and TIM18
+  35:./stdperiph/source/stm32f37x_dac.c ****              (DAC_Trigger_T2_TRGO, DAC_Trigger_T4_TRGO...)
+  36:./stdperiph/source/stm32f37x_dac.c ****              The timer TRGO event should be selected using TIM_SelectOutputTrigger()
+  37:./stdperiph/source/stm32f37x_dac.c ****              (++) TIM5 is applicable only for DAC1
+  38:./stdperiph/source/stm32f37x_dac.c ****              (++) TIM18 is applicable only for DAC2
+  39:./stdperiph/source/stm32f37x_dac.c ****       
+  40:./stdperiph/source/stm32f37x_dac.c ****          (#) Software using DAC_Trigger_Software
+  41:./stdperiph/source/stm32f37x_dac.c ****   
+  42:./stdperiph/source/stm32f37x_dac.c ****     [..] Each DAC channel integrates an output buffer that can be used to 
+  43:./stdperiph/source/stm32f37x_dac.c ****          reduce the output impedance, and to drive external loads directly
+  44:./stdperiph/source/stm32f37x_dac.c ****          without having to add an external operational amplifier.
+  45:./stdperiph/source/stm32f37x_dac.c ****          To enable, the output buffer use  
+  46:./stdperiph/source/stm32f37x_dac.c ****          DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable;
+  47:./stdperiph/source/stm32f37x_dac.c ****          before caliing DAC_Init() function
+  48:./stdperiph/source/stm32f37x_dac.c ****     
+  49:./stdperiph/source/stm32f37x_dac.c ****     [..] Refer to the device datasheet for more details about output impedance
+  50:./stdperiph/source/stm32f37x_dac.c ****          value with and without output buffer.
+  51:./stdperiph/source/stm32f37x_dac.c ****   
+  52:./stdperiph/source/stm32f37x_dac.c ****     [..] Both DAC1 channels can be used to generate
+  53:./stdperiph/source/stm32f37x_dac.c ****          (#) Noise wave using DAC_WaveGeneration_Noise
+  54:./stdperiph/source/stm32f37x_dac.c ****          (#) Triangle wave using DAC_WaveGeneration_Triangle
+  55:./stdperiph/source/stm32f37x_dac.c ****           
+  56:./stdperiph/source/stm32f37x_dac.c ****     [..] Wave generation can be disabled using DAC_WaveGeneration_None
+  57:./stdperiph/source/stm32f37x_dac.c ****   
+  58:./stdperiph/source/stm32f37x_dac.c ****     [..] The DAC data format can be:
+  59:./stdperiph/source/stm32f37x_dac.c ****          (#) 8-bit right alignment using DAC_Align_8b_R
+  60:./stdperiph/source/stm32f37x_dac.c ****          (#) 12-bit left alignment using DAC_Align_12b_L
+  61:./stdperiph/source/stm32f37x_dac.c ****          (#) 12-bit right alignment using DAC_Align_12b_R
+  62:./stdperiph/source/stm32f37x_dac.c ****   
+  63:./stdperiph/source/stm32f37x_dac.c ****     [..] The analog output voltage on each DAC channel pin is determined
+  64:./stdperiph/source/stm32f37x_dac.c ****          by the following equation: DAC_OUTx = VREF+ * DOR / 4095
+  65:./stdperiph/source/stm32f37x_dac.c ****          with  DOR is the Data Output Register
+  66:./stdperiph/source/stm32f37x_dac.c ****          VEF+ is the input voltage reference (refer to the device datasheet)
+  67:./stdperiph/source/stm32f37x_dac.c ****          e.g. To set DAC_OUT1 to 0.7V, use
+  68:./stdperiph/source/stm32f37x_dac.c ****          DAC_SetChannel1Data(DAC_Align_12b_R, 868);
+  69:./stdperiph/source/stm32f37x_dac.c ****          Assuming that VREF+ = 3.3, DAC_OUT1 = (3.3 * 868) / 4095 = 0.7V
+  70:./stdperiph/source/stm32f37x_dac.c ****   
+  71:./stdperiph/source/stm32f37x_dac.c ****     [..] A DMA1 request can be generated when an external trigger (but not
+  72:./stdperiph/source/stm32f37x_dac.c ****          a software trigger) occurs if DMA1 requests are enabled using
+  73:./stdperiph/source/stm32f37x_dac.c ****          DAC_DMACmd()
+  74:./stdperiph/source/stm32f37x_dac.c ****          DMA1 requests are mapped as following:
+  75:./stdperiph/source/stm32f37x_dac.c ****          (+) DAC channel1 is mapped on DMA1 channel3 which must be already 
+  76:./stdperiph/source/stm32f37x_dac.c ****              configured
+  77:./stdperiph/source/stm32f37x_dac.c ****          (+) DAC channel2 is mapped on DMA1 channel4 which must be already 
+  78:./stdperiph/source/stm32f37x_dac.c ****              configured
+  79:./stdperiph/source/stm32f37x_dac.c ****   
+  80:./stdperiph/source/stm32f37x_dac.c ****                         ##### How to use this driver #####
+  81:./stdperiph/source/stm32f37x_dac.c ****  ===============================================================================
+  82:./stdperiph/source/stm32f37x_dac.c ****     [..]
+  83:./stdperiph/source/stm32f37x_dac.c ****          (+) Enable DAC APB1 clock to get write access to DAC registers
+  84:./stdperiph/source/stm32f37x_dac.c ****              using RCC_APB1PeriphClockCmd(RCC_APB1Periph_DAC, ENABLE)
+  85:./stdperiph/source/stm32f37x_dac.c **** 
+  86:./stdperiph/source/stm32f37x_dac.c ****          (+) Configure DACx_OUTy (DAC1_OUT1: PA4, DAC1_OUT2: PA5, DAC2_OUT1: PA6)
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 3
+
+
+  87:./stdperiph/source/stm32f37x_dac.c ****              in analog mode.
+  88:./stdperiph/source/stm32f37x_dac.c **** 
+  89:./stdperiph/source/stm32f37x_dac.c ****          (+) Configure the DAC channel using DAC_Init()
+  90:./stdperiph/source/stm32f37x_dac.c **** 
+  91:./stdperiph/source/stm32f37x_dac.c ****          (+) Enable the DAC channel using DAC_Cmd()
+  92:./stdperiph/source/stm32f37x_dac.c ****   
+  93:./stdperiph/source/stm32f37x_dac.c ****     @endverbatim
+  94:./stdperiph/source/stm32f37x_dac.c ****   *
+  95:./stdperiph/source/stm32f37x_dac.c ****   ******************************************************************************
+  96:./stdperiph/source/stm32f37x_dac.c ****   * @attention
+  97:./stdperiph/source/stm32f37x_dac.c ****   *
+  98:./stdperiph/source/stm32f37x_dac.c ****   * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
+  99:./stdperiph/source/stm32f37x_dac.c ****   *
+ 100:./stdperiph/source/stm32f37x_dac.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+ 101:./stdperiph/source/stm32f37x_dac.c ****   * You may not use this file except in compliance with the License.
+ 102:./stdperiph/source/stm32f37x_dac.c ****   * You may obtain a copy of the License at:
+ 103:./stdperiph/source/stm32f37x_dac.c ****   *
+ 104:./stdperiph/source/stm32f37x_dac.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+ 105:./stdperiph/source/stm32f37x_dac.c ****   *
+ 106:./stdperiph/source/stm32f37x_dac.c ****   * Unless required by applicable law or agreed to in writing, software 
+ 107:./stdperiph/source/stm32f37x_dac.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+ 108:./stdperiph/source/stm32f37x_dac.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ 109:./stdperiph/source/stm32f37x_dac.c ****   * See the License for the specific language governing permissions and
+ 110:./stdperiph/source/stm32f37x_dac.c ****   * limitations under the License.
+ 111:./stdperiph/source/stm32f37x_dac.c ****   *
+ 112:./stdperiph/source/stm32f37x_dac.c ****   ******************************************************************************
+ 113:./stdperiph/source/stm32f37x_dac.c ****   */ 
+ 114:./stdperiph/source/stm32f37x_dac.c **** 
+ 115:./stdperiph/source/stm32f37x_dac.c **** /* Includes ------------------------------------------------------------------*/
+ 116:./stdperiph/source/stm32f37x_dac.c **** #include "stm32f37x_dac.h"
+ 117:./stdperiph/source/stm32f37x_dac.c **** #include "stm32f37x_rcc.h"
+ 118:./stdperiph/source/stm32f37x_dac.c **** 
+ 119:./stdperiph/source/stm32f37x_dac.c **** /** @addtogroup STM32F37x_StdPeriph_Driver
+ 120:./stdperiph/source/stm32f37x_dac.c ****   * @{
+ 121:./stdperiph/source/stm32f37x_dac.c ****   */
+ 122:./stdperiph/source/stm32f37x_dac.c **** 
+ 123:./stdperiph/source/stm32f37x_dac.c **** /** @defgroup DAC 
+ 124:./stdperiph/source/stm32f37x_dac.c ****   * @brief DAC driver modules
+ 125:./stdperiph/source/stm32f37x_dac.c ****   * @{
+ 126:./stdperiph/source/stm32f37x_dac.c ****   */ 
+ 127:./stdperiph/source/stm32f37x_dac.c **** 
+ 128:./stdperiph/source/stm32f37x_dac.c **** /* Private typedef -----------------------------------------------------------*/
+ 129:./stdperiph/source/stm32f37x_dac.c **** /* Private define ------------------------------------------------------------*/
+ 130:./stdperiph/source/stm32f37x_dac.c **** /* CR register Mask */
+ 131:./stdperiph/source/stm32f37x_dac.c **** #define CR_CLEAR_MASK              ((uint32_t)0x00000FFE)
+ 132:./stdperiph/source/stm32f37x_dac.c **** 
+ 133:./stdperiph/source/stm32f37x_dac.c **** /* DAC Dual Channels SWTRIG masks */
+ 134:./stdperiph/source/stm32f37x_dac.c **** #define DUAL_SWTRIG_SET            ((uint32_t)0x00000003)
+ 135:./stdperiph/source/stm32f37x_dac.c **** #define DUAL_SWTRIG_RESET          ((uint32_t)0xFFFFFFFC)
+ 136:./stdperiph/source/stm32f37x_dac.c **** 
+ 137:./stdperiph/source/stm32f37x_dac.c **** /* DHR registers offsets */
+ 138:./stdperiph/source/stm32f37x_dac.c **** #define DHR12R1_OFFSET             ((uint32_t)0x00000008)
+ 139:./stdperiph/source/stm32f37x_dac.c **** #define DHR12R2_OFFSET             ((uint32_t)0x00000014)
+ 140:./stdperiph/source/stm32f37x_dac.c **** #define DHR12RD_OFFSET             ((uint32_t)0x00000020)
+ 141:./stdperiph/source/stm32f37x_dac.c **** 
+ 142:./stdperiph/source/stm32f37x_dac.c **** /* DOR register offset */
+ 143:./stdperiph/source/stm32f37x_dac.c **** #define DOR_OFFSET                 ((uint32_t)0x0000002C)
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 4
+
+
+ 144:./stdperiph/source/stm32f37x_dac.c **** 
+ 145:./stdperiph/source/stm32f37x_dac.c **** /* Private macro -------------------------------------------------------------*/
+ 146:./stdperiph/source/stm32f37x_dac.c **** /* Private variables ---------------------------------------------------------*/
+ 147:./stdperiph/source/stm32f37x_dac.c **** /* Private function prototypes -----------------------------------------------*/
+ 148:./stdperiph/source/stm32f37x_dac.c **** /* Private functions ---------------------------------------------------------*/
+ 149:./stdperiph/source/stm32f37x_dac.c **** 
+ 150:./stdperiph/source/stm32f37x_dac.c **** /** @defgroup DAC_Private_Functions
+ 151:./stdperiph/source/stm32f37x_dac.c ****   * @{
+ 152:./stdperiph/source/stm32f37x_dac.c ****   */ 
+ 153:./stdperiph/source/stm32f37x_dac.c **** 
+ 154:./stdperiph/source/stm32f37x_dac.c **** /** @defgroup DAC_Group1 DAC channels configuration
+ 155:./stdperiph/source/stm32f37x_dac.c ****  *  @brief   DAC channels configuration: trigger, output buffer, data format 
+ 156:./stdperiph/source/stm32f37x_dac.c ****  *
+ 157:./stdperiph/source/stm32f37x_dac.c **** @verbatim
+ 158:./stdperiph/source/stm32f37x_dac.c ****  ===============================================================================
+ 159:./stdperiph/source/stm32f37x_dac.c ****   ##### DAC channels configuration: trigger, output buffer, data format #####
+ 160:./stdperiph/source/stm32f37x_dac.c ****  ===============================================================================  
+ 161:./stdperiph/source/stm32f37x_dac.c **** 
+ 162:./stdperiph/source/stm32f37x_dac.c **** @endverbatim
+ 163:./stdperiph/source/stm32f37x_dac.c ****   * @{
+ 164:./stdperiph/source/stm32f37x_dac.c ****   */
+ 165:./stdperiph/source/stm32f37x_dac.c **** 
+ 166:./stdperiph/source/stm32f37x_dac.c **** /**
+ 167:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Deinitializes the DAC peripheral registers to their default reset values.
+ 168:./stdperiph/source/stm32f37x_dac.c ****   * @param  None
+ 169:./stdperiph/source/stm32f37x_dac.c ****   * @retval None
+ 170:./stdperiph/source/stm32f37x_dac.c ****   */
+ 171:./stdperiph/source/stm32f37x_dac.c **** void DAC_DeInit(DAC_TypeDef* DACx)
+ 172:./stdperiph/source/stm32f37x_dac.c **** {
+  30              		.loc 1 172 0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              	.LVL0:
+  35 0000 08B5     		push	{r3, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 8
+  38              		.cfi_offset 3, -8
+  39              		.cfi_offset 14, -4
+ 173:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 174:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALL_PERIPH(DACx));
+ 175:./stdperiph/source/stm32f37x_dac.c **** 
+ 176:./stdperiph/source/stm32f37x_dac.c ****   if (DACx == DAC1)
+  40              		.loc 1 176 0
+  41 0002 0C4B     		ldr	r3, .L5
+  42 0004 9842     		cmp	r0, r3
+  43 0006 0AD1     		bne	.L2
+ 177:./stdperiph/source/stm32f37x_dac.c ****   {
+ 178:./stdperiph/source/stm32f37x_dac.c ****     /* Enable DAC1 reset state */
+ 179:./stdperiph/source/stm32f37x_dac.c ****     RCC_APB1PeriphResetCmd(RCC_APB1Periph_DAC1, ENABLE);
+  44              		.loc 1 179 0
+  45 0008 0121     		movs	r1, #1
+  46 000a 4FF00050 		mov	r0, #536870912
+  47              	.LVL1:
+  48 000e FFF7FEFF 		bl	RCC_APB1PeriphResetCmd
+  49              	.LVL2:
+ 180:./stdperiph/source/stm32f37x_dac.c ****     /* Release DAC1 from reset state */
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 5
+
+
+ 181:./stdperiph/source/stm32f37x_dac.c ****     RCC_APB1PeriphResetCmd(RCC_APB1Periph_DAC1, DISABLE);
+  50              		.loc 1 181 0
+  51 0012 0021     		movs	r1, #0
+  52 0014 4FF00050 		mov	r0, #536870912
+  53 0018 FFF7FEFF 		bl	RCC_APB1PeriphResetCmd
+  54              	.LVL3:
+  55 001c 08BD     		pop	{r3, pc}
+  56              	.LVL4:
+  57              	.L2:
+ 182:./stdperiph/source/stm32f37x_dac.c ****   }
+ 183:./stdperiph/source/stm32f37x_dac.c ****   else
+ 184:./stdperiph/source/stm32f37x_dac.c ****   {
+ 185:./stdperiph/source/stm32f37x_dac.c ****     /* Enable DAC2 reset state */
+ 186:./stdperiph/source/stm32f37x_dac.c ****     RCC_APB1PeriphResetCmd(RCC_APB1Periph_DAC2, ENABLE);
+  58              		.loc 1 186 0
+  59 001e 0121     		movs	r1, #1
+  60 0020 4FF08060 		mov	r0, #67108864
+  61              	.LVL5:
+  62 0024 FFF7FEFF 		bl	RCC_APB1PeriphResetCmd
+  63              	.LVL6:
+ 187:./stdperiph/source/stm32f37x_dac.c ****     /* Release DAC2 from reset state */
+ 188:./stdperiph/source/stm32f37x_dac.c ****     RCC_APB1PeriphResetCmd(RCC_APB1Periph_DAC2, DISABLE);
+  64              		.loc 1 188 0
+  65 0028 0021     		movs	r1, #0
+  66 002a 4FF08060 		mov	r0, #67108864
+  67 002e FFF7FEFF 		bl	RCC_APB1PeriphResetCmd
+  68              	.LVL7:
+  69 0032 08BD     		pop	{r3, pc}
+  70              	.L6:
+  71              		.align	2
+  72              	.L5:
+  73 0034 00740040 		.word	1073771520
+  74              		.cfi_endproc
+  75              	.LFE111:
+  77              		.section	.text.DAC_Init,"ax",%progbits
+  78              		.align	2
+  79              		.global	DAC_Init
+  80              		.thumb
+  81              		.thumb_func
+  83              	DAC_Init:
+  84              	.LFB112:
+ 189:./stdperiph/source/stm32f37x_dac.c ****   }
+ 190:./stdperiph/source/stm32f37x_dac.c **** }
+ 191:./stdperiph/source/stm32f37x_dac.c **** 
+ 192:./stdperiph/source/stm32f37x_dac.c **** /**
+ 193:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Initializes the DAC peripheral according to the specified 
+ 194:./stdperiph/source/stm32f37x_dac.c ****   *         parameters in the DAC_InitStruct.
+ 195:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 or 2 to select the DAC peripheral.  
+ 196:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Channel: the selected DAC channel. 
+ 197:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 198:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_1: DAC Channel1 selected
+ 199:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_2: DAC Channel2 selected
+ 200:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_InitStruct: pointer to a DAC_InitTypeDef structure that
+ 201:./stdperiph/source/stm32f37x_dac.c ****   *         contains the configuration information for the specified DAC channel.
+ 202:./stdperiph/source/stm32f37x_dac.c ****   * @retval None
+ 203:./stdperiph/source/stm32f37x_dac.c ****   */
+ 204:./stdperiph/source/stm32f37x_dac.c **** void DAC_Init(DAC_TypeDef* DACx, uint32_t DAC_Channel, DAC_InitTypeDef* DAC_InitStruct)
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 6
+
+
+ 205:./stdperiph/source/stm32f37x_dac.c **** {
+  85              		.loc 1 205 0
+  86              		.cfi_startproc
+  87              		@ args = 0, pretend = 0, frame = 0
+  88              		@ frame_needed = 0, uses_anonymous_args = 0
+  89              		@ link register save eliminated.
+  90              	.LVL8:
+  91 0000 30B4     		push	{r4, r5}
+  92              	.LCFI1:
+  93              		.cfi_def_cfa_offset 8
+  94              		.cfi_offset 4, -8
+  95              		.cfi_offset 5, -4
+  96              	.LVL9:
+ 206:./stdperiph/source/stm32f37x_dac.c ****   uint32_t tmpreg1 = 0, tmpreg2 = 0;
+ 207:./stdperiph/source/stm32f37x_dac.c **** 
+ 208:./stdperiph/source/stm32f37x_dac.c ****   /* Check the DAC parameters */
+ 209:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALL_PERIPH(DACx));
+ 210:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_TRIGGER(DAC_InitStruct->DAC_Trigger));
+ 211:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_GENERATE_WAVE(DAC_InitStruct->DAC_WaveGeneration));
+ 212:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_LFSR_UNMASK_TRIANGLE_AMPLITUDE(DAC_InitStruct->DAC_LFSRUnmask_TriangleAmplitu
+ 213:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_OUTPUT_BUFFER_STATE(DAC_InitStruct->DAC_OutputBuffer));
+ 214:./stdperiph/source/stm32f37x_dac.c **** 
+ 215:./stdperiph/source/stm32f37x_dac.c **** /*---------------------------- DAC CR Configuration --------------------------*/
+ 216:./stdperiph/source/stm32f37x_dac.c ****   /* Get the DAC CR value */
+ 217:./stdperiph/source/stm32f37x_dac.c ****   tmpreg1 = DACx->CR;
+  97              		.loc 1 217 0
+  98 0002 0368     		ldr	r3, [r0]
+  99              	.LVL10:
+ 218:./stdperiph/source/stm32f37x_dac.c ****   /* Clear BOFFx, TENx, TSELx, WAVEx and MAMPx bits */
+ 219:./stdperiph/source/stm32f37x_dac.c ****   tmpreg1 &= ~(CR_CLEAR_MASK << DAC_Channel);
+ 100              		.loc 1 219 0
+ 101 0004 40F6FE74 		movw	r4, #4094
+ 102 0008 8C40     		lsls	r4, r4, r1
+ 103 000a 23EA0404 		bic	r4, r3, r4
+ 104              	.LVL11:
+ 220:./stdperiph/source/stm32f37x_dac.c ****   /* Configure for the selected DAC channel: buffer output, trigger, wave generation,
+ 221:./stdperiph/source/stm32f37x_dac.c ****      mask/amplitude for wave generation */
+ 222:./stdperiph/source/stm32f37x_dac.c ****   /* Set TSELx and TENx bits according to DAC_Trigger value */
+ 223:./stdperiph/source/stm32f37x_dac.c ****   /* Set WAVEx bits according to DAC_WaveGeneration value */
+ 224:./stdperiph/source/stm32f37x_dac.c ****   /* Set MAMPx bits according to DAC_LFSRUnmask_TriangleAmplitude value */ 
+ 225:./stdperiph/source/stm32f37x_dac.c ****   /* Set BOFFx bit according to DAC_OutputBuffer value */   
+ 226:./stdperiph/source/stm32f37x_dac.c ****   tmpreg2 = (DAC_InitStruct->DAC_Trigger | DAC_InitStruct->DAC_WaveGeneration |
+ 105              		.loc 1 226 0
+ 106 000e 1568     		ldr	r5, [r2]
+ 107 0010 5368     		ldr	r3, [r2, #4]
+ 108 0012 1D43     		orrs	r5, r5, r3
+ 227:./stdperiph/source/stm32f37x_dac.c ****              DAC_InitStruct->DAC_LFSRUnmask_TriangleAmplitude | DAC_InitStruct->DAC_OutputBuffer);
+ 109              		.loc 1 227 0
+ 110 0014 9368     		ldr	r3, [r2, #8]
+ 226:./stdperiph/source/stm32f37x_dac.c ****              DAC_InitStruct->DAC_LFSRUnmask_TriangleAmplitude | DAC_InitStruct->DAC_OutputBuffer);
+ 111              		.loc 1 226 0
+ 112 0016 1D43     		orrs	r5, r5, r3
+ 113              		.loc 1 227 0
+ 114 0018 D368     		ldr	r3, [r2, #12]
+ 226:./stdperiph/source/stm32f37x_dac.c ****              DAC_InitStruct->DAC_LFSRUnmask_TriangleAmplitude | DAC_InitStruct->DAC_OutputBuffer);
+ 115              		.loc 1 226 0
+ 116 001a 2B43     		orrs	r3, r3, r5
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 7
+
+
+ 117              	.LVL12:
+ 228:./stdperiph/source/stm32f37x_dac.c ****   /* Calculate CR register value depending on DAC_Channel */
+ 229:./stdperiph/source/stm32f37x_dac.c ****   tmpreg1 |= tmpreg2 << DAC_Channel;
+ 118              		.loc 1 229 0
+ 119 001c 03FA01F1 		lsl	r1, r3, r1
+ 120              	.LVL13:
+ 121 0020 2143     		orrs	r1, r1, r4
+ 122              	.LVL14:
+ 230:./stdperiph/source/stm32f37x_dac.c ****   /* Write to DAC CR */
+ 231:./stdperiph/source/stm32f37x_dac.c ****   DACx->CR = tmpreg1;
+ 123              		.loc 1 231 0
+ 124 0022 0160     		str	r1, [r0]
+ 232:./stdperiph/source/stm32f37x_dac.c **** }
+ 125              		.loc 1 232 0
+ 126 0024 30BC     		pop	{r4, r5}
+ 127              	.LCFI2:
+ 128              		.cfi_restore 5
+ 129              		.cfi_restore 4
+ 130              		.cfi_def_cfa_offset 0
+ 131 0026 7047     		bx	lr
+ 132              		.cfi_endproc
+ 133              	.LFE112:
+ 135              		.section	.text.DAC_StructInit,"ax",%progbits
+ 136              		.align	2
+ 137              		.global	DAC_StructInit
+ 138              		.thumb
+ 139              		.thumb_func
+ 141              	DAC_StructInit:
+ 142              	.LFB113:
+ 233:./stdperiph/source/stm32f37x_dac.c **** 
+ 234:./stdperiph/source/stm32f37x_dac.c **** /**
+ 235:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Fills each DAC_InitStruct member with its default value.
+ 236:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_InitStruct: pointer to a DAC_InitTypeDef structure which will 
+ 237:./stdperiph/source/stm32f37x_dac.c ****   *         be initialized.
+ 238:./stdperiph/source/stm32f37x_dac.c ****   * @retval None
+ 239:./stdperiph/source/stm32f37x_dac.c ****   */
+ 240:./stdperiph/source/stm32f37x_dac.c **** void DAC_StructInit(DAC_InitTypeDef* DAC_InitStruct)
+ 241:./stdperiph/source/stm32f37x_dac.c **** {
+ 143              		.loc 1 241 0
+ 144              		.cfi_startproc
+ 145              		@ args = 0, pretend = 0, frame = 0
+ 146              		@ frame_needed = 0, uses_anonymous_args = 0
+ 147              		@ link register save eliminated.
+ 148              	.LVL15:
+ 242:./stdperiph/source/stm32f37x_dac.c **** /*--------------- Reset DAC init structure parameters values -----------------*/
+ 243:./stdperiph/source/stm32f37x_dac.c ****   /* Initialize the DAC_Trigger member */
+ 244:./stdperiph/source/stm32f37x_dac.c ****   DAC_InitStruct->DAC_Trigger = DAC_Trigger_None;
+ 149              		.loc 1 244 0
+ 150 0000 0023     		movs	r3, #0
+ 151 0002 0360     		str	r3, [r0]
+ 245:./stdperiph/source/stm32f37x_dac.c ****   /* Initialize the DAC_WaveGeneration member */
+ 246:./stdperiph/source/stm32f37x_dac.c ****   DAC_InitStruct->DAC_WaveGeneration = DAC_WaveGeneration_None;
+ 152              		.loc 1 246 0
+ 153 0004 4360     		str	r3, [r0, #4]
+ 247:./stdperiph/source/stm32f37x_dac.c ****   /* Initialize the DAC_LFSRUnmask_TriangleAmplitude member */
+ 248:./stdperiph/source/stm32f37x_dac.c ****   DAC_InitStruct->DAC_LFSRUnmask_TriangleAmplitude = DAC_LFSRUnmask_Bit0;
+ 154              		.loc 1 248 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 8
+
+
+ 155 0006 8360     		str	r3, [r0, #8]
+ 249:./stdperiph/source/stm32f37x_dac.c ****   /* Initialize the DAC_OutputBuffer member */
+ 250:./stdperiph/source/stm32f37x_dac.c ****   DAC_InitStruct->DAC_OutputBuffer = DAC_OutputBuffer_Enable;
+ 156              		.loc 1 250 0
+ 157 0008 C360     		str	r3, [r0, #12]
+ 158 000a 7047     		bx	lr
+ 159              		.cfi_endproc
+ 160              	.LFE113:
+ 162              		.section	.text.DAC_Cmd,"ax",%progbits
+ 163              		.align	2
+ 164              		.global	DAC_Cmd
+ 165              		.thumb
+ 166              		.thumb_func
+ 168              	DAC_Cmd:
+ 169              	.LFB114:
+ 251:./stdperiph/source/stm32f37x_dac.c **** }
+ 252:./stdperiph/source/stm32f37x_dac.c **** 
+ 253:./stdperiph/source/stm32f37x_dac.c **** /**
+ 254:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Enables or disables the specified DAC channel.
+ 255:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 or 2 to select the DAC peripheral.  
+ 256:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Channel: The selected DAC channel. 
+ 257:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 258:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_1: DAC Channel1 selected
+ 259:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_2: DAC Channel2 selected
+ 260:./stdperiph/source/stm32f37x_dac.c ****   * @param  NewState: new state of the DAC channel. 
+ 261:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 262:./stdperiph/source/stm32f37x_dac.c ****   * @note   When the DAC channel is enabled the trigger source can no more
+ 263:./stdperiph/source/stm32f37x_dac.c ****   *         be modified.
+ 264:./stdperiph/source/stm32f37x_dac.c ****   * @retval None
+ 265:./stdperiph/source/stm32f37x_dac.c ****   */
+ 266:./stdperiph/source/stm32f37x_dac.c **** void DAC_Cmd(DAC_TypeDef* DACx, uint32_t DAC_Channel, FunctionalState NewState)
+ 267:./stdperiph/source/stm32f37x_dac.c **** {
+ 170              		.loc 1 267 0
+ 171              		.cfi_startproc
+ 172              		@ args = 0, pretend = 0, frame = 0
+ 173              		@ frame_needed = 0, uses_anonymous_args = 0
+ 174              		@ link register save eliminated.
+ 175              	.LVL16:
+ 268:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 269:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALL_PERIPH(DACx));
+ 270:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_CHANNEL(DAC_Channel));
+ 271:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 272:./stdperiph/source/stm32f37x_dac.c **** 
+ 273:./stdperiph/source/stm32f37x_dac.c ****   if (NewState != DISABLE)
+ 176              		.loc 1 273 0
+ 177 0000 32B1     		cbz	r2, .L11
+ 274:./stdperiph/source/stm32f37x_dac.c ****   {
+ 275:./stdperiph/source/stm32f37x_dac.c ****     /* Enable the selected DAC channel */
+ 276:./stdperiph/source/stm32f37x_dac.c ****     DACx->CR |= (DAC_CR_EN1 << DAC_Channel);
+ 178              		.loc 1 276 0
+ 179 0002 0268     		ldr	r2, [r0]
+ 180              	.LVL17:
+ 181 0004 0123     		movs	r3, #1
+ 182 0006 03FA01F1 		lsl	r1, r3, r1
+ 183              	.LVL18:
+ 184 000a 1143     		orrs	r1, r1, r2
+ 185 000c 0160     		str	r1, [r0]
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 9
+
+
+ 186 000e 7047     		bx	lr
+ 187              	.LVL19:
+ 188              	.L11:
+ 277:./stdperiph/source/stm32f37x_dac.c ****   }
+ 278:./stdperiph/source/stm32f37x_dac.c ****   else
+ 279:./stdperiph/source/stm32f37x_dac.c ****   {
+ 280:./stdperiph/source/stm32f37x_dac.c ****     /* Disable the selected DAC channel */
+ 281:./stdperiph/source/stm32f37x_dac.c ****     DACx->CR &= (~(DAC_CR_EN1 << DAC_Channel));
+ 189              		.loc 1 281 0
+ 190 0010 0368     		ldr	r3, [r0]
+ 191 0012 0122     		movs	r2, #1
+ 192              	.LVL20:
+ 193 0014 02FA01F1 		lsl	r1, r2, r1
+ 194              	.LVL21:
+ 195 0018 23EA0101 		bic	r1, r3, r1
+ 196 001c 0160     		str	r1, [r0]
+ 197 001e 7047     		bx	lr
+ 198              		.cfi_endproc
+ 199              	.LFE114:
+ 201              		.section	.text.DAC_SoftwareTriggerCmd,"ax",%progbits
+ 202              		.align	2
+ 203              		.global	DAC_SoftwareTriggerCmd
+ 204              		.thumb
+ 205              		.thumb_func
+ 207              	DAC_SoftwareTriggerCmd:
+ 208              	.LFB115:
+ 282:./stdperiph/source/stm32f37x_dac.c ****   }
+ 283:./stdperiph/source/stm32f37x_dac.c **** }
+ 284:./stdperiph/source/stm32f37x_dac.c **** 
+ 285:./stdperiph/source/stm32f37x_dac.c **** /**
+ 286:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Enables or disables the selected DAC channel software trigger.
+ 287:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 or 2 to select the DAC peripheral.  
+ 288:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Channel: the selected DAC channel. 
+ 289:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 290:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_1: DAC Channel1 selected
+ 291:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_2: DAC Channel2 selected
+ 292:./stdperiph/source/stm32f37x_dac.c ****   * @param  NewState: new state of the selected DAC channel software trigger.
+ 293:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 294:./stdperiph/source/stm32f37x_dac.c ****   * @retval None
+ 295:./stdperiph/source/stm32f37x_dac.c ****   */
+ 296:./stdperiph/source/stm32f37x_dac.c **** void DAC_SoftwareTriggerCmd(DAC_TypeDef* DACx, uint32_t DAC_Channel, FunctionalState NewState)
+ 297:./stdperiph/source/stm32f37x_dac.c **** {
+ 209              		.loc 1 297 0
+ 210              		.cfi_startproc
+ 211              		@ args = 0, pretend = 0, frame = 0
+ 212              		@ frame_needed = 0, uses_anonymous_args = 0
+ 213              		@ link register save eliminated.
+ 214              	.LVL22:
+ 298:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 299:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALL_PERIPH(DACx));
+ 300:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_CHANNEL(DAC_Channel));
+ 301:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 302:./stdperiph/source/stm32f37x_dac.c **** 
+ 303:./stdperiph/source/stm32f37x_dac.c ****   if (NewState != DISABLE)
+ 215              		.loc 1 303 0
+ 216 0000 3AB1     		cbz	r2, .L14
+ 304:./stdperiph/source/stm32f37x_dac.c ****   {
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 10
+
+
+ 305:./stdperiph/source/stm32f37x_dac.c ****     /* Enable software trigger for the selected DAC channel */
+ 306:./stdperiph/source/stm32f37x_dac.c ****     DACx->SWTRIGR |= (uint32_t)DAC_SWTRIGR_SWTRIG1 << (DAC_Channel >> 4);
+ 217              		.loc 1 306 0
+ 218 0002 4268     		ldr	r2, [r0, #4]
+ 219              	.LVL23:
+ 220 0004 0909     		lsrs	r1, r1, #4
+ 221              	.LVL24:
+ 222 0006 0123     		movs	r3, #1
+ 223 0008 03FA01F1 		lsl	r1, r3, r1
+ 224 000c 1143     		orrs	r1, r1, r2
+ 225 000e 4160     		str	r1, [r0, #4]
+ 226 0010 7047     		bx	lr
+ 227              	.LVL25:
+ 228              	.L14:
+ 307:./stdperiph/source/stm32f37x_dac.c ****   }
+ 308:./stdperiph/source/stm32f37x_dac.c ****   else
+ 309:./stdperiph/source/stm32f37x_dac.c ****   {
+ 310:./stdperiph/source/stm32f37x_dac.c ****     /* Disable software trigger for the selected DAC channel */
+ 311:./stdperiph/source/stm32f37x_dac.c ****     DACx->SWTRIGR &= ~((uint32_t)DAC_SWTRIGR_SWTRIG1 << (DAC_Channel >> 4));
+ 229              		.loc 1 311 0
+ 230 0012 4368     		ldr	r3, [r0, #4]
+ 231 0014 0909     		lsrs	r1, r1, #4
+ 232              	.LVL26:
+ 233 0016 0122     		movs	r2, #1
+ 234              	.LVL27:
+ 235 0018 02FA01F1 		lsl	r1, r2, r1
+ 236 001c 23EA0101 		bic	r1, r3, r1
+ 237 0020 4160     		str	r1, [r0, #4]
+ 238 0022 7047     		bx	lr
+ 239              		.cfi_endproc
+ 240              	.LFE115:
+ 242              		.section	.text.DAC_DualSoftwareTriggerCmd,"ax",%progbits
+ 243              		.align	2
+ 244              		.global	DAC_DualSoftwareTriggerCmd
+ 245              		.thumb
+ 246              		.thumb_func
+ 248              	DAC_DualSoftwareTriggerCmd:
+ 249              	.LFB116:
+ 312:./stdperiph/source/stm32f37x_dac.c ****   }
+ 313:./stdperiph/source/stm32f37x_dac.c **** }
+ 314:./stdperiph/source/stm32f37x_dac.c **** 
+ 315:./stdperiph/source/stm32f37x_dac.c **** /**
+ 316:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Enables or disables simultaneously the two DAC channels software
+ 317:./stdperiph/source/stm32f37x_dac.c ****   *         triggers.
+ 318:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 to select the DAC1 peripheral.
+ 319:./stdperiph/source/stm32f37x_dac.c ****   * @note   Dual trigger is not applicable for DAC2 (DAC2 integrates one channel).
+ 320:./stdperiph/source/stm32f37x_dac.c ****   * @param  NewState: new state of the DAC channels software triggers.
+ 321:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 322:./stdperiph/source/stm32f37x_dac.c ****   * @retval None
+ 323:./stdperiph/source/stm32f37x_dac.c ****   */
+ 324:./stdperiph/source/stm32f37x_dac.c **** void DAC_DualSoftwareTriggerCmd(DAC_TypeDef* DACx, FunctionalState NewState)
+ 325:./stdperiph/source/stm32f37x_dac.c **** {
+ 250              		.loc 1 325 0
+ 251              		.cfi_startproc
+ 252              		@ args = 0, pretend = 0, frame = 0
+ 253              		@ frame_needed = 0, uses_anonymous_args = 0
+ 254              		@ link register save eliminated.
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 11
+
+
+ 255              	.LVL28:
+ 326:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 327:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_LIST1_PERIPH(DACx));
+ 328:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 329:./stdperiph/source/stm32f37x_dac.c **** 
+ 330:./stdperiph/source/stm32f37x_dac.c ****   if (NewState != DISABLE)
+ 256              		.loc 1 330 0
+ 257 0000 21B1     		cbz	r1, .L17
+ 331:./stdperiph/source/stm32f37x_dac.c ****   {
+ 332:./stdperiph/source/stm32f37x_dac.c ****     /* Enable software trigger for both DAC channels */
+ 333:./stdperiph/source/stm32f37x_dac.c ****     DACx->SWTRIGR |= DUAL_SWTRIG_SET;
+ 258              		.loc 1 333 0
+ 259 0002 4368     		ldr	r3, [r0, #4]
+ 260 0004 43F00303 		orr	r3, r3, #3
+ 261 0008 4360     		str	r3, [r0, #4]
+ 262 000a 7047     		bx	lr
+ 263              	.L17:
+ 334:./stdperiph/source/stm32f37x_dac.c ****   }
+ 335:./stdperiph/source/stm32f37x_dac.c ****   else
+ 336:./stdperiph/source/stm32f37x_dac.c ****   {
+ 337:./stdperiph/source/stm32f37x_dac.c ****     /* Disable software trigger for both DAC channels */
+ 338:./stdperiph/source/stm32f37x_dac.c ****     DACx->SWTRIGR &= DUAL_SWTRIG_RESET;
+ 264              		.loc 1 338 0
+ 265 000c 4368     		ldr	r3, [r0, #4]
+ 266 000e 23F00303 		bic	r3, r3, #3
+ 267 0012 4360     		str	r3, [r0, #4]
+ 268 0014 7047     		bx	lr
+ 269              		.cfi_endproc
+ 270              	.LFE116:
+ 272 0016 00BF     		.section	.text.DAC_WaveGenerationCmd,"ax",%progbits
+ 273              		.align	2
+ 274              		.global	DAC_WaveGenerationCmd
+ 275              		.thumb
+ 276              		.thumb_func
+ 278              	DAC_WaveGenerationCmd:
+ 279              	.LFB117:
+ 339:./stdperiph/source/stm32f37x_dac.c ****   }
+ 340:./stdperiph/source/stm32f37x_dac.c **** }
+ 341:./stdperiph/source/stm32f37x_dac.c **** 
+ 342:./stdperiph/source/stm32f37x_dac.c **** /**
+ 343:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Enables or disables the selected DAC channel wave generation.
+ 344:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 to select the DAC1 peripheral.
+ 345:./stdperiph/source/stm32f37x_dac.c ****   * @note   Wave generation is not available in DAC2.
+ 346:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Channel: the selected DAC channel. 
+ 347:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 348:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_1: DAC Channel1 selected
+ 349:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_2: DAC Channel2 selected
+ 350:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Wave: Specifies the wave type to enable or disable.
+ 351:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 352:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Wave_Noise: noise wave generation
+ 353:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Wave_Triangle: triangle wave generation
+ 354:./stdperiph/source/stm32f37x_dac.c ****   * @param  NewState: new state of the selected DAC channel wave generation.
+ 355:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 356:./stdperiph/source/stm32f37x_dac.c ****   * @note   
+ 357:./stdperiph/source/stm32f37x_dac.c ****   * @retval None
+ 358:./stdperiph/source/stm32f37x_dac.c ****   */
+ 359:./stdperiph/source/stm32f37x_dac.c **** void DAC_WaveGenerationCmd(DAC_TypeDef* DACx, uint32_t DAC_Channel, uint32_t DAC_Wave, FunctionalSt
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 12
+
+
+ 360:./stdperiph/source/stm32f37x_dac.c **** {
+ 280              		.loc 1 360 0
+ 281              		.cfi_startproc
+ 282              		@ args = 0, pretend = 0, frame = 0
+ 283              		@ frame_needed = 0, uses_anonymous_args = 0
+ 284              		@ link register save eliminated.
+ 285              	.LVL29:
+ 361:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 362:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_LIST1_PERIPH(DACx));
+ 363:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_CHANNEL(DAC_Channel));
+ 364:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_WAVE(DAC_Wave)); 
+ 365:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 366:./stdperiph/source/stm32f37x_dac.c **** 
+ 367:./stdperiph/source/stm32f37x_dac.c ****   if (NewState != DISABLE)
+ 286              		.loc 1 367 0
+ 287 0000 23B1     		cbz	r3, .L20
+ 368:./stdperiph/source/stm32f37x_dac.c ****   {
+ 369:./stdperiph/source/stm32f37x_dac.c ****     /* Enable the selected wave generation for the selected DAC channel */
+ 370:./stdperiph/source/stm32f37x_dac.c ****     DACx->CR |= DAC_Wave << DAC_Channel;
+ 288              		.loc 1 370 0
+ 289 0002 0368     		ldr	r3, [r0]
+ 290              	.LVL30:
+ 291 0004 8A40     		lsls	r2, r2, r1
+ 292              	.LVL31:
+ 293 0006 1A43     		orrs	r2, r2, r3
+ 294 0008 0260     		str	r2, [r0]
+ 295 000a 7047     		bx	lr
+ 296              	.LVL32:
+ 297              	.L20:
+ 371:./stdperiph/source/stm32f37x_dac.c ****   }
+ 372:./stdperiph/source/stm32f37x_dac.c ****   else
+ 373:./stdperiph/source/stm32f37x_dac.c ****   {
+ 374:./stdperiph/source/stm32f37x_dac.c ****     /* Disable the selected wave generation for the selected DAC channel */
+ 375:./stdperiph/source/stm32f37x_dac.c ****     DACx->CR &= ~(DAC_Wave << DAC_Channel);
+ 298              		.loc 1 375 0
+ 299 000c 0368     		ldr	r3, [r0]
+ 300              	.LVL33:
+ 301 000e 8A40     		lsls	r2, r2, r1
+ 302              	.LVL34:
+ 303 0010 23EA0202 		bic	r2, r3, r2
+ 304 0014 0260     		str	r2, [r0]
+ 305 0016 7047     		bx	lr
+ 306              		.cfi_endproc
+ 307              	.LFE117:
+ 309              		.section	.text.DAC_SetChannel1Data,"ax",%progbits
+ 310              		.align	2
+ 311              		.global	DAC_SetChannel1Data
+ 312              		.thumb
+ 313              		.thumb_func
+ 315              	DAC_SetChannel1Data:
+ 316              	.LFB118:
+ 376:./stdperiph/source/stm32f37x_dac.c ****   }
+ 377:./stdperiph/source/stm32f37x_dac.c **** }
+ 378:./stdperiph/source/stm32f37x_dac.c **** 
+ 379:./stdperiph/source/stm32f37x_dac.c **** /**
+ 380:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Set the specified data holding register value for DAC channel1.
+ 381:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 or 2 to select the DAC peripheral.  
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 13
+
+
+ 382:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Align: Specifies the data alignment for DAC channel1.
+ 383:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 384:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Align_8b_R: 8bit right data alignment selected
+ 385:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Align_12b_L: 12bit left data alignment selected
+ 386:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Align_12b_R: 12bit right data alignment selected
+ 387:./stdperiph/source/stm32f37x_dac.c ****   * @param  Data: Data to be loaded in the selected data holding register.
+ 388:./stdperiph/source/stm32f37x_dac.c ****   * @retval None
+ 389:./stdperiph/source/stm32f37x_dac.c ****   */
+ 390:./stdperiph/source/stm32f37x_dac.c **** void DAC_SetChannel1Data(DAC_TypeDef* DACx, uint32_t DAC_Align, uint16_t Data)
+ 391:./stdperiph/source/stm32f37x_dac.c **** {  
+ 317              		.loc 1 391 0
+ 318              		.cfi_startproc
+ 319              		@ args = 0, pretend = 0, frame = 8
+ 320              		@ frame_needed = 0, uses_anonymous_args = 0
+ 321              		@ link register save eliminated.
+ 322              	.LVL35:
+ 323 0000 82B0     		sub	sp, sp, #8
+ 324              	.LCFI3:
+ 325              		.cfi_def_cfa_offset 8
+ 392:./stdperiph/source/stm32f37x_dac.c ****   __IO uint32_t tmp = 0;
+ 326              		.loc 1 392 0
+ 327 0002 0023     		movs	r3, #0
+ 328 0004 0193     		str	r3, [sp, #4]
+ 393:./stdperiph/source/stm32f37x_dac.c ****   
+ 394:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 395:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALL_PERIPH(DACx));
+ 396:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALIGN(DAC_Align));
+ 397:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_DATA(Data));
+ 398:./stdperiph/source/stm32f37x_dac.c ****   
+ 399:./stdperiph/source/stm32f37x_dac.c ****   tmp = (uint32_t)DACx; 
+ 329              		.loc 1 399 0
+ 330 0006 0190     		str	r0, [sp, #4]
+ 400:./stdperiph/source/stm32f37x_dac.c ****   tmp += DHR12R1_OFFSET + DAC_Align;
+ 331              		.loc 1 400 0
+ 332 0008 019B     		ldr	r3, [sp, #4]
+ 333 000a 1944     		add	r1, r1, r3
+ 334              	.LVL36:
+ 335 000c 0831     		adds	r1, r1, #8
+ 336 000e 0191     		str	r1, [sp, #4]
+ 401:./stdperiph/source/stm32f37x_dac.c **** 
+ 402:./stdperiph/source/stm32f37x_dac.c ****   /* Set the DAC channel1 selected data holding register */
+ 403:./stdperiph/source/stm32f37x_dac.c ****   *(__IO uint32_t *) tmp = Data;
+ 337              		.loc 1 403 0
+ 338 0010 019B     		ldr	r3, [sp, #4]
+ 339 0012 1A60     		str	r2, [r3]
+ 404:./stdperiph/source/stm32f37x_dac.c **** }
+ 340              		.loc 1 404 0
+ 341 0014 02B0     		add	sp, sp, #8
+ 342              	.LCFI4:
+ 343              		.cfi_def_cfa_offset 0
+ 344              		@ sp needed
+ 345 0016 7047     		bx	lr
+ 346              		.cfi_endproc
+ 347              	.LFE118:
+ 349              		.section	.text.DAC_SetChannel2Data,"ax",%progbits
+ 350              		.align	2
+ 351              		.global	DAC_SetChannel2Data
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 14
+
+
+ 352              		.thumb
+ 353              		.thumb_func
+ 355              	DAC_SetChannel2Data:
+ 356              	.LFB119:
+ 405:./stdperiph/source/stm32f37x_dac.c **** 
+ 406:./stdperiph/source/stm32f37x_dac.c **** /**
+ 407:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Set the specified data holding register value for DAC channel2.
+ 408:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 to select the DAC peripheral.
+ 409:./stdperiph/source/stm32f37x_dac.c ****   * @note   This function is available only for DAC1.
+ 410:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Align: Specifies the data alignment for DAC channel2.
+ 411:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 412:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Align_8b_R: 8bit right data alignment selected
+ 413:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Align_12b_L: 12bit left data alignment selected
+ 414:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Align_12b_R: 12bit right data alignment selected
+ 415:./stdperiph/source/stm32f37x_dac.c ****   * @param  Data : Data to be loaded in the selected data holding register.
+ 416:./stdperiph/source/stm32f37x_dac.c ****   * @retval None
+ 417:./stdperiph/source/stm32f37x_dac.c ****   */
+ 418:./stdperiph/source/stm32f37x_dac.c **** void DAC_SetChannel2Data(DAC_TypeDef* DACx, uint32_t DAC_Align, uint16_t Data)
+ 419:./stdperiph/source/stm32f37x_dac.c **** {
+ 357              		.loc 1 419 0
+ 358              		.cfi_startproc
+ 359              		@ args = 0, pretend = 0, frame = 8
+ 360              		@ frame_needed = 0, uses_anonymous_args = 0
+ 361              		@ link register save eliminated.
+ 362              	.LVL37:
+ 363 0000 82B0     		sub	sp, sp, #8
+ 364              	.LCFI5:
+ 365              		.cfi_def_cfa_offset 8
+ 420:./stdperiph/source/stm32f37x_dac.c ****   __IO uint32_t tmp = 0;
+ 366              		.loc 1 420 0
+ 367 0002 0023     		movs	r3, #0
+ 368 0004 0193     		str	r3, [sp, #4]
+ 421:./stdperiph/source/stm32f37x_dac.c **** 
+ 422:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 423:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_LIST1_PERIPH(DACx));
+ 424:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALIGN(DAC_Align));
+ 425:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_DATA(Data));
+ 426:./stdperiph/source/stm32f37x_dac.c ****   
+ 427:./stdperiph/source/stm32f37x_dac.c ****   tmp = (uint32_t)DACx;
+ 369              		.loc 1 427 0
+ 370 0006 0190     		str	r0, [sp, #4]
+ 428:./stdperiph/source/stm32f37x_dac.c ****   tmp += DHR12R2_OFFSET + DAC_Align;
+ 371              		.loc 1 428 0
+ 372 0008 019B     		ldr	r3, [sp, #4]
+ 373 000a 1944     		add	r1, r1, r3
+ 374              	.LVL38:
+ 375 000c 1431     		adds	r1, r1, #20
+ 376 000e 0191     		str	r1, [sp, #4]
+ 429:./stdperiph/source/stm32f37x_dac.c **** 
+ 430:./stdperiph/source/stm32f37x_dac.c ****   /* Set the DAC channel2 selected data holding register */
+ 431:./stdperiph/source/stm32f37x_dac.c ****   *(__IO uint32_t *)tmp = Data;
+ 377              		.loc 1 431 0
+ 378 0010 019B     		ldr	r3, [sp, #4]
+ 379 0012 1A60     		str	r2, [r3]
+ 432:./stdperiph/source/stm32f37x_dac.c **** }
+ 380              		.loc 1 432 0
+ 381 0014 02B0     		add	sp, sp, #8
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 15
+
+
+ 382              	.LCFI6:
+ 383              		.cfi_def_cfa_offset 0
+ 384              		@ sp needed
+ 385 0016 7047     		bx	lr
+ 386              		.cfi_endproc
+ 387              	.LFE119:
+ 389              		.section	.text.DAC_SetDualChannelData,"ax",%progbits
+ 390              		.align	2
+ 391              		.global	DAC_SetDualChannelData
+ 392              		.thumb
+ 393              		.thumb_func
+ 395              	DAC_SetDualChannelData:
+ 396              	.LFB120:
+ 433:./stdperiph/source/stm32f37x_dac.c **** 
+ 434:./stdperiph/source/stm32f37x_dac.c **** /**
+ 435:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Set the specified data holding register value for dual channel DAC.
+ 436:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 to select the DAC peripheral.
+ 437:./stdperiph/source/stm32f37x_dac.c ****   * @note   This function isn't applicable for DAC2.
+ 438:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Align: Specifies the data alignment for dual channel DAC.
+ 439:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 440:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Align_8b_R: 8bit right data alignment selected
+ 441:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Align_12b_L: 12bit left data alignment selected
+ 442:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Align_12b_R: 12bit right data alignment selected
+ 443:./stdperiph/source/stm32f37x_dac.c ****   * @param  Data2: Data for DAC Channel2 to be loaded in the selected data 
+ 444:./stdperiph/source/stm32f37x_dac.c ****   *         holding register.
+ 445:./stdperiph/source/stm32f37x_dac.c ****   * @param  Data1: Data for DAC Channel1 to be loaded in the selected data 
+ 446:./stdperiph/source/stm32f37x_dac.c ****   *         holding register.
+ 447:./stdperiph/source/stm32f37x_dac.c ****   * @note In dual mode, a unique register access is required to write in both
+ 448:./stdperiph/source/stm32f37x_dac.c ****   *       DAC channels at the same time.
+ 449:./stdperiph/source/stm32f37x_dac.c ****   * @retval None
+ 450:./stdperiph/source/stm32f37x_dac.c ****   */
+ 451:./stdperiph/source/stm32f37x_dac.c **** void DAC_SetDualChannelData(DAC_TypeDef* DACx, uint32_t DAC_Align, uint16_t Data2, uint16_t Data1)
+ 452:./stdperiph/source/stm32f37x_dac.c **** {
+ 397              		.loc 1 452 0
+ 398              		.cfi_startproc
+ 399              		@ args = 0, pretend = 0, frame = 0
+ 400              		@ frame_needed = 0, uses_anonymous_args = 0
+ 401              		@ link register save eliminated.
+ 402              	.LVL39:
+ 453:./stdperiph/source/stm32f37x_dac.c ****   uint32_t data = 0, tmp = 0;
+ 454:./stdperiph/source/stm32f37x_dac.c ****   
+ 455:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 456:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_LIST1_PERIPH(DACx));
+ 457:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALIGN(DAC_Align));
+ 458:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_DATA(Data1));
+ 459:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_DATA(Data2));
+ 460:./stdperiph/source/stm32f37x_dac.c ****   
+ 461:./stdperiph/source/stm32f37x_dac.c ****   /* Calculate and set dual DAC data holding register value */
+ 462:./stdperiph/source/stm32f37x_dac.c ****   if (DAC_Align == DAC_Align_8b_R)
+ 403              		.loc 1 462 0
+ 404 0000 0829     		cmp	r1, #8
+ 405 0002 02D1     		bne	.L27
+ 463:./stdperiph/source/stm32f37x_dac.c ****   {
+ 464:./stdperiph/source/stm32f37x_dac.c ****     data = ((uint32_t)Data2 << 8) | Data1; 
+ 406              		.loc 1 464 0
+ 407 0004 43EA0223 		orr	r3, r3, r2, lsl #8
+ 408              	.LVL40:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 16
+
+
+ 409 0008 01E0     		b	.L28
+ 410              	.LVL41:
+ 411              	.L27:
+ 465:./stdperiph/source/stm32f37x_dac.c ****   }
+ 466:./stdperiph/source/stm32f37x_dac.c ****   else
+ 467:./stdperiph/source/stm32f37x_dac.c ****   {
+ 468:./stdperiph/source/stm32f37x_dac.c ****     data = ((uint32_t)Data2 << 16) | Data1;
+ 412              		.loc 1 468 0
+ 413 000a 43EA0243 		orr	r3, r3, r2, lsl #16
+ 414              	.LVL42:
+ 415              	.L28:
+ 469:./stdperiph/source/stm32f37x_dac.c ****   }
+ 470:./stdperiph/source/stm32f37x_dac.c ****   
+ 471:./stdperiph/source/stm32f37x_dac.c ****   tmp = (uint32_t)DACx;
+ 472:./stdperiph/source/stm32f37x_dac.c ****   tmp += DHR12RD_OFFSET + DAC_Align;
+ 416              		.loc 1 472 0
+ 417 000e 0844     		add	r0, r0, r1
+ 418              	.LVL43:
+ 473:./stdperiph/source/stm32f37x_dac.c **** 
+ 474:./stdperiph/source/stm32f37x_dac.c ****   /* Set the dual DAC selected data holding register */
+ 475:./stdperiph/source/stm32f37x_dac.c ****   *(__IO uint32_t *)tmp = data;
+ 419              		.loc 1 475 0
+ 420 0010 0362     		str	r3, [r0, #32]
+ 421 0012 7047     		bx	lr
+ 422              		.cfi_endproc
+ 423              	.LFE120:
+ 425              		.section	.text.DAC_GetDataOutputValue,"ax",%progbits
+ 426              		.align	2
+ 427              		.global	DAC_GetDataOutputValue
+ 428              		.thumb
+ 429              		.thumb_func
+ 431              	DAC_GetDataOutputValue:
+ 432              	.LFB121:
+ 476:./stdperiph/source/stm32f37x_dac.c **** }
+ 477:./stdperiph/source/stm32f37x_dac.c **** 
+ 478:./stdperiph/source/stm32f37x_dac.c **** /**
+ 479:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Returns the last data output value of the selected DAC channel.
+ 480:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 or 2 to select the DAC peripheral.  
+ 481:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Channel: the selected DAC channel. 
+ 482:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 483:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_1: DAC Channel1 selected
+ 484:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_2: DAC Channel2 selected
+ 485:./stdperiph/source/stm32f37x_dac.c ****   * @retval The selected DAC channel data output value.
+ 486:./stdperiph/source/stm32f37x_dac.c ****   */
+ 487:./stdperiph/source/stm32f37x_dac.c **** uint16_t DAC_GetDataOutputValue(DAC_TypeDef* DACx, uint32_t DAC_Channel)
+ 488:./stdperiph/source/stm32f37x_dac.c **** {
+ 433              		.loc 1 488 0
+ 434              		.cfi_startproc
+ 435              		@ args = 0, pretend = 0, frame = 8
+ 436              		@ frame_needed = 0, uses_anonymous_args = 0
+ 437              		@ link register save eliminated.
+ 438              	.LVL44:
+ 439 0000 82B0     		sub	sp, sp, #8
+ 440              	.LCFI7:
+ 441              		.cfi_def_cfa_offset 8
+ 489:./stdperiph/source/stm32f37x_dac.c ****   __IO uint32_t tmp = 0;
+ 442              		.loc 1 489 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 17
+
+
+ 443 0002 0023     		movs	r3, #0
+ 444 0004 0193     		str	r3, [sp, #4]
+ 490:./stdperiph/source/stm32f37x_dac.c ****   
+ 491:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 492:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALL_PERIPH(DACx));
+ 493:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_CHANNEL(DAC_Channel));
+ 494:./stdperiph/source/stm32f37x_dac.c ****   
+ 495:./stdperiph/source/stm32f37x_dac.c ****   tmp = (uint32_t) DACx;
+ 445              		.loc 1 495 0
+ 446 0006 0190     		str	r0, [sp, #4]
+ 496:./stdperiph/source/stm32f37x_dac.c ****   tmp += DOR_OFFSET + ((uint32_t)DAC_Channel >> 2);
+ 447              		.loc 1 496 0
+ 448 0008 019B     		ldr	r3, [sp, #4]
+ 449 000a 03EB9101 		add	r1, r3, r1, lsr #2
+ 450              	.LVL45:
+ 451 000e 2C31     		adds	r1, r1, #44
+ 452 0010 0191     		str	r1, [sp, #4]
+ 497:./stdperiph/source/stm32f37x_dac.c ****   
+ 498:./stdperiph/source/stm32f37x_dac.c ****   /* Returns the DAC channel data output register value */
+ 499:./stdperiph/source/stm32f37x_dac.c ****   return (uint16_t) (*(__IO uint32_t*) tmp);
+ 453              		.loc 1 499 0
+ 454 0012 019B     		ldr	r3, [sp, #4]
+ 455 0014 1868     		ldr	r0, [r3]
+ 456              	.LVL46:
+ 500:./stdperiph/source/stm32f37x_dac.c **** }
+ 457              		.loc 1 500 0
+ 458 0016 80B2     		uxth	r0, r0
+ 459 0018 02B0     		add	sp, sp, #8
+ 460              	.LCFI8:
+ 461              		.cfi_def_cfa_offset 0
+ 462              		@ sp needed
+ 463 001a 7047     		bx	lr
+ 464              		.cfi_endproc
+ 465              	.LFE121:
+ 467              		.section	.text.DAC_DMACmd,"ax",%progbits
+ 468              		.align	2
+ 469              		.global	DAC_DMACmd
+ 470              		.thumb
+ 471              		.thumb_func
+ 473              	DAC_DMACmd:
+ 474              	.LFB122:
+ 501:./stdperiph/source/stm32f37x_dac.c **** 
+ 502:./stdperiph/source/stm32f37x_dac.c **** /**
+ 503:./stdperiph/source/stm32f37x_dac.c ****   * @}
+ 504:./stdperiph/source/stm32f37x_dac.c ****   */
+ 505:./stdperiph/source/stm32f37x_dac.c **** 
+ 506:./stdperiph/source/stm32f37x_dac.c **** /** @defgroup DAC_Group2 DMA management functions
+ 507:./stdperiph/source/stm32f37x_dac.c ****  *  @brief   DMA management functions
+ 508:./stdperiph/source/stm32f37x_dac.c ****  *
+ 509:./stdperiph/source/stm32f37x_dac.c **** @verbatim   
+ 510:./stdperiph/source/stm32f37x_dac.c ****  ===============================================================================
+ 511:./stdperiph/source/stm32f37x_dac.c ****                     ##### DMA management functions #####
+ 512:./stdperiph/source/stm32f37x_dac.c ****  =============================================================================== 
+ 513:./stdperiph/source/stm32f37x_dac.c **** 
+ 514:./stdperiph/source/stm32f37x_dac.c **** @endverbatim
+ 515:./stdperiph/source/stm32f37x_dac.c ****   * @{
+ 516:./stdperiph/source/stm32f37x_dac.c ****   */
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 18
+
+
+ 517:./stdperiph/source/stm32f37x_dac.c **** 
+ 518:./stdperiph/source/stm32f37x_dac.c **** /**
+ 519:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Enables or disables the specified DAC channel DMA request.
+ 520:./stdperiph/source/stm32f37x_dac.c ****   *         When enabled DMA1 is generated when an external trigger (EXTI Line9,
+ 521:./stdperiph/source/stm32f37x_dac.c ****   *         TIM2, TIM4, TIM6, TIM7 or TIM9  but not a software trigger) occurs
+ 522:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 or 2 to select the DAC peripheral.
+ 523:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Channel: the selected DAC channel.
+ 524:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 525:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_1: DAC Channel1 selected
+ 526:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_2: DAC Channel2 selected
+ 527:./stdperiph/source/stm32f37x_dac.c ****   * @param  NewState: new state of the selected DAC channel DMA request.
+ 528:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 529:./stdperiph/source/stm32f37x_dac.c ****   * @note The DAC channel1 (channel2) is mapped on DMA1 channel3 (channel4) which 
+ 530:./stdperiph/source/stm32f37x_dac.c ****   *       must be already configured. 
+ 531:./stdperiph/source/stm32f37x_dac.c ****   * @retval None
+ 532:./stdperiph/source/stm32f37x_dac.c ****   */
+ 533:./stdperiph/source/stm32f37x_dac.c **** void DAC_DMACmd(DAC_TypeDef* DACx, uint32_t DAC_Channel, FunctionalState NewState)
+ 534:./stdperiph/source/stm32f37x_dac.c **** {
+ 475              		.loc 1 534 0
+ 476              		.cfi_startproc
+ 477              		@ args = 0, pretend = 0, frame = 0
+ 478              		@ frame_needed = 0, uses_anonymous_args = 0
+ 479              		@ link register save eliminated.
+ 480              	.LVL47:
+ 535:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 536:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALL_PERIPH(DACx));
+ 537:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_CHANNEL(DAC_Channel));
+ 538:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 539:./stdperiph/source/stm32f37x_dac.c **** 
+ 540:./stdperiph/source/stm32f37x_dac.c ****   if (NewState != DISABLE)
+ 481              		.loc 1 540 0
+ 482 0000 3AB1     		cbz	r2, .L32
+ 541:./stdperiph/source/stm32f37x_dac.c ****   {
+ 542:./stdperiph/source/stm32f37x_dac.c ****     /* Enable the selected DAC channel DMA request */
+ 543:./stdperiph/source/stm32f37x_dac.c ****     DACx->CR |= (DAC_CR_DMAEN1 << DAC_Channel);
+ 483              		.loc 1 543 0
+ 484 0002 0268     		ldr	r2, [r0]
+ 485              	.LVL48:
+ 486 0004 4FF48053 		mov	r3, #4096
+ 487 0008 03FA01F1 		lsl	r1, r3, r1
+ 488              	.LVL49:
+ 489 000c 1143     		orrs	r1, r1, r2
+ 490 000e 0160     		str	r1, [r0]
+ 491 0010 7047     		bx	lr
+ 492              	.LVL50:
+ 493              	.L32:
+ 544:./stdperiph/source/stm32f37x_dac.c ****   }
+ 545:./stdperiph/source/stm32f37x_dac.c ****   else
+ 546:./stdperiph/source/stm32f37x_dac.c ****   {
+ 547:./stdperiph/source/stm32f37x_dac.c ****     /* Disable the selected DAC channel DMA request */
+ 548:./stdperiph/source/stm32f37x_dac.c ****     DACx->CR &= (~(DAC_CR_DMAEN1 << DAC_Channel));
+ 494              		.loc 1 548 0
+ 495 0012 0368     		ldr	r3, [r0]
+ 496 0014 4FF48052 		mov	r2, #4096
+ 497              	.LVL51:
+ 498 0018 02FA01F1 		lsl	r1, r2, r1
+ 499              	.LVL52:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 19
+
+
+ 500 001c 23EA0101 		bic	r1, r3, r1
+ 501 0020 0160     		str	r1, [r0]
+ 502 0022 7047     		bx	lr
+ 503              		.cfi_endproc
+ 504              	.LFE122:
+ 506              		.section	.text.DAC_ITConfig,"ax",%progbits
+ 507              		.align	2
+ 508              		.global	DAC_ITConfig
+ 509              		.thumb
+ 510              		.thumb_func
+ 512              	DAC_ITConfig:
+ 513              	.LFB123:
+ 549:./stdperiph/source/stm32f37x_dac.c ****   }
+ 550:./stdperiph/source/stm32f37x_dac.c **** }
+ 551:./stdperiph/source/stm32f37x_dac.c **** 
+ 552:./stdperiph/source/stm32f37x_dac.c **** /**
+ 553:./stdperiph/source/stm32f37x_dac.c ****   * @}
+ 554:./stdperiph/source/stm32f37x_dac.c ****   */
+ 555:./stdperiph/source/stm32f37x_dac.c **** 
+ 556:./stdperiph/source/stm32f37x_dac.c **** /** @defgroup DAC_Group3 Interrupts and flags management functions
+ 557:./stdperiph/source/stm32f37x_dac.c ****  *  @brief   Interrupts and flags management functions
+ 558:./stdperiph/source/stm32f37x_dac.c ****  *
+ 559:./stdperiph/source/stm32f37x_dac.c **** @verbatim   
+ 560:./stdperiph/source/stm32f37x_dac.c ****  ===============================================================================
+ 561:./stdperiph/source/stm32f37x_dac.c ****             ##### Interrupts and flags management functions #####
+ 562:./stdperiph/source/stm32f37x_dac.c ****  ===============================================================================
+ 563:./stdperiph/source/stm32f37x_dac.c **** 
+ 564:./stdperiph/source/stm32f37x_dac.c **** @endverbatim
+ 565:./stdperiph/source/stm32f37x_dac.c ****   * @{
+ 566:./stdperiph/source/stm32f37x_dac.c ****   */
+ 567:./stdperiph/source/stm32f37x_dac.c **** 
+ 568:./stdperiph/source/stm32f37x_dac.c **** /**
+ 569:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Enables or disables the specified DAC interrupts.
+ 570:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 or 2 to select the DAC peripheral.  
+ 571:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Channel: the selected DAC channel. 
+ 572:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 573:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_1: DAC Channel1 selected
+ 574:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_2: DAC Channel2 selected
+ 575:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_IT: specifies the DAC interrupt sources to be enabled or disabled. 
+ 576:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be:
+ 577:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_IT_DMAUDR: DMA underrun interrupt mask
+ 578:./stdperiph/source/stm32f37x_dac.c ****   * @note   The DMA underrun occurs when a second external trigger arrives before
+ 579:./stdperiph/source/stm32f37x_dac.c ****   *         the acknowledgement for the first external trigger is received (first request).
+ 580:./stdperiph/source/stm32f37x_dac.c ****   * @param  NewState: new state of the specified DAC interrupts.
+ 581:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 582:./stdperiph/source/stm32f37x_dac.c ****   * @retval None
+ 583:./stdperiph/source/stm32f37x_dac.c ****   */ 
+ 584:./stdperiph/source/stm32f37x_dac.c **** void DAC_ITConfig(DAC_TypeDef* DACx, uint32_t DAC_Channel, uint32_t DAC_IT, FunctionalState NewStat
+ 585:./stdperiph/source/stm32f37x_dac.c **** {
+ 514              		.loc 1 585 0
+ 515              		.cfi_startproc
+ 516              		@ args = 0, pretend = 0, frame = 0
+ 517              		@ frame_needed = 0, uses_anonymous_args = 0
+ 518              		@ link register save eliminated.
+ 519              	.LVL53:
+ 586:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 587:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALL_PERIPH(DACx));
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 20
+
+
+ 588:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_CHANNEL(DAC_Channel));
+ 589:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 590:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_IT(DAC_IT)); 
+ 591:./stdperiph/source/stm32f37x_dac.c **** 
+ 592:./stdperiph/source/stm32f37x_dac.c ****   if (NewState != DISABLE)
+ 520              		.loc 1 592 0
+ 521 0000 23B1     		cbz	r3, .L35
+ 593:./stdperiph/source/stm32f37x_dac.c ****   {
+ 594:./stdperiph/source/stm32f37x_dac.c ****     /* Enable the selected DAC interrupts */
+ 595:./stdperiph/source/stm32f37x_dac.c ****     DACx->CR |=  (DAC_IT << DAC_Channel);
+ 522              		.loc 1 595 0
+ 523 0002 0368     		ldr	r3, [r0]
+ 524              	.LVL54:
+ 525 0004 8A40     		lsls	r2, r2, r1
+ 526              	.LVL55:
+ 527 0006 1A43     		orrs	r2, r2, r3
+ 528 0008 0260     		str	r2, [r0]
+ 529 000a 7047     		bx	lr
+ 530              	.LVL56:
+ 531              	.L35:
+ 596:./stdperiph/source/stm32f37x_dac.c ****   }
+ 597:./stdperiph/source/stm32f37x_dac.c ****   else
+ 598:./stdperiph/source/stm32f37x_dac.c ****   {
+ 599:./stdperiph/source/stm32f37x_dac.c ****     /* Disable the selected DAC interrupts */
+ 600:./stdperiph/source/stm32f37x_dac.c ****     DACx->CR &= (~(uint32_t)(DAC_IT << DAC_Channel));
+ 532              		.loc 1 600 0
+ 533 000c 0368     		ldr	r3, [r0]
+ 534              	.LVL57:
+ 535 000e 8A40     		lsls	r2, r2, r1
+ 536              	.LVL58:
+ 537 0010 23EA0202 		bic	r2, r3, r2
+ 538 0014 0260     		str	r2, [r0]
+ 539 0016 7047     		bx	lr
+ 540              		.cfi_endproc
+ 541              	.LFE123:
+ 543              		.section	.text.DAC_GetFlagStatus,"ax",%progbits
+ 544              		.align	2
+ 545              		.global	DAC_GetFlagStatus
+ 546              		.thumb
+ 547              		.thumb_func
+ 549              	DAC_GetFlagStatus:
+ 550              	.LFB124:
+ 601:./stdperiph/source/stm32f37x_dac.c ****   }
+ 602:./stdperiph/source/stm32f37x_dac.c **** }
+ 603:./stdperiph/source/stm32f37x_dac.c **** 
+ 604:./stdperiph/source/stm32f37x_dac.c **** /**
+ 605:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Checks whether the specified DAC flag is set or not.
+ 606:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 or 2 to select the DAC peripheral.  
+ 607:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Channel: thee selected DAC channel. 
+ 608:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 609:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_1: DAC Channel1 selected
+ 610:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_2: DAC Channel2 selected
+ 611:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_FLAG: specifies the flag to check. 
+ 612:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be:
+ 613:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_FLAG_DMAUDR: DMA underrun flag
+ 614:./stdperiph/source/stm32f37x_dac.c ****   * @note   The DMA underrun occurs when a second external trigger arrives before
+ 615:./stdperiph/source/stm32f37x_dac.c ****   *         the acknowledgement for the first external trigger is received (first request).
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 21
+
+
+ 616:./stdperiph/source/stm32f37x_dac.c ****   * @retval The new state of DAC_FLAG (SET or RESET).
+ 617:./stdperiph/source/stm32f37x_dac.c ****   */
+ 618:./stdperiph/source/stm32f37x_dac.c **** FlagStatus DAC_GetFlagStatus(DAC_TypeDef* DACx, uint32_t DAC_Channel, uint32_t DAC_FLAG)
+ 619:./stdperiph/source/stm32f37x_dac.c **** {
+ 551              		.loc 1 619 0
+ 552              		.cfi_startproc
+ 553              		@ args = 0, pretend = 0, frame = 0
+ 554              		@ frame_needed = 0, uses_anonymous_args = 0
+ 555              		@ link register save eliminated.
+ 556              	.LVL59:
+ 620:./stdperiph/source/stm32f37x_dac.c ****   FlagStatus bitstatus = RESET;
+ 621:./stdperiph/source/stm32f37x_dac.c **** 
+ 622:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 623:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALL_PERIPH(DACx));
+ 624:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_CHANNEL(DAC_Channel));
+ 625:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_FLAG(DAC_FLAG));
+ 626:./stdperiph/source/stm32f37x_dac.c **** 
+ 627:./stdperiph/source/stm32f37x_dac.c ****   /* Check the status of the specified DAC flag */
+ 628:./stdperiph/source/stm32f37x_dac.c ****   if ((DACx->SR & (DAC_FLAG << DAC_Channel)) != (uint8_t)RESET)
+ 557              		.loc 1 628 0
+ 558 0000 436B     		ldr	r3, [r0, #52]
+ 559 0002 8A40     		lsls	r2, r2, r1
+ 560              	.LVL60:
+ 561 0004 1342     		tst	r3, r2
+ 562 0006 01D0     		beq	.L39
+ 629:./stdperiph/source/stm32f37x_dac.c ****   {
+ 630:./stdperiph/source/stm32f37x_dac.c ****     /* DAC_FLAG is set */
+ 631:./stdperiph/source/stm32f37x_dac.c ****     bitstatus = SET;
+ 563              		.loc 1 631 0
+ 564 0008 0120     		movs	r0, #1
+ 565              	.LVL61:
+ 566 000a 7047     		bx	lr
+ 567              	.LVL62:
+ 568              	.L39:
+ 632:./stdperiph/source/stm32f37x_dac.c ****   }
+ 633:./stdperiph/source/stm32f37x_dac.c ****   else
+ 634:./stdperiph/source/stm32f37x_dac.c ****   {
+ 635:./stdperiph/source/stm32f37x_dac.c ****     /* DAC_FLAG is reset */
+ 636:./stdperiph/source/stm32f37x_dac.c ****     bitstatus = RESET;
+ 569              		.loc 1 636 0
+ 570 000c 0020     		movs	r0, #0
+ 571              	.LVL63:
+ 637:./stdperiph/source/stm32f37x_dac.c ****   }
+ 638:./stdperiph/source/stm32f37x_dac.c ****   /* Return the DAC_FLAG status */
+ 639:./stdperiph/source/stm32f37x_dac.c ****   return  bitstatus;
+ 640:./stdperiph/source/stm32f37x_dac.c **** }
+ 572              		.loc 1 640 0
+ 573 000e 7047     		bx	lr
+ 574              		.cfi_endproc
+ 575              	.LFE124:
+ 577              		.section	.text.DAC_ClearFlag,"ax",%progbits
+ 578              		.align	2
+ 579              		.global	DAC_ClearFlag
+ 580              		.thumb
+ 581              		.thumb_func
+ 583              	DAC_ClearFlag:
+ 584              	.LFB125:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 22
+
+
+ 641:./stdperiph/source/stm32f37x_dac.c **** 
+ 642:./stdperiph/source/stm32f37x_dac.c **** /**
+ 643:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Clears the DAC channel's pending flags.
+ 644:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 or 2 to select the DAC peripheral.  
+ 645:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Channel: the selected DAC channel. 
+ 646:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 647:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_1: DAC Channel1 selected
+ 648:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_2: DAC Channel2 selected
+ 649:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_FLAG: specifies the flag to clear. 
+ 650:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be:
+ 651:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_FLAG_DMAUDR: DMA underrun flag                          
+ 652:./stdperiph/source/stm32f37x_dac.c ****   * @retval None
+ 653:./stdperiph/source/stm32f37x_dac.c ****   */
+ 654:./stdperiph/source/stm32f37x_dac.c **** void DAC_ClearFlag(DAC_TypeDef* DACx, uint32_t DAC_Channel, uint32_t DAC_FLAG)
+ 655:./stdperiph/source/stm32f37x_dac.c **** {
+ 585              		.loc 1 655 0
+ 586              		.cfi_startproc
+ 587              		@ args = 0, pretend = 0, frame = 0
+ 588              		@ frame_needed = 0, uses_anonymous_args = 0
+ 589              		@ link register save eliminated.
+ 590              	.LVL64:
+ 656:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 657:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALL_PERIPH(DACx));
+ 658:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_CHANNEL(DAC_Channel));
+ 659:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_FLAG(DAC_FLAG));
+ 660:./stdperiph/source/stm32f37x_dac.c **** 
+ 661:./stdperiph/source/stm32f37x_dac.c ****   /* Clear the selected DAC flags */
+ 662:./stdperiph/source/stm32f37x_dac.c ****   DACx->SR = (DAC_FLAG << DAC_Channel);
+ 591              		.loc 1 662 0
+ 592 0000 8A40     		lsls	r2, r2, r1
+ 593              	.LVL65:
+ 594 0002 4263     		str	r2, [r0, #52]
+ 595 0004 7047     		bx	lr
+ 596              		.cfi_endproc
+ 597              	.LFE125:
+ 599 0006 00BF     		.section	.text.DAC_GetITStatus,"ax",%progbits
+ 600              		.align	2
+ 601              		.global	DAC_GetITStatus
+ 602              		.thumb
+ 603              		.thumb_func
+ 605              	DAC_GetITStatus:
+ 606              	.LFB126:
+ 663:./stdperiph/source/stm32f37x_dac.c **** }
+ 664:./stdperiph/source/stm32f37x_dac.c **** 
+ 665:./stdperiph/source/stm32f37x_dac.c **** /**
+ 666:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Checks whether the specified DAC interrupt has occurred or not.
+ 667:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 or 2 to select the DAC peripheral.  
+ 668:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Channel: the selected DAC channel. 
+ 669:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 670:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_1: DAC Channel1 selected
+ 671:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_2: DAC Channel2 selected
+ 672:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_IT: specifies the DAC interrupt source to check. 
+ 673:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be:
+ 674:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_IT_DMAUDR: DMA underrun interrupt mask
+ 675:./stdperiph/source/stm32f37x_dac.c ****   * @note   The DMA underrun occurs when a second external trigger arrives before
+ 676:./stdperiph/source/stm32f37x_dac.c ****   *         the acknowledgement for the first external trigger is received (first request).
+ 677:./stdperiph/source/stm32f37x_dac.c ****   * @retval The new state of DAC_IT (SET or RESET).
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 23
+
+
+ 678:./stdperiph/source/stm32f37x_dac.c ****   */
+ 679:./stdperiph/source/stm32f37x_dac.c **** ITStatus DAC_GetITStatus(DAC_TypeDef* DACx, uint32_t DAC_Channel, uint32_t DAC_IT)
+ 680:./stdperiph/source/stm32f37x_dac.c **** {
+ 607              		.loc 1 680 0
+ 608              		.cfi_startproc
+ 609              		@ args = 0, pretend = 0, frame = 0
+ 610              		@ frame_needed = 0, uses_anonymous_args = 0
+ 611              		@ link register save eliminated.
+ 612              	.LVL66:
+ 681:./stdperiph/source/stm32f37x_dac.c ****   ITStatus bitstatus = RESET;
+ 682:./stdperiph/source/stm32f37x_dac.c ****   uint32_t enablestatus = 0;
+ 683:./stdperiph/source/stm32f37x_dac.c ****   
+ 684:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 685:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALL_PERIPH(DACx));
+ 686:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_CHANNEL(DAC_Channel));
+ 687:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_IT(DAC_IT));
+ 688:./stdperiph/source/stm32f37x_dac.c **** 
+ 689:./stdperiph/source/stm32f37x_dac.c ****   /* Get the DAC_IT enable bit status */
+ 690:./stdperiph/source/stm32f37x_dac.c ****   enablestatus = (DACx->CR & (DAC_IT << DAC_Channel)) ;
+ 613              		.loc 1 690 0
+ 614 0000 0368     		ldr	r3, [r0]
+ 615 0002 8A40     		lsls	r2, r2, r1
+ 616              	.LVL67:
+ 617 0004 1340     		ands	r3, r3, r2
+ 618              	.LVL68:
+ 691:./stdperiph/source/stm32f37x_dac.c ****   
+ 692:./stdperiph/source/stm32f37x_dac.c ****   /* Check the status of the specified DAC interrupt */
+ 693:./stdperiph/source/stm32f37x_dac.c ****   if (((DACx->SR & (DAC_IT << DAC_Channel)) != (uint32_t)RESET) && enablestatus)
+ 619              		.loc 1 693 0
+ 620 0006 416B     		ldr	r1, [r0, #52]
+ 621              	.LVL69:
+ 622 0008 0A42     		tst	r2, r1
+ 623 000a 02D0     		beq	.L43
+ 624              		.loc 1 693 0 is_stmt 0 discriminator 1
+ 625 000c 1BB9     		cbnz	r3, .L44
+ 694:./stdperiph/source/stm32f37x_dac.c ****   {
+ 695:./stdperiph/source/stm32f37x_dac.c ****     /* DAC_IT is set */
+ 696:./stdperiph/source/stm32f37x_dac.c ****     bitstatus = SET;
+ 697:./stdperiph/source/stm32f37x_dac.c ****   }
+ 698:./stdperiph/source/stm32f37x_dac.c ****   else
+ 699:./stdperiph/source/stm32f37x_dac.c ****   {
+ 700:./stdperiph/source/stm32f37x_dac.c ****     /* DAC_IT is reset */
+ 701:./stdperiph/source/stm32f37x_dac.c ****     bitstatus = RESET;
+ 626              		.loc 1 701 0 is_stmt 1
+ 627 000e 0020     		movs	r0, #0
+ 628              	.LVL70:
+ 629 0010 7047     		bx	lr
+ 630              	.LVL71:
+ 631              	.L43:
+ 632 0012 0020     		movs	r0, #0
+ 633              	.LVL72:
+ 634 0014 7047     		bx	lr
+ 635              	.LVL73:
+ 636              	.L44:
+ 696:./stdperiph/source/stm32f37x_dac.c ****   }
+ 637              		.loc 1 696 0
+ 638 0016 0120     		movs	r0, #1
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 24
+
+
+ 639              	.LVL74:
+ 702:./stdperiph/source/stm32f37x_dac.c ****   }
+ 703:./stdperiph/source/stm32f37x_dac.c ****   /* Return the DAC_IT status */
+ 704:./stdperiph/source/stm32f37x_dac.c ****   return  bitstatus;
+ 705:./stdperiph/source/stm32f37x_dac.c **** }
+ 640              		.loc 1 705 0
+ 641 0018 7047     		bx	lr
+ 642              		.cfi_endproc
+ 643              	.LFE126:
+ 645 001a 00BF     		.section	.text.DAC_ClearITPendingBit,"ax",%progbits
+ 646              		.align	2
+ 647              		.global	DAC_ClearITPendingBit
+ 648              		.thumb
+ 649              		.thumb_func
+ 651              	DAC_ClearITPendingBit:
+ 652              	.LFB127:
+ 706:./stdperiph/source/stm32f37x_dac.c **** 
+ 707:./stdperiph/source/stm32f37x_dac.c **** /**
+ 708:./stdperiph/source/stm32f37x_dac.c ****   * @brief  Clears the DAC channel's interrupt pending bits.
+ 709:./stdperiph/source/stm32f37x_dac.c ****   * @param  DACx: where x can be 1 or 2 to select the DAC peripheral.
+ 710:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_Channel: the selected DAC channel. 
+ 711:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be one of the following values:
+ 712:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_1: DAC Channel1 selected
+ 713:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_Channel_2: DAC Channel2 selected
+ 714:./stdperiph/source/stm32f37x_dac.c ****   * @param  DAC_IT: specifies the DAC interrupt pending bit to clear.
+ 715:./stdperiph/source/stm32f37x_dac.c ****   *          This parameter can be the following values:
+ 716:./stdperiph/source/stm32f37x_dac.c ****   *            @arg DAC_IT_DMAUDR: DMA underrun interrupt mask
+ 717:./stdperiph/source/stm32f37x_dac.c ****   * @retval None
+ 718:./stdperiph/source/stm32f37x_dac.c ****   */
+ 719:./stdperiph/source/stm32f37x_dac.c **** void DAC_ClearITPendingBit(DAC_TypeDef* DACx, uint32_t DAC_Channel, uint32_t DAC_IT)
+ 720:./stdperiph/source/stm32f37x_dac.c **** {
+ 653              		.loc 1 720 0
+ 654              		.cfi_startproc
+ 655              		@ args = 0, pretend = 0, frame = 0
+ 656              		@ frame_needed = 0, uses_anonymous_args = 0
+ 657              		@ link register save eliminated.
+ 658              	.LVL75:
+ 721:./stdperiph/source/stm32f37x_dac.c ****   /* Check the parameters */
+ 722:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_ALL_PERIPH(DACx));
+ 723:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_CHANNEL(DAC_Channel));
+ 724:./stdperiph/source/stm32f37x_dac.c ****   assert_param(IS_DAC_IT(DAC_IT)); 
+ 725:./stdperiph/source/stm32f37x_dac.c **** 
+ 726:./stdperiph/source/stm32f37x_dac.c ****   /* Clear the selected DAC interrupt pending bits */
+ 727:./stdperiph/source/stm32f37x_dac.c ****   DACx->SR = (DAC_IT << DAC_Channel);
+ 659              		.loc 1 727 0
+ 660 0000 8A40     		lsls	r2, r2, r1
+ 661              	.LVL76:
+ 662 0002 4263     		str	r2, [r0, #52]
+ 663 0004 7047     		bx	lr
+ 664              		.cfi_endproc
+ 665              	.LFE127:
+ 667 0006 00BF     		.text
+ 668              	.Letext0:
+ 669              		.file 2 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\machine\\_defaul
+ 670              		.file 3 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 671              		.file 4 "cmsis/include/stm32f37x.h"
+ 672              		.file 5 "stdperiph/include/stm32f37x_dac.h"
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 25
+
+
+ 673              		.file 6 "cmsis/include/core_cm4.h"
+ 674              		.file 7 "stdperiph/include/stm32f37x_rcc.h"
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccarDpj2.s 			page 26
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f37x_dac.c
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:22     .text.DAC_DeInit:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:27     .text.DAC_DeInit:00000000 DAC_DeInit
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:73     .text.DAC_DeInit:00000034 $d
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:78     .text.DAC_Init:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:83     .text.DAC_Init:00000000 DAC_Init
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:136    .text.DAC_StructInit:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:141    .text.DAC_StructInit:00000000 DAC_StructInit
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:163    .text.DAC_Cmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:168    .text.DAC_Cmd:00000000 DAC_Cmd
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:202    .text.DAC_SoftwareTriggerCmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:207    .text.DAC_SoftwareTriggerCmd:00000000 DAC_SoftwareTriggerCmd
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:243    .text.DAC_DualSoftwareTriggerCmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:248    .text.DAC_DualSoftwareTriggerCmd:00000000 DAC_DualSoftwareTriggerCmd
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:273    .text.DAC_WaveGenerationCmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:278    .text.DAC_WaveGenerationCmd:00000000 DAC_WaveGenerationCmd
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:310    .text.DAC_SetChannel1Data:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:315    .text.DAC_SetChannel1Data:00000000 DAC_SetChannel1Data
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:350    .text.DAC_SetChannel2Data:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:355    .text.DAC_SetChannel2Data:00000000 DAC_SetChannel2Data
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:390    .text.DAC_SetDualChannelData:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:395    .text.DAC_SetDualChannelData:00000000 DAC_SetDualChannelData
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:426    .text.DAC_GetDataOutputValue:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:431    .text.DAC_GetDataOutputValue:00000000 DAC_GetDataOutputValue
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:468    .text.DAC_DMACmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:473    .text.DAC_DMACmd:00000000 DAC_DMACmd
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:507    .text.DAC_ITConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:512    .text.DAC_ITConfig:00000000 DAC_ITConfig
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:544    .text.DAC_GetFlagStatus:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:549    .text.DAC_GetFlagStatus:00000000 DAC_GetFlagStatus
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:578    .text.DAC_ClearFlag:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:583    .text.DAC_ClearFlag:00000000 DAC_ClearFlag
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:600    .text.DAC_GetITStatus:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:605    .text.DAC_GetITStatus:00000000 DAC_GetITStatus
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:646    .text.DAC_ClearITPendingBit:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccarDpj2.s:651    .text.DAC_ClearITPendingBit:00000000 DAC_ClearITPendingBit
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+RCC_APB1PeriphResetCmd

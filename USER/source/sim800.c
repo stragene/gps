@@ -5,18 +5,18 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-static void vSysTickInit_1ms(void);
-static void vDelay_Ms(uint32_t delay);
+struct gprs_dev Sim800GPRS;
+struct gprs_dev *pSim800GPRS = &Sim800GPRS;
+static void vSysTickInit(void);
+static void vDelay(uint32_t ticks);
 static void vSim800_HardInit(void);
 static void vSim800_pEn(void);
 static void vSim800_PDen(void);
 static void vSim800_OnOff(void);
 static bool blSim800SendCmd(char *pcmd, char *response, uint32_t timeout, uint32_t retry);
-static uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len);
+static uint32_t dwSim800SendData(uint8_t *pbuf, uint32_t len, uint32_t timeout);
 static void vSim800AutoReadEn(void);
 static uint32_t Sim800Read(uint8_t *buf, uint32_t count);
-static struct gprs_dev Sim800GPRS;
-static struct gprs_dev *pSim800GPRS = &Sim800GPRS;
 
 /********************************************************************
 * 功    能：SIM800初始化
@@ -68,7 +68,7 @@ void vSim800_HardInit(void)
     NVIC_Init(&NVIC_Initstruc);
     USART_Cmd(USART3, ENABLE);
 
-    vSysTickInit_1ms();
+    vSysTickInit();
 }
 /********************************************************************
 * 功    能：Sim800_GPRS Init
@@ -79,26 +79,27 @@ void vSim800_HardInit(void)
 **********************************************************************/
 void vSim800GPRSInit(struct gprs_dev *pGPRS)
 {
-    pGPRS.Interface = pUartGPRS;
-    pGPRS.Init = vSim800_HardInit;
-    pGPRS.PowerEn = vSim800_pEn;
-    pGPRS.PowerDen = vSim800_PDen;
-    pGPRS.OnOff = vSim800_OnOff;
-    pGPRS.SendCmd = blSim800SendCmd;
-    pGPRS.SendData = dwSim800Send;
-    pGPRS.AutoReadEn = vSim800AutoReadEn;
-    pGPRS.Read = Sim800Read;
-    pGPRS.delay = vDelay_Ms;
+    vSim800_HardInit();
+    pGPRS->Interface = pUartGPRS;
+    //pGPRS->Init = vSim800_HardInit;
+    pGPRS->PowerEn = vSim800_pEn;
+    pGPRS->PowerDen = vSim800_PDen;
+    pGPRS->OnOff = vSim800_OnOff;
+    pGPRS->SendCmd = blSim800SendCmd;
+    pGPRS->SendData = dwSim800SendData;
+    pGPRS->AutoReadEn = vSim800AutoReadEn;
+    pGPRS->Read = Sim800Read;
+    pGPRS->delay = vDelay;
 }
 void vSim800_OnOff(void)
 {
     /*引脚拉高*/
     GPIO_WriteBit(GPIOA, GPIO_Pin_3, Bit_RESET);
-    vDelay_Ms(500);
+    vDelay(TICKS_500MS);
     /*引脚拉低*/
     GPIO_WriteBit(GPIOA, GPIO_Pin_3, Bit_SET);
     /*延时1秒*/
-    vDelay_Ms(1000);
+    vDelay(TICKS_1S);
     /*引脚拉高*/
     GPIO_WriteBit(GPIOA, GPIO_Pin_3, Bit_RESET);
 }
@@ -127,18 +128,18 @@ void vSim800_PDen(void)
 }
 
 /********************************************************************
-* 功    能：Enable 1ms Systick , no interrupt
+* 功    能：Enable  Systick , no interrupt
 * 输    入：none
 * 输    出：none
 * 编 写 人：stragen
 * 编写日期：
 **********************************************************************/
-void vSysTickInit_1ms(void)
+void vSysTickInit(void)
 {
-    uint32_t ticks = SystemCoreClock / 1000;
-    SysTick->LOAD = (ticks & SysTick_LOAD_RELOAD_Msk) - 1;       /* set reload register */
-    NVIC_SetPriority(SysTick_IRQn, (1 << __NVIC_PRIO_BITS) - 1); /* set Priority for Systick Interrupt */
-    SysTick->VAL = 0;                                            /* Load the SysTick Counter Value */
+    uint32_t ticks = SystemCoreClock / configTICK_RATE_HZ;
+    SysTick->LOAD = (ticks & SysTick_LOAD_RELOAD_Msk) - 1; /* set reload register */
+    //NVIC_SetPriority(SysTick_IRQn, (1 << __NVIC_PRIO_BITS) - 1); /* set Priority for Systick Interrupt */
+    SysTick->VAL = 0; /* Load the SysTick Counter Value */
     SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk |
                     //SysTick_CTRL_TICKINT_Msk   |
                     SysTick_CTRL_ENABLE_Msk; /* Enable SysTick IRQ and SysTick Timer */
@@ -151,15 +152,15 @@ void vSysTickInit_1ms(void)
 * 编 写 人：stragen
 * 编写日期：
 **********************************************************************/
-void vDelay_Ms(uint32_t ms)
+void vDelay(uint32_t ticks)
 {
-    if (ms != 0xFFFFFFFF)
-        ms++;
-    while (ms)
+    if (ticks != 0xFFFFFFFF)
+        ticks++;
+    while (ticks)
     {
         if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) != 0U)
         {
-            ms--;
+            ticks--;
         }
     }
 }
@@ -171,15 +172,126 @@ void vDelay_Ms(uint32_t ms)
 * 编 写 人：stragen
 * 编写日期：
 **********************************************************************/
-bool blSim800SendCmd(char *pcmd, char *pExpectAns, uint32_t timeout, uint32_t retry)
+bool blSim800SendCmd(char *pcmd, char *pExpectAns, uint32_t delay, uint32_t retry)
 {
     uint8_t buf[50];
-    uint32_t readlen;
-    bool result;
-    char *pAns;
+    uint8_t *ptr = NULL;
+    uint8_t *pExpans = (uint8_t *)pExpectAns;
+    uint8_t ExpansLen = strlen(pExpectAns);
+    char *pRealAns = NULL;
+    uint32_t AnsLen = 0;
+    uint32_t timeout;
+    enum
+    {
+        Start,
+        End,
+        Compare
+    } AnsStatus;
+    AnsStatus = Start;
+    bool result = false;
     do
     {
-        Uart_OnceWrite(pSim800GPRS->Interface, (uint8_t *)pcmd, strlen(pcmd), 500);
+        if (pExpectAns == "")
+        {
+            Uart_OnceWrite(pSim800GPRS->Interface, (uint8_t *)pcmd, strlen(pcmd), TICKS_500MS);
+            AnsLen = Uart_OnceRead(pSim800GPRS->Interface, &buf[0], 50, delay);
+            buf[AnsLen] = '\0';
+            //pAns = (char *)buf;
+            if (0 == strcmp(pcmd, "AT+CSQ\r\n"))
+            {
+                result = ((buf[9] - '0') * 10 + (buf[10] - '0') >= 16);
+            }
+            else if (0 == strcmp(pcmd, "AT+CGATT?\r\n"))
+            {
+                result = ((buf[10] - '0') == 1);
+            }
+            else if (0 == strcmp(pcmd, "AT+CIFSR\r\n"))
+            {
+                result = true;
+            }
+        }
+        else
+        {
+            timeout = delay;
+            memset(buf, 0, sizeof(buf));
+            ptr = &buf[0];
+            AnsLen = 0;
+            Uart_OnceWrite(pSim800GPRS->Interface, (uint8_t *)pcmd, strlen(pcmd), TICKS_500MS);
+            do
+            {
+                if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) != 0U)
+                {
+                    timeout--;
+                }
+                switch (AnsStatus)
+                {
+                case Start:
+                {
+                    if (Uart_Read(pSim800GPRS->Interface, ptr, 1) > 0)
+                    {
+                        if (*ptr == *pExpans)
+                        {
+                            pRealAns = ptr; //期待字符在buf中的首地址
+                            AnsLen++;
+                            ptr++;
+                            AnsStatus = End;
+                        }
+                    }
+                    break;
+                }
+                case End:
+                {
+                    if (Uart_Read(pSim800GPRS->Interface, ptr, 1) > 0)
+                    {
+                        ptr++;
+                        AnsLen++;
+                    }
+                    if (AnsLen >= ExpansLen)
+                    {
+                        AnsStatus = Compare;
+                    }
+                    break;
+                }
+                case Compare:
+                {
+                    result = !bcmp(pExpectAns, pRealAns, ExpansLen);
+                    AnsStatus = Start;
+                    break;
+                }
+                }
+            } while (!result && timeout);
+        }
+    } while (!result && --retry);
+    return (result);
+}
+
+#if 0
+        buf[readlen] = '\0';
+        pAns = (char *)buf;
+        if (pExpectAns == NULL)
+        {
+            if (0 == strcmp(pcmd, "AT+CSQ"))
+            {
+                result = ((buf[8] - '0') * 10 + (buf[9] - '0') >= 16);
+            }
+            else if (0 == strcmp(pcmd, "AT+CGATT?"))
+            {
+                result = ((buf[10] - '0') == 1);
+            }
+            else if (0 == strcmp(pcmd, "AT+CIFSR "))
+            {
+            }
+        }
+        else
+        {
+            pAns = strchr(pAns, *pExpectAns);
+            result = !bcmp(pExpectAns, pAns, strlen(pExpectAns));
+        }
+#endif
+#if 0
+    do
+    {
+        Uart_OnceWrite(pSim800GPRS->Interface, (uint8_t *)pcmd, strlen(pcmd), TICKS_500MS);
         readlen = Uart_OnceRead(pSim800GPRS->Interface, &buf[0], 50, timeout);
         buf[readlen] = '\0';
         pAns = (char *)buf;
@@ -204,19 +316,37 @@ bool blSim800SendCmd(char *pcmd, char *pExpectAns, uint32_t timeout, uint32_t re
         }
         retry--;
     } while (!result && retry);
-    return (result);
-}
+#endif
 /********************************************************************
-* 功    能：vSim800Send
+* 功    能：vSim800SendData
 * 输    入：
 * 输    出：
 * 编 写 人：stragen
 * 编写日期：
 **********************************************************************/
-uint32_t dwSim800Send(uint8_t *pbuf, uint32_t len)
+uint32_t dwSim800SendData(uint8_t *pbuf, uint32_t len, uint32_t timeout)
 {
     uint32_t sendlen;
-    sendlen = Uart_OnceWrite(pSim800GPRS->Interface->pRsvbuf, pbuf, len, 500);
+    uint32_t readlen;
+    uint8_t buf[20];
+    uint8_t *pAns = NULL;
+    char *pExpectAns = "OK";
+    bool result = false;
+    //pSim800GPRS->SendCmd("", "OK", 50000, 2);
+    //while (pSim800GPRS->Read(&rsvData, 1) == 'O')
+    sendlen = Uart_OnceWrite(pSim800GPRS->Interface, pbuf, len, TICKS_500MS);
+    readlen = Uart_OnceRead(pSim800GPRS->Interface, &buf[0], 11, timeout);
+    if (readlen == 11)
+    {
+        buf[readlen] = '\0';
+        pAns = (char *)buf;
+        pAns = strchr(pAns, *pExpectAns);
+        result = !bcmp(pExpectAns, pAns, strlen(pExpectAns));
+    }
+    if (result)
+        return sendlen;
+    else
+        return 0;
 }
 
 /********************************************************************
@@ -232,5 +362,5 @@ void vSim800AutoReadEn(void)
 }
 uint32_t Sim800Read(uint8_t *buf, uint32_t count)
 {
-    Uart_Read(pSim800GPRS->Interface, buf, count);
+    return Uart_Read(pSim800GPRS->Interface, buf, count);
 }

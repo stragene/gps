@@ -1,0 +1,776 @@
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 1
+   4              		.eabi_attribute 28, 1
+   5              		.fpu fpv4-sp-d16
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.thumb
+  16              		.syntax unified
+  17              		.file	"gps.c"
+  18              		.text
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.global	__aeabi_ui2d
+  22              		.section	.text.GprmcFill,"ax",%progbits
+  23              		.align	2
+  24              		.thumb
+  25              		.thumb_func
+  27              	GprmcFill:
+  28              	.LFB116:
+  29              		.file 1 "./user/source/gps.c"
+   1:./user/source/gps.c **** #include <stdlib.h>
+   2:./user/source/gps.c **** #include <string.h>
+   3:./user/source/gps.c **** #include "stm32f37x.h"
+   4:./user/source/gps.c **** #include "gps.h"
+   5:./user/source/gps.c **** #include "uart.h"
+   6:./user/source/gps.c **** 
+   7:./user/source/gps.c **** static void vGps_Init(void);
+   8:./user/source/gps.c **** static void vGps_PEn(void);
+   9:./user/source/gps.c **** static void vGps_PDen(void);
+  10:./user/source/gps.c **** static char *pGetGprmc(uint8_t *buf, uint8_t len);
+  11:./user/source/gps.c **** static bool GprmcFill(char *pframe, struct frame_gprmc *tmpGprmc);
+  12:./user/source/gps.c **** /* 结构体定义-- ------------------------------------------------------------------*/
+  13:./user/source/gps.c **** 
+  14:./user/source/gps.c **** struct gps_dev Sim800GPS = {.Init = vGps_Init,
+  15:./user/source/gps.c ****                             .PowerEn = vGps_PEn,
+  16:./user/source/gps.c ****                             .PowerDen = vGps_PDen,
+  17:./user/source/gps.c ****                             .Read = Uart_OnceRead,
+  18:./user/source/gps.c ****                             .pGetGprmc = pGetGprmc,
+  19:./user/source/gps.c ****                             .GprmcFill = GprmcFill};
+  20:./user/source/gps.c **** 
+  21:./user/source/gps.c **** struct gps_dev *pSim800GPS = &Sim800GPS;
+  22:./user/source/gps.c **** 
+  23:./user/source/gps.c **** /*******************************************************************************
+  24:./user/source/gps.c **** * 函数名称           : vGps_Init()
+  25:./user/source/gps.c **** * 函数功能           : GPS外设初始化
+  26:./user/source/gps.c **** * 输    入           : 
+  27:./user/source/gps.c **** * 输    出           : 
+  28:./user/source/gps.c **** * 返 回 值           : 1
+  29:./user/source/gps.c **** * 备    注           :                       
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s 			page 2
+
+
+  30:./user/source/gps.c **** *******************************************************************************/
+  31:./user/source/gps.c **** void vGps_Init(void)
+  32:./user/source/gps.c **** {
+  33:./user/source/gps.c ****     /*PA2配置为GPS使能*/
+  34:./user/source/gps.c ****     GPIO_InitTypeDef GPIO_Initstruc;
+  35:./user/source/gps.c ****     USART_InitTypeDef USART_Initstruc;
+  36:./user/source/gps.c ****     NVIC_InitTypeDef NVIC_Initstruc;
+  37:./user/source/gps.c ****     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+  38:./user/source/gps.c ****     GPIO_Initstruc.GPIO_Pin = GPIO_Pin_2;
+  39:./user/source/gps.c ****     GPIO_Initstruc.GPIO_Mode = GPIO_Mode_OUT;
+  40:./user/source/gps.c ****     GPIO_Initstruc.GPIO_OType = GPIO_OType_PP; //开漏
+  41:./user/source/gps.c ****     GPIO_Initstruc.GPIO_Speed = GPIO_Speed_2MHz;
+  42:./user/source/gps.c ****     GPIO_Initstruc.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  43:./user/source/gps.c ****     GPIO_Init(GPIOA, &GPIO_Initstruc);
+  44:./user/source/gps.c ****     /*B6和B7配置为串口1,GPS*/
+  45:./user/source/gps.c ****     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
+  46:./user/source/gps.c ****     GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_7);
+  47:./user/source/gps.c ****     GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_7);
+  48:./user/source/gps.c ****     GPIO_Initstruc.GPIO_Mode = GPIO_Mode_AF;
+  49:./user/source/gps.c ****     GPIO_Initstruc.GPIO_OType = GPIO_OType_PP;
+  50:./user/source/gps.c ****     GPIO_Initstruc.GPIO_PuPd = GPIO_PuPd_UP;
+  51:./user/source/gps.c ****     GPIO_Initstruc.GPIO_Speed = GPIO_Speed_2MHz;
+  52:./user/source/gps.c ****     GPIO_Initstruc.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
+  53:./user/source/gps.c ****     GPIO_Init(GPIOB, &GPIO_Initstruc);
+  54:./user/source/gps.c ****     /*串口初始化*/
+  55:./user/source/gps.c **** 
+  56:./user/source/gps.c ****     RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+  57:./user/source/gps.c ****     USART_OverSampling8Cmd(USART1, ENABLE);
+  58:./user/source/gps.c ****     USART_Initstruc.USART_BaudRate = 115200;
+  59:./user/source/gps.c ****     USART_Initstruc.USART_Mode = (USART_Mode_Rx | USART_Mode_Tx);
+  60:./user/source/gps.c ****     USART_Initstruc.USART_WordLength = USART_WordLength_9b;
+  61:./user/source/gps.c ****     USART_Initstruc.USART_Parity = USART_Parity_No;
+  62:./user/source/gps.c ****     USART_Initstruc.USART_StopBits = USART_StopBits_1;
+  63:./user/source/gps.c ****     USART_Initstruc.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+  64:./user/source/gps.c ****     USART_Init(USART1, &USART_Initstruc);
+  65:./user/source/gps.c **** 
+  66:./user/source/gps.c ****     NVIC_Initstruc.NVIC_IRQChannel = USART1_IRQn;
+  67:./user/source/gps.c ****     NVIC_Initstruc.NVIC_IRQChannelPreemptionPriority = 0;
+  68:./user/source/gps.c ****     //NVIC_Initstruc.NVIC_IRQChannelSubPriority = 0;
+  69:./user/source/gps.c ****     NVIC_Initstruc.NVIC_IRQChannelCmd = ENABLE;
+  70:./user/source/gps.c ****     NVIC_Init(&NVIC_Initstruc);
+  71:./user/source/gps.c **** 
+  72:./user/source/gps.c ****     USART_Cmd(USART1, ENABLE);
+  73:./user/source/gps.c ****     //UART_GPS.Init();
+  74:./user/source/gps.c **** }
+  75:./user/source/gps.c **** 
+  76:./user/source/gps.c **** /*******************************************************************************
+  77:./user/source/gps.c **** * 函数名称           : vGps_EnDen()
+  78:./user/source/gps.c **** * 函数功能           : GPS使能/禁能
+  79:./user/source/gps.c **** * 输    入           : 
+  80:./user/source/gps.c **** * 输    出           : 
+  81:./user/source/gps.c **** * 返 回 值           : 1
+  82:./user/source/gps.c **** * 备    注           :                       
+  83:./user/source/gps.c **** *******************************************************************************/
+  84:./user/source/gps.c **** void vGps_PEn(void)
+  85:./user/source/gps.c **** {
+  86:./user/source/gps.c ****     GPIO_WriteBit(GPIOA, GPIO_Pin_2, Bit_SET);
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s 			page 3
+
+
+  87:./user/source/gps.c **** }
+  88:./user/source/gps.c **** /*******************************************************************************
+  89:./user/source/gps.c **** * 函数名称           : vGps_EnDen()
+  90:./user/source/gps.c **** * 函数功能           : GPS使能/禁能
+  91:./user/source/gps.c **** * 输    入           : 
+  92:./user/source/gps.c **** * 输    出           : 
+  93:./user/source/gps.c **** * 返 回 值           : 1
+  94:./user/source/gps.c **** * 备    注           :                       
+  95:./user/source/gps.c **** *******************************************************************************/
+  96:./user/source/gps.c **** void vGps_PDen(void)
+  97:./user/source/gps.c **** {
+  98:./user/source/gps.c ****     GPIO_WriteBit(GPIOA, GPIO_Pin_2, Bit_RESET);
+  99:./user/source/gps.c **** }
+ 100:./user/source/gps.c **** 
+ 101:./user/source/gps.c **** /*******************************************************************************
+ 102:./user/source/gps.c **** * 函数名称           : 读取Gprmc帧
+ 103:./user/source/gps.c **** * 函数功能           : 
+ 104:./user/source/gps.c **** * 输    入           : 
+ 105:./user/source/gps.c **** * 输    出           : 
+ 106:./user/source/gps.c **** * 返 回 值           : 1
+ 107:./user/source/gps.c **** * 备    注           :                       
+ 108:./user/source/gps.c **** *******************************************************************************/
+ 109:./user/source/gps.c **** char *pGetGprmc(uint8_t *buf, uint8_t len)
+ 110:./user/source/gps.c **** {
+ 111:./user/source/gps.c ****     //char ucGPSFrame[DRV_BUF_SIZE];
+ 112:./user/source/gps.c ****     *(buf + len) = '\0';
+ 113:./user/source/gps.c ****     char *pGPSFrame = (char *)buf;
+ 114:./user/source/gps.c ****     /*找到$GPRMC*/
+ 115:./user/source/gps.c ****     do
+ 116:./user/source/gps.c ****     {
+ 117:./user/source/gps.c ****         pGPSFrame = strchr(pGPSFrame, '$');
+ 118:./user/source/gps.c ****     } while (strncmp(pGPSFrame, "$GPRMC", 6) != 0);
+ 119:./user/source/gps.c ****     return pGPSFrame;
+ 120:./user/source/gps.c **** }
+ 121:./user/source/gps.c **** /*******************************************************************************
+ 122:./user/source/gps.c **** * 函数名称           : GPS_Analysis()
+ 123:./user/source/gps.c **** * 函数功能           : 对GPS数据帧进行解析并装入到结构体中
+ 124:./user/source/gps.c **** * 输    入           : 
+ 125:./user/source/gps.c **** * 输    出           : 
+ 126:./user/source/gps.c **** * 返 回 值           : 1
+ 127:./user/source/gps.c **** * 备    注           :                       
+ 128:./user/source/gps.c **** *******************************************************************************/
+ 129:./user/source/gps.c **** bool GprmcFill(char *pframe, struct frame_gprmc *tmpGprmc)
+ 130:./user/source/gps.c **** {
+  30              		.loc 1 130 0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 56
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              	.LVL0:
+  35 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 20
+  38              		.cfi_offset 4, -20
+  39              		.cfi_offset 5, -16
+  40              		.cfi_offset 6, -12
+  41              		.cfi_offset 7, -8
+  42              		.cfi_offset 14, -4
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s 			page 4
+
+
+  43 0002 8FB0     		sub	sp, sp, #60
+  44              	.LCFI1:
+  45              		.cfi_def_cfa_offset 80
+  46 0004 0D46     		mov	r5, r1
+  47              	.LVL1:
+ 131:./user/source/gps.c ****     uint32_t j = 0;
+ 132:./user/source/gps.c ****     char *tmpchr[14];
+ 133:./user/source/gps.c ****     char *pGPSFrame;
+ 134:./user/source/gps.c ****     bool result = false;
+ 135:./user/source/gps.c **** 
+ 136:./user/source/gps.c ****     /*
+ 137:./user/source/gps.c **** 	tmpchr[0]= strtok( pGPSFrame, ","); 	
+ 138:./user/source/gps.c **** 	for( j= 1; j< 13; j++)
+ 139:./user/source/gps.c **** 	{
+ 140:./user/source/gps.c **** 		tmpchr[j]= strtok( NULL, ",");
+ 141:./user/source/gps.c **** 		if (tmpchr[j] != NULL)
+ 142:./user/source/gps.c **** 			continue;
+ 143:./user/source/gps.c **** 		else
+ 144:./user/source/gps.c **** 			break;
+ 145:./user/source/gps.c **** 	}*/
+ 146:./user/source/gps.c **** 
+ 147:./user/source/gps.c ****     /*子串化并转存*/
+ 148:./user/source/gps.c ****     tmpchr[0] = strtok(pframe, ",");
+  48              		.loc 1 148 0
+  49 0006 3649     		ldr	r1, .L9
+  50              	.LVL2:
+  51 0008 FFF7FEFF 		bl	strtok
+  52              	.LVL3:
+  53 000c 0090     		str	r0, [sp]
+ 131:./user/source/gps.c ****     uint32_t j = 0;
+  54              		.loc 1 131 0
+  55 000e 0024     		movs	r4, #0
+ 149:./user/source/gps.c ****     while (tmpchr[j] != NULL && j < 12) //以此存储第1~12子帧，第12帧以*结尾
+  56              		.loc 1 149 0
+  57 0010 09E0     		b	.L2
+  58              	.LVL4:
+  59              	.L4:
+ 150:./user/source/gps.c ****     {
+ 151:./user/source/gps.c ****         tmpchr[++j] = strtok(NULL, ",");
+  60              		.loc 1 151 0
+  61 0012 0134     		adds	r4, r4, #1
+  62              	.LVL5:
+  63 0014 3249     		ldr	r1, .L9
+  64 0016 0020     		movs	r0, #0
+  65 0018 FFF7FEFF 		bl	strtok
+  66              	.LVL6:
+  67 001c 0EAB     		add	r3, sp, #56
+  68 001e 03EB8403 		add	r3, r3, r4, lsl #2
+  69 0022 43F8380C 		str	r0, [r3, #-56]
+  70              	.LVL7:
+  71              	.L2:
+ 149:./user/source/gps.c ****     while (tmpchr[j] != NULL && j < 12) //以此存储第1~12子帧，第12帧以*结尾
+  72              		.loc 1 149 0
+  73 0026 0EAB     		add	r3, sp, #56
+  74 0028 03EB8403 		add	r3, r3, r4, lsl #2
+  75 002c 53F8383C 		ldr	r3, [r3, #-56]
+  76 0030 0BB1     		cbz	r3, .L3
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s 			page 5
+
+
+ 149:./user/source/gps.c ****     while (tmpchr[j] != NULL && j < 12) //以此存储第1~12子帧，第12帧以*结尾
+  77              		.loc 1 149 0 is_stmt 0 discriminator 1
+  78 0032 0B2C     		cmp	r4, #11
+  79 0034 EDD9     		bls	.L4
+  80              	.L3:
+  81              	.LVL8:
+ 152:./user/source/gps.c ****     }
+ 153:./user/source/gps.c **** 
+ 154:./user/source/gps.c ****     pGPSFrame = tmpchr[12];              // mode*sum
+ 155:./user/source/gps.c ****     tmpchr[12] = strtok(pGPSFrame, "*"); // mode
+  82              		.loc 1 155 0 is_stmt 1
+  83 0036 2B4E     		ldr	r6, .L9+4
+  84 0038 3146     		mov	r1, r6
+  85 003a 0C98     		ldr	r0, [sp, #48]
+  86 003c FFF7FEFF 		bl	strtok
+  87              	.LVL9:
+  88 0040 0746     		mov	r7, r0
+ 156:./user/source/gps.c ****     tmpchr[13] = strtok(NULL, "*");      // sum
+  89              		.loc 1 156 0
+  90 0042 3146     		mov	r1, r6
+  91 0044 0020     		movs	r0, #0
+  92 0046 FFF7FEFF 		bl	strtok
+  93              	.LVL10:
+  94 004a 0646     		mov	r6, r0
+ 157:./user/source/gps.c ****     if (j != 12)
+  95              		.loc 1 157 0
+  96 004c 0C2C     		cmp	r4, #12
+  97 004e 41D1     		bne	.L6
+ 158:./user/source/gps.c ****     {
+ 159:./user/source/gps.c ****         result = false;
+ 160:./user/source/gps.c ****     }
+ 161:./user/source/gps.c ****     else
+ 162:./user/source/gps.c ****     {
+ 163:./user/source/gps.c ****         if (!strncmp(tmpchr[12], "V", 1))
+  98              		.loc 1 163 0
+  99 0050 3B78     		ldrb	r3, [r7]	@ zero_extendqisi2
+ 100 0052 562B     		cmp	r3, #86
+ 101 0054 40D0     		beq	.L7
+ 164:./user/source/gps.c ****         {
+ 165:./user/source/gps.c ****             result = false;
+ 166:./user/source/gps.c ****         }
+ 167:./user/source/gps.c **** 
+ 168:./user/source/gps.c ****         else
+ 169:./user/source/gps.c ****         {
+ 170:./user/source/gps.c ****             tmpGprmc->UTC = *tmpchr[1];
+ 102              		.loc 1 170 0
+ 103 0056 019B     		ldr	r3, [sp, #4]
+ 104 0058 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 105 005a AB70     		strb	r3, [r5, #2]
+ 171:./user/source/gps.c ****             tmpGprmc->VA = *tmpchr[2];
+ 106              		.loc 1 171 0
+ 107 005c 029B     		ldr	r3, [sp, #8]
+ 108 005e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 109 0060 EB70     		strb	r3, [r5, #3]
+ 172:./user/source/gps.c ****             tmpGprmc->WD = atof(tmpchr[3]);
+ 110              		.loc 1 172 0
+ 111 0062 0398     		ldr	r0, [sp, #12]
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s 			page 6
+
+
+ 112 0064 FFF7FEFF 		bl	atof
+ 113              	.LVL11:
+ 114 0068 85ED020B 		vstr.64	d0, [r5, #8]
+ 173:./user/source/gps.c ****             tmpGprmc->WDNS = *tmpchr[4];
+ 115              		.loc 1 173 0
+ 116 006c 049B     		ldr	r3, [sp, #16]
+ 117 006e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 118 0070 2B74     		strb	r3, [r5, #16]
+ 174:./user/source/gps.c ****             tmpGprmc->JD = atof(tmpchr[5]);
+ 119              		.loc 1 174 0
+ 120 0072 0598     		ldr	r0, [sp, #20]
+ 121 0074 FFF7FEFF 		bl	atof
+ 122              	.LVL12:
+ 123 0078 85ED060B 		vstr.64	d0, [r5, #24]
+ 175:./user/source/gps.c ****             tmpGprmc->JDWE = *tmpchr[6];
+ 124              		.loc 1 175 0
+ 125 007c 069B     		ldr	r3, [sp, #24]
+ 126 007e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 127 0080 85F82030 		strb	r3, [r5, #32]
+ 176:./user/source/gps.c ****             tmpGprmc->SPEED = atof(tmpchr[7]);
+ 128              		.loc 1 176 0
+ 129 0084 0798     		ldr	r0, [sp, #28]
+ 130 0086 FFF7FEFF 		bl	atof
+ 131              	.LVL13:
+ 132 008a 85ED0A0B 		vstr.64	d0, [r5, #40]
+ 177:./user/source/gps.c ****             tmpGprmc->XHQD = *tmpchr[8];
+ 133              		.loc 1 177 0
+ 134 008e 089B     		ldr	r3, [sp, #32]
+ 135 0090 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 136 0092 FFF7FEFF 		bl	__aeabi_ui2d
+ 137              	.LVL14:
+ 138 0096 C5E90C01 		strd	r0, [r5, #48]
+ 178:./user/source/gps.c ****             tmpGprmc->DATE = *tmpchr[9];
+ 139              		.loc 1 178 0
+ 140 009a 099B     		ldr	r3, [sp, #36]
+ 141 009c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 142 009e 85F83830 		strb	r3, [r5, #56]
+ 179:./user/source/gps.c ****             tmpGprmc->MAGE = *tmpchr[10];
+ 143              		.loc 1 179 0
+ 144 00a2 0A9B     		ldr	r3, [sp, #40]
+ 145 00a4 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 146 00a6 07EE903A 		vmov	s15, r3	@ int
+ 147 00aa F8EE677A 		vcvt.f32.u32	s15, s15
+ 148 00ae C5ED0F7A 		vstr.32	s15, [r5, #60]
+ 180:./user/source/gps.c ****             tmpGprmc->ANGLE = *tmpchr[11];
+ 149              		.loc 1 180 0
+ 150 00b2 0B9B     		ldr	r3, [sp, #44]
+ 151 00b4 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 152 00b6 07EE903A 		vmov	s15, r3	@ int
+ 153 00ba F8EE677A 		vcvt.f32.u32	s15, s15
+ 154 00be C5ED107A 		vstr.32	s15, [r5, #64]
+ 181:./user/source/gps.c ****             tmpGprmc->MODE = *tmpchr[12];
+ 155              		.loc 1 181 0
+ 156 00c2 3B78     		ldrb	r3, [r7]	@ zero_extendqisi2
+ 157 00c4 85F84430 		strb	r3, [r5, #68]
+ 182:./user/source/gps.c ****             tmpGprmc->SUM = atoi(tmpchr[13]);
+ 158              		.loc 1 182 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s 			page 7
+
+
+ 159 00c8 3046     		mov	r0, r6
+ 160 00ca FFF7FEFF 		bl	atoi
+ 161              	.LVL15:
+ 162 00ce A864     		str	r0, [r5, #72]
+ 163              	.LVL16:
+ 183:./user/source/gps.c ****             result = true;
+ 164              		.loc 1 183 0
+ 165 00d0 0120     		movs	r0, #1
+ 166 00d2 02E0     		b	.L5
+ 167              	.LVL17:
+ 168              	.L6:
+ 159:./user/source/gps.c ****     }
+ 169              		.loc 1 159 0
+ 170 00d4 0020     		movs	r0, #0
+ 171 00d6 00E0     		b	.L5
+ 172              	.L7:
+ 165:./user/source/gps.c ****         }
+ 173              		.loc 1 165 0
+ 174 00d8 0020     		movs	r0, #0
+ 175              	.LVL18:
+ 176              	.L5:
+ 184:./user/source/gps.c ****         }
+ 185:./user/source/gps.c ****     }
+ 186:./user/source/gps.c **** 
+ 187:./user/source/gps.c ****     return result;
+ 188:./user/source/gps.c **** }
+ 177              		.loc 1 188 0
+ 178 00da 0FB0     		add	sp, sp, #60
+ 179              	.LCFI2:
+ 180              		.cfi_def_cfa_offset 20
+ 181              		@ sp needed
+ 182 00dc F0BD     		pop	{r4, r5, r6, r7, pc}
+ 183              	.LVL19:
+ 184              	.L10:
+ 185 00de 00BF     		.align	2
+ 186              	.L9:
+ 187 00e0 00000000 		.word	.LC0
+ 188 00e4 04000000 		.word	.LC1
+ 189              		.cfi_endproc
+ 190              	.LFE116:
+ 192              		.section	.text.pGetGprmc,"ax",%progbits
+ 193              		.align	2
+ 194              		.thumb
+ 195              		.thumb_func
+ 197              	pGetGprmc:
+ 198              	.LFB115:
+ 110:./user/source/gps.c ****     //char ucGPSFrame[DRV_BUF_SIZE];
+ 199              		.loc 1 110 0
+ 200              		.cfi_startproc
+ 201              		@ args = 0, pretend = 0, frame = 0
+ 202              		@ frame_needed = 0, uses_anonymous_args = 0
+ 203              	.LVL20:
+ 204 0000 10B5     		push	{r4, lr}
+ 205              	.LCFI3:
+ 206              		.cfi_def_cfa_offset 8
+ 207              		.cfi_offset 4, -8
+ 208              		.cfi_offset 14, -4
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s 			page 8
+
+
+ 209 0002 0446     		mov	r4, r0
+ 112:./user/source/gps.c ****     char *pGPSFrame = (char *)buf;
+ 210              		.loc 1 112 0
+ 211 0004 0023     		movs	r3, #0
+ 212 0006 4354     		strb	r3, [r0, r1]
+ 213              	.LVL21:
+ 214              	.L12:
+ 117:./user/source/gps.c ****     } while (strncmp(pGPSFrame, "$GPRMC", 6) != 0);
+ 215              		.loc 1 117 0 discriminator 1
+ 216 0008 2421     		movs	r1, #36
+ 217 000a 2046     		mov	r0, r4
+ 218 000c FFF7FEFF 		bl	strchr
+ 219              	.LVL22:
+ 220 0010 0446     		mov	r4, r0
+ 221              	.LVL23:
+ 118:./user/source/gps.c ****     return pGPSFrame;
+ 222              		.loc 1 118 0 discriminator 1
+ 223 0012 0622     		movs	r2, #6
+ 224 0014 0349     		ldr	r1, .L14
+ 225 0016 FFF7FEFF 		bl	strncmp
+ 226              	.LVL24:
+ 227 001a 0028     		cmp	r0, #0
+ 228 001c F4D1     		bne	.L12
+ 120:./user/source/gps.c **** /*******************************************************************************
+ 229              		.loc 1 120 0
+ 230 001e 2046     		mov	r0, r4
+ 231 0020 10BD     		pop	{r4, pc}
+ 232              	.LVL25:
+ 233              	.L15:
+ 234 0022 00BF     		.align	2
+ 235              	.L14:
+ 236 0024 08000000 		.word	.LC2
+ 237              		.cfi_endproc
+ 238              	.LFE115:
+ 240              		.section	.text.vGps_PDen,"ax",%progbits
+ 241              		.align	2
+ 242              		.thumb
+ 243              		.thumb_func
+ 245              	vGps_PDen:
+ 246              	.LFB114:
+  97:./user/source/gps.c ****     GPIO_WriteBit(GPIOA, GPIO_Pin_2, Bit_RESET);
+ 247              		.loc 1 97 0
+ 248              		.cfi_startproc
+ 249              		@ args = 0, pretend = 0, frame = 0
+ 250              		@ frame_needed = 0, uses_anonymous_args = 0
+ 251 0000 08B5     		push	{r3, lr}
+ 252              	.LCFI4:
+ 253              		.cfi_def_cfa_offset 8
+ 254              		.cfi_offset 3, -8
+ 255              		.cfi_offset 14, -4
+  98:./user/source/gps.c **** }
+ 256              		.loc 1 98 0
+ 257 0002 0022     		movs	r2, #0
+ 258 0004 0421     		movs	r1, #4
+ 259 0006 4FF09040 		mov	r0, #1207959552
+ 260 000a FFF7FEFF 		bl	GPIO_WriteBit
+ 261              	.LVL26:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s 			page 9
+
+
+ 262 000e 08BD     		pop	{r3, pc}
+ 263              		.cfi_endproc
+ 264              	.LFE114:
+ 266              		.section	.text.vGps_PEn,"ax",%progbits
+ 267              		.align	2
+ 268              		.thumb
+ 269              		.thumb_func
+ 271              	vGps_PEn:
+ 272              	.LFB113:
+  85:./user/source/gps.c ****     GPIO_WriteBit(GPIOA, GPIO_Pin_2, Bit_SET);
+ 273              		.loc 1 85 0
+ 274              		.cfi_startproc
+ 275              		@ args = 0, pretend = 0, frame = 0
+ 276              		@ frame_needed = 0, uses_anonymous_args = 0
+ 277 0000 08B5     		push	{r3, lr}
+ 278              	.LCFI5:
+ 279              		.cfi_def_cfa_offset 8
+ 280              		.cfi_offset 3, -8
+ 281              		.cfi_offset 14, -4
+  86:./user/source/gps.c **** }
+ 282              		.loc 1 86 0
+ 283 0002 0122     		movs	r2, #1
+ 284 0004 0421     		movs	r1, #4
+ 285 0006 4FF09040 		mov	r0, #1207959552
+ 286 000a FFF7FEFF 		bl	GPIO_WriteBit
+ 287              	.LVL27:
+ 288 000e 08BD     		pop	{r3, pc}
+ 289              		.cfi_endproc
+ 290              	.LFE113:
+ 292              		.section	.text.vGps_Init,"ax",%progbits
+ 293              		.align	2
+ 294              		.thumb
+ 295              		.thumb_func
+ 297              	vGps_Init:
+ 298              	.LFB112:
+  32:./user/source/gps.c ****     /*PA2配置为GPS使能*/
+ 299              		.loc 1 32 0
+ 300              		.cfi_startproc
+ 301              		@ args = 0, pretend = 0, frame = 40
+ 302              		@ frame_needed = 0, uses_anonymous_args = 0
+ 303 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 304              	.LCFI6:
+ 305              		.cfi_def_cfa_offset 20
+ 306              		.cfi_offset 4, -20
+ 307              		.cfi_offset 5, -16
+ 308              		.cfi_offset 6, -12
+ 309              		.cfi_offset 7, -8
+ 310              		.cfi_offset 14, -4
+ 311 0002 8BB0     		sub	sp, sp, #44
+ 312              	.LCFI7:
+ 313              		.cfi_def_cfa_offset 64
+  37:./user/source/gps.c ****     GPIO_Initstruc.GPIO_Pin = GPIO_Pin_2;
+ 314              		.loc 1 37 0
+ 315 0004 0121     		movs	r1, #1
+ 316 0006 4FF40030 		mov	r0, #131072
+ 317 000a FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 318              	.LVL28:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s 			page 10
+
+
+  38:./user/source/gps.c ****     GPIO_Initstruc.GPIO_Mode = GPIO_Mode_OUT;
+ 319              		.loc 1 38 0
+ 320 000e 0423     		movs	r3, #4
+ 321 0010 0893     		str	r3, [sp, #32]
+  39:./user/source/gps.c ****     GPIO_Initstruc.GPIO_OType = GPIO_OType_PP; //开漏
+ 322              		.loc 1 39 0
+ 323 0012 0124     		movs	r4, #1
+ 324 0014 8DF82440 		strb	r4, [sp, #36]
+  40:./user/source/gps.c ****     GPIO_Initstruc.GPIO_Speed = GPIO_Speed_2MHz;
+ 325              		.loc 1 40 0
+ 326 0018 0025     		movs	r5, #0
+ 327 001a 8DF82650 		strb	r5, [sp, #38]
+  41:./user/source/gps.c ****     GPIO_Initstruc.GPIO_PuPd = GPIO_PuPd_NOPULL;
+ 328              		.loc 1 41 0
+ 329 001e 0227     		movs	r7, #2
+ 330 0020 8DF82570 		strb	r7, [sp, #37]
+  42:./user/source/gps.c ****     GPIO_Init(GPIOA, &GPIO_Initstruc);
+ 331              		.loc 1 42 0
+ 332 0024 8DF82750 		strb	r5, [sp, #39]
+  43:./user/source/gps.c ****     /*B6和B7配置为串口1,GPS*/
+ 333              		.loc 1 43 0
+ 334 0028 08A9     		add	r1, sp, #32
+ 335 002a 4FF09040 		mov	r0, #1207959552
+ 336 002e FFF7FEFF 		bl	GPIO_Init
+ 337              	.LVL29:
+  45:./user/source/gps.c ****     GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_7);
+ 338              		.loc 1 45 0
+ 339 0032 2146     		mov	r1, r4
+ 340 0034 4FF48020 		mov	r0, #262144
+ 341 0038 FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 342              	.LVL30:
+  46:./user/source/gps.c ****     GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_7);
+ 343              		.loc 1 46 0
+ 344 003c 204E     		ldr	r6, .L22
+ 345 003e 0722     		movs	r2, #7
+ 346 0040 0621     		movs	r1, #6
+ 347 0042 3046     		mov	r0, r6
+ 348 0044 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 349              	.LVL31:
+  47:./user/source/gps.c ****     GPIO_Initstruc.GPIO_Mode = GPIO_Mode_AF;
+ 350              		.loc 1 47 0
+ 351 0048 0722     		movs	r2, #7
+ 352 004a 1146     		mov	r1, r2
+ 353 004c 3046     		mov	r0, r6
+ 354 004e FFF7FEFF 		bl	GPIO_PinAFConfig
+ 355              	.LVL32:
+  48:./user/source/gps.c ****     GPIO_Initstruc.GPIO_OType = GPIO_OType_PP;
+ 356              		.loc 1 48 0
+ 357 0052 8DF82470 		strb	r7, [sp, #36]
+  49:./user/source/gps.c ****     GPIO_Initstruc.GPIO_PuPd = GPIO_PuPd_UP;
+ 358              		.loc 1 49 0
+ 359 0056 8DF82650 		strb	r5, [sp, #38]
+  50:./user/source/gps.c ****     GPIO_Initstruc.GPIO_Speed = GPIO_Speed_2MHz;
+ 360              		.loc 1 50 0
+ 361 005a 8DF82740 		strb	r4, [sp, #39]
+  51:./user/source/gps.c ****     GPIO_Initstruc.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
+ 362              		.loc 1 51 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s 			page 11
+
+
+ 363 005e 8DF82570 		strb	r7, [sp, #37]
+  52:./user/source/gps.c ****     GPIO_Init(GPIOB, &GPIO_Initstruc);
+ 364              		.loc 1 52 0
+ 365 0062 C023     		movs	r3, #192
+ 366 0064 0893     		str	r3, [sp, #32]
+  53:./user/source/gps.c ****     /*串口初始化*/
+ 367              		.loc 1 53 0
+ 368 0066 08A9     		add	r1, sp, #32
+ 369 0068 3046     		mov	r0, r6
+ 370 006a FFF7FEFF 		bl	GPIO_Init
+ 371              	.LVL33:
+  56:./user/source/gps.c ****     USART_OverSampling8Cmd(USART1, ENABLE);
+ 372              		.loc 1 56 0
+ 373 006e 2146     		mov	r1, r4
+ 374 0070 4FF48040 		mov	r0, #16384
+ 375 0074 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 376              	.LVL34:
+  57:./user/source/gps.c ****     USART_Initstruc.USART_BaudRate = 115200;
+ 377              		.loc 1 57 0
+ 378 0078 124E     		ldr	r6, .L22+4
+ 379 007a 2146     		mov	r1, r4
+ 380 007c 3046     		mov	r0, r6
+ 381 007e FFF7FEFF 		bl	USART_OverSampling8Cmd
+ 382              	.LVL35:
+  58:./user/source/gps.c ****     USART_Initstruc.USART_Mode = (USART_Mode_Rx | USART_Mode_Tx);
+ 383              		.loc 1 58 0
+ 384 0082 4FF4E133 		mov	r3, #115200
+ 385 0086 0293     		str	r3, [sp, #8]
+  59:./user/source/gps.c ****     USART_Initstruc.USART_WordLength = USART_WordLength_9b;
+ 386              		.loc 1 59 0
+ 387 0088 0C23     		movs	r3, #12
+ 388 008a 0693     		str	r3, [sp, #24]
+  60:./user/source/gps.c ****     USART_Initstruc.USART_Parity = USART_Parity_No;
+ 389              		.loc 1 60 0
+ 390 008c 4FF48053 		mov	r3, #4096
+ 391 0090 0393     		str	r3, [sp, #12]
+  61:./user/source/gps.c ****     USART_Initstruc.USART_StopBits = USART_StopBits_1;
+ 392              		.loc 1 61 0
+ 393 0092 0595     		str	r5, [sp, #20]
+  62:./user/source/gps.c ****     USART_Initstruc.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+ 394              		.loc 1 62 0
+ 395 0094 0495     		str	r5, [sp, #16]
+  63:./user/source/gps.c ****     USART_Init(USART1, &USART_Initstruc);
+ 396              		.loc 1 63 0
+ 397 0096 0795     		str	r5, [sp, #28]
+  64:./user/source/gps.c **** 
+ 398              		.loc 1 64 0
+ 399 0098 02A9     		add	r1, sp, #8
+ 400 009a 3046     		mov	r0, r6
+ 401 009c FFF7FEFF 		bl	USART_Init
+ 402              	.LVL36:
+  66:./user/source/gps.c ****     NVIC_Initstruc.NVIC_IRQChannelPreemptionPriority = 0;
+ 403              		.loc 1 66 0
+ 404 00a0 2523     		movs	r3, #37
+ 405 00a2 8DF80430 		strb	r3, [sp, #4]
+  67:./user/source/gps.c ****     //NVIC_Initstruc.NVIC_IRQChannelSubPriority = 0;
+ 406              		.loc 1 67 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s 			page 12
+
+
+ 407 00a6 8DF80550 		strb	r5, [sp, #5]
+  69:./user/source/gps.c ****     NVIC_Init(&NVIC_Initstruc);
+ 408              		.loc 1 69 0
+ 409 00aa 8DF80740 		strb	r4, [sp, #7]
+  70:./user/source/gps.c **** 
+ 410              		.loc 1 70 0
+ 411 00ae 01A8     		add	r0, sp, #4
+ 412 00b0 FFF7FEFF 		bl	NVIC_Init
+ 413              	.LVL37:
+  72:./user/source/gps.c ****     //UART_GPS.Init();
+ 414              		.loc 1 72 0
+ 415 00b4 2146     		mov	r1, r4
+ 416 00b6 3046     		mov	r0, r6
+ 417 00b8 FFF7FEFF 		bl	USART_Cmd
+ 418              	.LVL38:
+  74:./user/source/gps.c **** 
+ 419              		.loc 1 74 0
+ 420 00bc 0BB0     		add	sp, sp, #44
+ 421              	.LCFI8:
+ 422              		.cfi_def_cfa_offset 20
+ 423              		@ sp needed
+ 424 00be F0BD     		pop	{r4, r5, r6, r7, pc}
+ 425              	.L23:
+ 426              		.align	2
+ 427              	.L22:
+ 428 00c0 00040048 		.word	1207960576
+ 429 00c4 00380140 		.word	1073821696
+ 430              		.cfi_endproc
+ 431              	.LFE112:
+ 433              		.global	pSim800GPS
+ 434              		.global	Sim800GPS
+ 435              		.section	.data.pSim800GPS,"aw",%progbits
+ 436              		.align	2
+ 439              	pSim800GPS:
+ 440 0000 00000000 		.word	Sim800GPS
+ 441              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 442              		.align	2
+ 443              	.LC0:
+ 444 0000 2C00     		.ascii	",\000"
+ 445 0002 0000     		.space	2
+ 446              	.LC1:
+ 447 0004 2A00     		.ascii	"*\000"
+ 448 0006 0000     		.space	2
+ 449              	.LC2:
+ 450 0008 24475052 		.ascii	"$GPRMC\000"
+ 450      4D4300
+ 451              		.section	.data.Sim800GPS,"aw",%progbits
+ 452              		.align	2
+ 455              	Sim800GPS:
+ 456 0000 00000000 		.word	vGps_Init
+ 457 0004 00000000 		.word	vGps_PEn
+ 458 0008 00000000 		.word	vGps_PDen
+ 459 000c 00000000 		.word	Uart_OnceRead
+ 460 0010 00000000 		.word	pGetGprmc
+ 461 0014 00000000 		.word	GprmcFill
+ 462              		.text
+ 463              	.Letext0:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s 			page 13
+
+
+ 464              		.file 2 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\machine\\_defaul
+ 465              		.file 3 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 466              		.file 4 "cmsis/include/stm32f37x.h"
+ 467              		.file 5 "stdperiph/include/stm32f37x_gpio.h"
+ 468              		.file 6 "stdperiph/include/stm32f37x_usart.h"
+ 469              		.file 7 "stdperiph/include/stm32f37x_misc.h"
+ 470              		.file 8 "user/include/gps.h"
+ 471              		.file 9 "cmsis/include/core_cm4.h"
+ 472              		.file 10 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\string.h"
+ 473              		.file 11 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\stdlib.h"
+ 474              		.file 12 "stdperiph/include/stm32f37x_rcc.h"
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s 			page 14
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 gps.c
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:23     .text.GprmcFill:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:27     .text.GprmcFill:00000000 GprmcFill
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:187    .text.GprmcFill:000000e0 $d
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:193    .text.pGetGprmc:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:197    .text.pGetGprmc:00000000 pGetGprmc
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:236    .text.pGetGprmc:00000024 $d
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:241    .text.vGps_PDen:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:245    .text.vGps_PDen:00000000 vGps_PDen
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:267    .text.vGps_PEn:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:271    .text.vGps_PEn:00000000 vGps_PEn
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:293    .text.vGps_Init:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:297    .text.vGps_Init:00000000 vGps_Init
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:428    .text.vGps_Init:000000c0 $d
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:439    .data.pSim800GPS:00000000 pSim800GPS
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:455    .data.Sim800GPS:00000000 Sim800GPS
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:436    .data.pSim800GPS:00000000 $d
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:442    .rodata.str1.4:00000000 $d
+C:\Users\strag\AppData\Local\Temp\ccvW2cpp.s:452    .data.Sim800GPS:00000000 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+__aeabi_ui2d
+strtok
+atof
+atoi
+strchr
+strncmp
+GPIO_WriteBit
+RCC_AHBPeriphClockCmd
+GPIO_Init
+GPIO_PinAFConfig
+RCC_APB2PeriphClockCmd
+USART_OverSampling8Cmd
+USART_Init
+NVIC_Init
+USART_Cmd
+Uart_OnceRead

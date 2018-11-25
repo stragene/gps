@@ -11,10 +11,8 @@ static struct ucbuf Uart1_Rsvbuf, Uart1_Sndbuf, Uart3_Rsvbuf, Uart3_Sndbuf;
 static UartDef UartGPS = {USART1, &Uart1_Rsvbuf, &Uart1_Sndbuf};
 static UartDef UartGPRS = {USART3, &Uart3_Rsvbuf, &Uart3_Sndbuf};
 
-UartDef * pUartGPS = &UartGPS;
-UartDef * pUartGPRS = &UartGPRS;
-
-
+UartDef *pUartGPS = &UartGPS;
+UartDef *pUartGPRS = &UartGPRS;
 
 /************************************************************
 * 函数名称: Uart_Write
@@ -124,7 +122,7 @@ uint32_t Uart_OnceRead(UartDef *puart, uint8_t *buf, uint32_t count, uint32_t de
     {
         return 0;
     }
-    USART_ITConfig(puart->handler, USART_IT_RXNE, ENABLE);
+    //USART_ITConfig(puart->handler, USART_IT_RXNE, ENABLE);
     readlen = uwBuf_UnReadLen(puart->pRsvbuf);
     while (delay)
     {
@@ -137,7 +135,7 @@ uint32_t Uart_OnceRead(UartDef *puart, uint8_t *buf, uint32_t count, uint32_t de
             delay--;
         }
     }
-    USART_ITConfig(puart->handler, USART_IT_RXNE, DISABLE);
+    //USART_ITConfig(puart->handler, USART_IT_RXNE, DISABLE);
     if (readlen)
     {
         /*实际读到的长度*/
@@ -193,7 +191,7 @@ uint32_t Uart_Read(UartDef *puart, uint8_t *buf, uint32_t count)
     {
         /*实际读到的长度*/
         readlen = (readlen < count ? readlen : count);
-        
+
         for (i = 0; i < readlen; i++)
         {
             *(buf + i) = puart->pRsvbuf->data[puart->pRsvbuf->rd];

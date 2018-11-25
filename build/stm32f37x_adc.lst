@@ -1,0 +1,3000 @@
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 1
+   4              		.eabi_attribute 28, 1
+   5              		.fpu fpv4-sp-d16
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.thumb
+  16              		.syntax unified
+  17              		.file	"stm32f37x_adc.c"
+  18              		.text
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.section	.text.ADC_DeInit,"ax",%progbits
+  22              		.align	2
+  23              		.global	ADC_DeInit
+  24              		.thumb
+  25              		.thumb_func
+  27              	ADC_DeInit:
+  28              	.LFB111:
+  29              		.file 1 "./stdperiph/source/stm32f37x_adc.c"
+   1:./stdperiph/source/stm32f37x_adc.c **** /**
+   2:./stdperiph/source/stm32f37x_adc.c ****   ******************************************************************************
+   3:./stdperiph/source/stm32f37x_adc.c ****   * @file    stm32f37x_adc.c
+   4:./stdperiph/source/stm32f37x_adc.c ****   * @author  MCD Application Team
+   5:./stdperiph/source/stm32f37x_adc.c ****   * @version V1.0.0
+   6:./stdperiph/source/stm32f37x_adc.c ****   * @date    20-September-2012
+   7:./stdperiph/source/stm32f37x_adc.c ****   * @brief   This file provides firmware functions to manage the following 
+   8:./stdperiph/source/stm32f37x_adc.c ****   *          functionalities of the Analog to Digital Converter (ADC) peripheral:
+   9:./stdperiph/source/stm32f37x_adc.c ****   *           + Initialization and Configuration
+  10:./stdperiph/source/stm32f37x_adc.c ****   *           + Analog Watchdog configuration
+  11:./stdperiph/source/stm32f37x_adc.c ****   *           + Temperature Sensor, Vrefint (Internal Reference Voltage)
+  12:./stdperiph/source/stm32f37x_adc.c ****   *             and VBAT (Voltage battery) management
+  13:./stdperiph/source/stm32f37x_adc.c ****   *           + Regular Channels Configuration
+  14:./stdperiph/source/stm32f37x_adc.c ****   *           + Regular Channels DMA Configuration
+  15:./stdperiph/source/stm32f37x_adc.c ****   *           + Injected channels Configuration
+  16:./stdperiph/source/stm32f37x_adc.c ****   *           + Interrupts and flags management
+  17:./stdperiph/source/stm32f37x_adc.c ****   *         
+  18:./stdperiph/source/stm32f37x_adc.c ****   *  @verbatim
+  19:./stdperiph/source/stm32f37x_adc.c **** ================================================================================
+  20:./stdperiph/source/stm32f37x_adc.c ****                       ##### How to use this driver #####
+  21:./stdperiph/source/stm32f37x_adc.c **** ================================================================================
+  22:./stdperiph/source/stm32f37x_adc.c ****     [..]
+  23:./stdperiph/source/stm32f37x_adc.c ****     (#) Enable the ADC interface clock using 
+  24:./stdperiph/source/stm32f37x_adc.c ****         RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+  25:./stdperiph/source/stm32f37x_adc.c ****     (#) ADC pins configuration
+  26:./stdperiph/source/stm32f37x_adc.c ****        (++) Enable the clock for the ADC GPIOs using the following function:
+  27:./stdperiph/source/stm32f37x_adc.c ****             RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOx, ENABLE);
+  28:./stdperiph/source/stm32f37x_adc.c ****        (++) Configure these ADC pins in analog mode using GPIO_Init();
+  29:./stdperiph/source/stm32f37x_adc.c ****     (#) Configure the data alignment using the ADC_Init() function.
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 2
+
+
+  30:./stdperiph/source/stm32f37x_adc.c ****     (#) Activate the ADC peripheral using ADC_Cmd() function.
+  31:./stdperiph/source/stm32f37x_adc.c **** 
+  32:./stdperiph/source/stm32f37x_adc.c ****     *** Regular channels group configuration ***
+  33:./stdperiph/source/stm32f37x_adc.c ****     ============================================
+  34:./stdperiph/source/stm32f37x_adc.c ****     [..] 
+  35:./stdperiph/source/stm32f37x_adc.c ****     (+) To configure the ADC regular channels group features, use 
+  36:./stdperiph/source/stm32f37x_adc.c ****         ADC_Init() and ADC_RegularChannelConfig() functions.
+  37:./stdperiph/source/stm32f37x_adc.c ****     (+) To activate the continuous mode, use the ADC_ContinuousModeCmd()
+  38:./stdperiph/source/stm32f37x_adc.c ****         function.
+  39:./stdperiph/source/stm32f37x_adc.c ****     (+) To configure and activate the Discontinuous mode, use the
+  40:./stdperiph/source/stm32f37x_adc.c ****         ADC_DiscModeChannelCountConfig() and ADC_DiscModeCmd() functions.
+  41:./stdperiph/source/stm32f37x_adc.c ****     (+) To read the ADC converted values, use the ADC_GetConversionValue()
+  42:./stdperiph/source/stm32f37x_adc.c ****         function.
+  43:./stdperiph/source/stm32f37x_adc.c **** 
+  44:./stdperiph/source/stm32f37x_adc.c ****     *** DMA for Regular channels group features configuration ***
+  45:./stdperiph/source/stm32f37x_adc.c ****     =============================================================
+  46:./stdperiph/source/stm32f37x_adc.c ****     [..]
+  47:./stdperiph/source/stm32f37x_adc.c ****     (+) To enable the DMA mode for regular channels group, use the 
+  48:./stdperiph/source/stm32f37x_adc.c ****         ADC_DMACmd() function.
+  49:./stdperiph/source/stm32f37x_adc.c ****              
+  50:./stdperiph/source/stm32f37x_adc.c ****     *** Injected channels group configuration ***
+  51:./stdperiph/source/stm32f37x_adc.c ****     =============================================
+  52:./stdperiph/source/stm32f37x_adc.c ****     [..]    
+  53:./stdperiph/source/stm32f37x_adc.c ****     (+) To configure the ADC Injected channels group features, use 
+  54:./stdperiph/source/stm32f37x_adc.c ****         ADC_InjectedChannelConfig() function.
+  55:./stdperiph/source/stm32f37x_adc.c ****     (+) To activate the Injected Discontinuous mode, use the 
+  56:./stdperiph/source/stm32f37x_adc.c ****         ADC_InjectedDiscModeCmd() function.  
+  57:./stdperiph/source/stm32f37x_adc.c ****     (+) To activate the AutoInjected mode, use the ADC_AutoInjectedConvCmd() 
+  58:./stdperiph/source/stm32f37x_adc.c ****         function.
+  59:./stdperiph/source/stm32f37x_adc.c ****     (+) To read the ADC converted values, use the ADC_GetInjectedConversionValue() function.
+  60:./stdperiph/source/stm32f37x_adc.c **** 
+  61:./stdperiph/source/stm32f37x_adc.c ****   *  @endverbatim
+  62:./stdperiph/source/stm32f37x_adc.c ****   *
+  63:./stdperiph/source/stm32f37x_adc.c ****   ******************************************************************************
+  64:./stdperiph/source/stm32f37x_adc.c ****   * @attention
+  65:./stdperiph/source/stm32f37x_adc.c ****   *
+  66:./stdperiph/source/stm32f37x_adc.c ****   * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
+  67:./stdperiph/source/stm32f37x_adc.c ****   *
+  68:./stdperiph/source/stm32f37x_adc.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  69:./stdperiph/source/stm32f37x_adc.c ****   * You may not use this file except in compliance with the License.
+  70:./stdperiph/source/stm32f37x_adc.c ****   * You may obtain a copy of the License at:
+  71:./stdperiph/source/stm32f37x_adc.c ****   *
+  72:./stdperiph/source/stm32f37x_adc.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  73:./stdperiph/source/stm32f37x_adc.c ****   *
+  74:./stdperiph/source/stm32f37x_adc.c ****   * Unless required by applicable law or agreed to in writing, software 
+  75:./stdperiph/source/stm32f37x_adc.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  76:./stdperiph/source/stm32f37x_adc.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  77:./stdperiph/source/stm32f37x_adc.c ****   * See the License for the specific language governing permissions and
+  78:./stdperiph/source/stm32f37x_adc.c ****   * limitations under the License.
+  79:./stdperiph/source/stm32f37x_adc.c ****   *
+  80:./stdperiph/source/stm32f37x_adc.c ****   ******************************************************************************
+  81:./stdperiph/source/stm32f37x_adc.c ****   */
+  82:./stdperiph/source/stm32f37x_adc.c **** 
+  83:./stdperiph/source/stm32f37x_adc.c **** /* Includes ------------------------------------------------------------------*/
+  84:./stdperiph/source/stm32f37x_adc.c **** #include "stm32f37x_adc.h"
+  85:./stdperiph/source/stm32f37x_adc.c **** #include "stm32f37x_rcc.h"
+  86:./stdperiph/source/stm32f37x_adc.c **** 
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 3
+
+
+  87:./stdperiph/source/stm32f37x_adc.c **** /** @addtogroup STM32F37x_StdPeriph_Driver
+  88:./stdperiph/source/stm32f37x_adc.c ****   * @{
+  89:./stdperiph/source/stm32f37x_adc.c ****   */
+  90:./stdperiph/source/stm32f37x_adc.c **** 
+  91:./stdperiph/source/stm32f37x_adc.c **** /** @defgroup ADC 
+  92:./stdperiph/source/stm32f37x_adc.c ****   * @brief ADC driver modules
+  93:./stdperiph/source/stm32f37x_adc.c ****   * @{
+  94:./stdperiph/source/stm32f37x_adc.c ****   */
+  95:./stdperiph/source/stm32f37x_adc.c **** 
+  96:./stdperiph/source/stm32f37x_adc.c **** /* Private typedef -----------------------------------------------------------*/
+  97:./stdperiph/source/stm32f37x_adc.c **** /* Private define ------------------------------------------------------------*/
+  98:./stdperiph/source/stm32f37x_adc.c **** /* CR2 register Mask */
+  99:./stdperiph/source/stm32f37x_adc.c **** #define ADC_CR2_CLEAR_MASK         ((uint32_t)0xFFF1F7FD)
+ 100:./stdperiph/source/stm32f37x_adc.c **** /* ADC SQRx mask */
+ 101:./stdperiph/source/stm32f37x_adc.c **** #define ADC_SQR_SQ_SET             ((uint32_t)0x0000001F)
+ 102:./stdperiph/source/stm32f37x_adc.c **** /* ADC JSQRx mask */
+ 103:./stdperiph/source/stm32f37x_adc.c **** #define ADC_JSQR_JSQ_SET           ((uint32_t)0x0000001F)
+ 104:./stdperiph/source/stm32f37x_adc.c **** /* ADC SMPRx mask */
+ 105:./stdperiph/source/stm32f37x_adc.c **** #define ADC_SMPR_SMP_SET           ((uint32_t)0x00000007)
+ 106:./stdperiph/source/stm32f37x_adc.c **** /* ADC JDRx registers offset */
+ 107:./stdperiph/source/stm32f37x_adc.c **** #define ADC_JDR_OFFSET             ((uint8_t)0x28)
+ 108:./stdperiph/source/stm32f37x_adc.c **** 
+ 109:./stdperiph/source/stm32f37x_adc.c **** /* Private macro -------------------------------------------------------------*/
+ 110:./stdperiph/source/stm32f37x_adc.c **** /* Private variables ---------------------------------------------------------*/
+ 111:./stdperiph/source/stm32f37x_adc.c **** /* Private function prototypes -----------------------------------------------*/
+ 112:./stdperiph/source/stm32f37x_adc.c **** /* Private functions ---------------------------------------------------------*/
+ 113:./stdperiph/source/stm32f37x_adc.c **** 
+ 114:./stdperiph/source/stm32f37x_adc.c **** /** @defgroup ADC_Private_Functions
+ 115:./stdperiph/source/stm32f37x_adc.c ****   * @{
+ 116:./stdperiph/source/stm32f37x_adc.c ****   */
+ 117:./stdperiph/source/stm32f37x_adc.c **** 
+ 118:./stdperiph/source/stm32f37x_adc.c **** /** @defgroup ADC_Group1 Initialization and Configuration functions
+ 119:./stdperiph/source/stm32f37x_adc.c ****  *  @brief   Initialization and Configuration functions 
+ 120:./stdperiph/source/stm32f37x_adc.c ****  *
+ 121:./stdperiph/source/stm32f37x_adc.c **** @verbatim
+ 122:./stdperiph/source/stm32f37x_adc.c ****  ===============================================================================
+ 123:./stdperiph/source/stm32f37x_adc.c ****           ##### Initialization and Configuration functions #####
+ 124:./stdperiph/source/stm32f37x_adc.c ****  ===============================================================================  
+ 125:./stdperiph/source/stm32f37x_adc.c ****     [..] This section provides functions allowing to:
+ 126:./stdperiph/source/stm32f37x_adc.c ****         (+) Scan Conversion Mode (multichannels or one channel) for regular group
+ 127:./stdperiph/source/stm32f37x_adc.c ****         (+) ADC Continuous Conversion Mode (Continuous or Single conversion) for
+ 128:./stdperiph/source/stm32f37x_adc.c ****             regular group
+ 129:./stdperiph/source/stm32f37x_adc.c ****         (+) External trigger Edge and source of regular group, 
+ 130:./stdperiph/source/stm32f37x_adc.c ****         (+) Converted data alignment (left or right)
+ 131:./stdperiph/source/stm32f37x_adc.c ****         (+) The number of ADC conversions that will be done using the sequencer
+ 132:./stdperiph/source/stm32f37x_adc.c ****             for regular channel group
+ 133:./stdperiph/source/stm32f37x_adc.c ****         (+) Enable or disable the ADC peripheral
+ 134:./stdperiph/source/stm32f37x_adc.c ****         (+) Start/Reset the calibration
+ 135:./stdperiph/source/stm32f37x_adc.c ****    
+ 136:./stdperiph/source/stm32f37x_adc.c **** @endverbatim
+ 137:./stdperiph/source/stm32f37x_adc.c ****   * @{
+ 138:./stdperiph/source/stm32f37x_adc.c ****   */
+ 139:./stdperiph/source/stm32f37x_adc.c **** 
+ 140:./stdperiph/source/stm32f37x_adc.c **** /**
+ 141:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Deinitializes the ADCx peripheral registers to their default reset values.
+ 142:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 143:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 4
+
+
+ 144:./stdperiph/source/stm32f37x_adc.c ****   */
+ 145:./stdperiph/source/stm32f37x_adc.c **** void ADC_DeInit(ADC_TypeDef* ADCx)
+ 146:./stdperiph/source/stm32f37x_adc.c **** {
+  30              		.loc 1 146 0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              	.LVL0:
+  35 0000 08B5     		push	{r3, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 8
+  38              		.cfi_offset 3, -8
+  39              		.cfi_offset 14, -4
+ 147:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 148:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 149:./stdperiph/source/stm32f37x_adc.c **** 
+ 150:./stdperiph/source/stm32f37x_adc.c ****   /* Enable ADC1 reset state */
+ 151:./stdperiph/source/stm32f37x_adc.c ****   RCC_APB2PeriphResetCmd(RCC_APB2Periph_ADC1, ENABLE);
+  40              		.loc 1 151 0
+  41 0002 0121     		movs	r1, #1
+  42 0004 4FF40070 		mov	r0, #512
+  43              	.LVL1:
+  44 0008 FFF7FEFF 		bl	RCC_APB2PeriphResetCmd
+  45              	.LVL2:
+ 152:./stdperiph/source/stm32f37x_adc.c ****   /* Release ADC1 from reset state */
+ 153:./stdperiph/source/stm32f37x_adc.c ****   RCC_APB2PeriphResetCmd(RCC_APB2Periph_ADC1, DISABLE);
+  46              		.loc 1 153 0
+  47 000c 0021     		movs	r1, #0
+  48 000e 4FF40070 		mov	r0, #512
+  49 0012 FFF7FEFF 		bl	RCC_APB2PeriphResetCmd
+  50              	.LVL3:
+  51 0016 08BD     		pop	{r3, pc}
+  52              		.cfi_endproc
+  53              	.LFE111:
+  55              		.section	.text.ADC_Init,"ax",%progbits
+  56              		.align	2
+  57              		.global	ADC_Init
+  58              		.thumb
+  59              		.thumb_func
+  61              	ADC_Init:
+  62              	.LFB112:
+ 154:./stdperiph/source/stm32f37x_adc.c **** }
+ 155:./stdperiph/source/stm32f37x_adc.c **** 
+ 156:./stdperiph/source/stm32f37x_adc.c **** /**
+ 157:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Initializes the ADCx peripheral according to the specified parameters
+ 158:./stdperiph/source/stm32f37x_adc.c ****   *         in the ADC_InitStruct.
+ 159:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 160:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_InitStruct: pointer to an ADC_InitTypeDef structure that contains
+ 161:./stdperiph/source/stm32f37x_adc.c ****   *         the configuration information for the specified ADC peripheral.
+ 162:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 163:./stdperiph/source/stm32f37x_adc.c ****   */
+ 164:./stdperiph/source/stm32f37x_adc.c **** void ADC_Init(ADC_TypeDef* ADCx, ADC_InitTypeDef* ADC_InitStruct)
+ 165:./stdperiph/source/stm32f37x_adc.c **** {
+  63              		.loc 1 165 0
+  64              		.cfi_startproc
+  65              		@ args = 0, pretend = 0, frame = 0
+  66              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 5
+
+
+  67              		@ link register save eliminated.
+  68              	.LVL4:
+  69 0000 10B4     		push	{r4}
+  70              	.LCFI1:
+  71              		.cfi_def_cfa_offset 4
+  72              		.cfi_offset 4, -4
+  73              	.LVL5:
+ 166:./stdperiph/source/stm32f37x_adc.c ****   uint32_t tmpreg1 = 0;
+ 167:./stdperiph/source/stm32f37x_adc.c ****   uint8_t tmpreg2 = 0;
+ 168:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 169:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 170:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_FUNCTIONAL_STATE(ADC_InitStruct->ADC_ScanConvMode));
+ 171:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_FUNCTIONAL_STATE(ADC_InitStruct->ADC_ContinuousConvMode));
+ 172:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_EXT_TRIG(ADC_InitStruct->ADC_ExternalTrigConv));   
+ 173:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_DATA_ALIGN(ADC_InitStruct->ADC_DataAlign)); 
+ 174:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_REGULAR_LENGTH(ADC_InitStruct->ADC_NbrOfChannel));
+ 175:./stdperiph/source/stm32f37x_adc.c **** 
+ 176:./stdperiph/source/stm32f37x_adc.c ****   /*---------------------------- ADCx CR1 Configuration -----------------*/
+ 177:./stdperiph/source/stm32f37x_adc.c ****   /* Get the ADCx CR1 value */
+ 178:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 = ADCx->CR1;
+  74              		.loc 1 178 0
+  75 0002 4368     		ldr	r3, [r0, #4]
+  76              	.LVL6:
+ 179:./stdperiph/source/stm32f37x_adc.c ****   /* Clear SCAN bit */
+ 180:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 &= (uint32_t)(~ADC_CR1_SCAN);
+  77              		.loc 1 180 0
+  78 0004 23F48073 		bic	r3, r3, #256
+  79              	.LVL7:
+ 181:./stdperiph/source/stm32f37x_adc.c ****   /* Configure ADCx: scan conversion mode */
+ 182:./stdperiph/source/stm32f37x_adc.c ****   /* Set SCAN bit according to ADC_ScanConvMode value */
+ 183:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 |= (uint32_t)((uint32_t)ADC_InitStruct->ADC_ScanConvMode << 8);
+  80              		.loc 1 183 0
+  81 0008 0A78     		ldrb	r2, [r1]	@ zero_extendqisi2
+  82 000a 43EA0223 		orr	r3, r3, r2, lsl #8
+  83              	.LVL8:
+ 184:./stdperiph/source/stm32f37x_adc.c ****   /* Write to ADCx CR1 */
+ 185:./stdperiph/source/stm32f37x_adc.c ****   ADCx->CR1 = tmpreg1;
+  84              		.loc 1 185 0
+  85 000e 4360     		str	r3, [r0, #4]
+ 186:./stdperiph/source/stm32f37x_adc.c **** 
+ 187:./stdperiph/source/stm32f37x_adc.c ****   /*---------------------------- ADCx CR2 Configuration -----------------*/
+ 188:./stdperiph/source/stm32f37x_adc.c ****   /* Get the ADCx CR2 value */
+ 189:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 = ADCx->CR2;
+  86              		.loc 1 189 0
+  87 0010 8368     		ldr	r3, [r0, #8]
+  88              	.LVL9:
+ 190:./stdperiph/source/stm32f37x_adc.c ****   /* Clear CONT, ALIGN and EXTSEL bits */
+ 191:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 &= ADC_CR2_CLEAR_MASK;
+  89              		.loc 1 191 0
+  90 0012 0B4C     		ldr	r4, .L5
+  91 0014 1C40     		ands	r4, r4, r3
+  92              	.LVL10:
+ 192:./stdperiph/source/stm32f37x_adc.c ****   /* Configure ADCx: external trigger event and continuous conversion mode */
+ 193:./stdperiph/source/stm32f37x_adc.c ****   /* Set ALIGN bit according to ADC_DataAlign value */
+ 194:./stdperiph/source/stm32f37x_adc.c ****   /* Set EXTSEL bits according to ADC_ExternalTrigConv value */
+ 195:./stdperiph/source/stm32f37x_adc.c ****   /* Set CONT bit according to ADC_ContinuousConvMode value */
+ 196:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 |= (uint32_t)(ADC_InitStruct->ADC_DataAlign | ADC_InitStruct->ADC_ExternalTrigConv |
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 6
+
+
+  93              		.loc 1 196 0
+  94 0016 8A68     		ldr	r2, [r1, #8]
+  95 0018 4B68     		ldr	r3, [r1, #4]
+  96 001a 1A43     		orrs	r2, r2, r3
+ 197:./stdperiph/source/stm32f37x_adc.c ****             ((uint32_t)ADC_InitStruct->ADC_ContinuousConvMode << 1));
+  97              		.loc 1 197 0
+  98 001c 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+ 196:./stdperiph/source/stm32f37x_adc.c ****             ((uint32_t)ADC_InitStruct->ADC_ContinuousConvMode << 1));
+  99              		.loc 1 196 0
+ 100 001e 42EA4303 		orr	r3, r2, r3, lsl #1
+ 101 0022 2343     		orrs	r3, r3, r4
+ 102              	.LVL11:
+ 198:./stdperiph/source/stm32f37x_adc.c ****   /* Write to ADCx CR2 */
+ 199:./stdperiph/source/stm32f37x_adc.c ****   ADCx->CR2 = tmpreg1;
+ 103              		.loc 1 199 0
+ 104 0024 8360     		str	r3, [r0, #8]
+ 200:./stdperiph/source/stm32f37x_adc.c **** 
+ 201:./stdperiph/source/stm32f37x_adc.c ****   /*---------------------------- ADCx SQR1 Configuration -----------------*/
+ 202:./stdperiph/source/stm32f37x_adc.c ****   /* Get the ADCx SQR1 value */
+ 203:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 = ADCx->SQR1;
+ 105              		.loc 1 203 0
+ 106 0026 C36A     		ldr	r3, [r0, #44]
+ 107              	.LVL12:
+ 204:./stdperiph/source/stm32f37x_adc.c ****   /* Clear L bits */
+ 205:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 &= (uint32_t) (~ADC_SQR1_L);
+ 108              		.loc 1 205 0
+ 109 0028 23F47002 		bic	r2, r3, #15728640
+ 110              	.LVL13:
+ 206:./stdperiph/source/stm32f37x_adc.c ****   /* Configure ADCx: regular channel sequence length */
+ 207:./stdperiph/source/stm32f37x_adc.c ****   /* Set L bits according to ADC_NbrOfChannel value */
+ 208:./stdperiph/source/stm32f37x_adc.c ****   tmpreg2 |= (uint8_t) (ADC_InitStruct->ADC_NbrOfChannel - (uint8_t)1);
+ 111              		.loc 1 208 0
+ 112 002c 0B7B     		ldrb	r3, [r1, #12]	@ zero_extendqisi2
+ 113 002e 013B     		subs	r3, r3, #1
+ 114 0030 DBB2     		uxtb	r3, r3
+ 115              	.LVL14:
+ 209:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 |= (uint32_t)tmpreg2 << 20;
+ 116              		.loc 1 209 0
+ 117 0032 42EA0353 		orr	r3, r2, r3, lsl #20
+ 118              	.LVL15:
+ 210:./stdperiph/source/stm32f37x_adc.c ****   /* Write to ADCx SQR1 */
+ 211:./stdperiph/source/stm32f37x_adc.c ****   ADCx->SQR1 = tmpreg1;
+ 119              		.loc 1 211 0
+ 120 0036 C362     		str	r3, [r0, #44]
+ 121              	.LVL16:
+ 212:./stdperiph/source/stm32f37x_adc.c **** }
+ 122              		.loc 1 212 0
+ 123 0038 5DF8044B 		ldr	r4, [sp], #4
+ 124              	.LCFI2:
+ 125              		.cfi_restore 4
+ 126              		.cfi_def_cfa_offset 0
+ 127 003c 7047     		bx	lr
+ 128              	.L6:
+ 129 003e 00BF     		.align	2
+ 130              	.L5:
+ 131 0040 FDF7F1FF 		.word	-919555
+ 132              		.cfi_endproc
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 7
+
+
+ 133              	.LFE112:
+ 135              		.section	.text.ADC_StructInit,"ax",%progbits
+ 136              		.align	2
+ 137              		.global	ADC_StructInit
+ 138              		.thumb
+ 139              		.thumb_func
+ 141              	ADC_StructInit:
+ 142              	.LFB113:
+ 213:./stdperiph/source/stm32f37x_adc.c **** 
+ 214:./stdperiph/source/stm32f37x_adc.c **** /**
+ 215:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Fills each ADC_InitStruct member with its default value.
+ 216:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_InitStruct : pointer to an ADC_InitTypeDef structure which will be initialized.
+ 217:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 218:./stdperiph/source/stm32f37x_adc.c ****   */
+ 219:./stdperiph/source/stm32f37x_adc.c **** void ADC_StructInit(ADC_InitTypeDef* ADC_InitStruct)
+ 220:./stdperiph/source/stm32f37x_adc.c **** {
+ 143              		.loc 1 220 0
+ 144              		.cfi_startproc
+ 145              		@ args = 0, pretend = 0, frame = 0
+ 146              		@ frame_needed = 0, uses_anonymous_args = 0
+ 147              		@ link register save eliminated.
+ 148              	.LVL17:
+ 221:./stdperiph/source/stm32f37x_adc.c ****   /* Reset ADC init structure parameters values */
+ 222:./stdperiph/source/stm32f37x_adc.c ****   /* initialize the ADC_ScanConvMode member */
+ 223:./stdperiph/source/stm32f37x_adc.c ****   ADC_InitStruct->ADC_ScanConvMode = DISABLE;
+ 149              		.loc 1 223 0
+ 150 0000 0023     		movs	r3, #0
+ 151 0002 0370     		strb	r3, [r0]
+ 224:./stdperiph/source/stm32f37x_adc.c ****   /* Initialize the ADC_ContinuousConvMode member */
+ 225:./stdperiph/source/stm32f37x_adc.c ****   ADC_InitStruct->ADC_ContinuousConvMode = DISABLE;
+ 152              		.loc 1 225 0
+ 153 0004 4370     		strb	r3, [r0, #1]
+ 226:./stdperiph/source/stm32f37x_adc.c ****   /* Initialize the ADC_ExternalTrigConv member */
+ 227:./stdperiph/source/stm32f37x_adc.c ****   ADC_InitStruct->ADC_ExternalTrigConv = ADC_ExternalTrigConv_T19_TRGO;
+ 154              		.loc 1 227 0
+ 155 0006 4360     		str	r3, [r0, #4]
+ 228:./stdperiph/source/stm32f37x_adc.c ****   /* Initialize the ADC_DataAlign member */
+ 229:./stdperiph/source/stm32f37x_adc.c ****   ADC_InitStruct->ADC_DataAlign = ADC_DataAlign_Right;
+ 156              		.loc 1 229 0
+ 157 0008 8360     		str	r3, [r0, #8]
+ 230:./stdperiph/source/stm32f37x_adc.c ****   /* Initialize the ADC_NbrOfChannel member */
+ 231:./stdperiph/source/stm32f37x_adc.c ****   ADC_InitStruct->ADC_NbrOfChannel = 1;
+ 158              		.loc 1 231 0
+ 159 000a 0123     		movs	r3, #1
+ 160 000c 0373     		strb	r3, [r0, #12]
+ 161 000e 7047     		bx	lr
+ 162              		.cfi_endproc
+ 163              	.LFE113:
+ 165              		.section	.text.ADC_Cmd,"ax",%progbits
+ 166              		.align	2
+ 167              		.global	ADC_Cmd
+ 168              		.thumb
+ 169              		.thumb_func
+ 171              	ADC_Cmd:
+ 172              	.LFB114:
+ 232:./stdperiph/source/stm32f37x_adc.c **** }
+ 233:./stdperiph/source/stm32f37x_adc.c **** 
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 8
+
+
+ 234:./stdperiph/source/stm32f37x_adc.c **** /**
+ 235:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Enables or disables the specified ADC peripheral.
+ 236:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 237:./stdperiph/source/stm32f37x_adc.c ****   * @param  NewState: new state of the ADCx peripheral.
+ 238:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 239:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 240:./stdperiph/source/stm32f37x_adc.c ****   */
+ 241:./stdperiph/source/stm32f37x_adc.c **** void ADC_Cmd(ADC_TypeDef* ADCx, FunctionalState NewState)
+ 242:./stdperiph/source/stm32f37x_adc.c **** {
+ 173              		.loc 1 242 0
+ 174              		.cfi_startproc
+ 175              		@ args = 0, pretend = 0, frame = 0
+ 176              		@ frame_needed = 0, uses_anonymous_args = 0
+ 177              		@ link register save eliminated.
+ 178              	.LVL18:
+ 243:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 244:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 245:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 246:./stdperiph/source/stm32f37x_adc.c ****   if (NewState != DISABLE)
+ 179              		.loc 1 246 0
+ 180 0000 21B1     		cbz	r1, .L9
+ 247:./stdperiph/source/stm32f37x_adc.c ****   {
+ 248:./stdperiph/source/stm32f37x_adc.c ****     /* Set the ADON bit to wake up the ADC from power down mode */
+ 249:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR2 |= ADC_CR2_ADON;
+ 181              		.loc 1 249 0
+ 182 0002 8368     		ldr	r3, [r0, #8]
+ 183 0004 43F00103 		orr	r3, r3, #1
+ 184 0008 8360     		str	r3, [r0, #8]
+ 185 000a 7047     		bx	lr
+ 186              	.L9:
+ 250:./stdperiph/source/stm32f37x_adc.c ****   }
+ 251:./stdperiph/source/stm32f37x_adc.c ****   else
+ 252:./stdperiph/source/stm32f37x_adc.c ****   {
+ 253:./stdperiph/source/stm32f37x_adc.c ****     /* Disable the selected ADC peripheral */
+ 254:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR2 &= (uint32_t)(~ADC_CR2_ADON);
+ 187              		.loc 1 254 0
+ 188 000c 8368     		ldr	r3, [r0, #8]
+ 189 000e 23F00103 		bic	r3, r3, #1
+ 190 0012 8360     		str	r3, [r0, #8]
+ 191 0014 7047     		bx	lr
+ 192              		.cfi_endproc
+ 193              	.LFE114:
+ 195 0016 00BF     		.section	.text.ADC_StartCalibration,"ax",%progbits
+ 196              		.align	2
+ 197              		.global	ADC_StartCalibration
+ 198              		.thumb
+ 199              		.thumb_func
+ 201              	ADC_StartCalibration:
+ 202              	.LFB115:
+ 255:./stdperiph/source/stm32f37x_adc.c ****   }
+ 256:./stdperiph/source/stm32f37x_adc.c **** }
+ 257:./stdperiph/source/stm32f37x_adc.c **** 
+ 258:./stdperiph/source/stm32f37x_adc.c **** /**
+ 259:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Starts the selected ADC calibration process.
+ 260:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 261:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 262:./stdperiph/source/stm32f37x_adc.c ****   */
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 9
+
+
+ 263:./stdperiph/source/stm32f37x_adc.c **** void ADC_StartCalibration(ADC_TypeDef* ADCx)
+ 264:./stdperiph/source/stm32f37x_adc.c **** {
+ 203              		.loc 1 264 0
+ 204              		.cfi_startproc
+ 205              		@ args = 0, pretend = 0, frame = 0
+ 206              		@ frame_needed = 0, uses_anonymous_args = 0
+ 207              		@ link register save eliminated.
+ 208              	.LVL19:
+ 265:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 266:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 267:./stdperiph/source/stm32f37x_adc.c ****   /* Enable the selected ADC calibration process */  
+ 268:./stdperiph/source/stm32f37x_adc.c ****   ADCx->CR2 |= ADC_CR2_CAL;
+ 209              		.loc 1 268 0
+ 210 0000 8368     		ldr	r3, [r0, #8]
+ 211 0002 43F00403 		orr	r3, r3, #4
+ 212 0006 8360     		str	r3, [r0, #8]
+ 213 0008 7047     		bx	lr
+ 214              		.cfi_endproc
+ 215              	.LFE115:
+ 217 000a 00BF     		.section	.text.ADC_ResetCalibration,"ax",%progbits
+ 218              		.align	2
+ 219              		.global	ADC_ResetCalibration
+ 220              		.thumb
+ 221              		.thumb_func
+ 223              	ADC_ResetCalibration:
+ 224              	.LFB116:
+ 269:./stdperiph/source/stm32f37x_adc.c **** }
+ 270:./stdperiph/source/stm32f37x_adc.c **** 
+ 271:./stdperiph/source/stm32f37x_adc.c **** /**
+ 272:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Resets the selected ADC calibration registers.
+ 273:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 274:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 275:./stdperiph/source/stm32f37x_adc.c ****   */
+ 276:./stdperiph/source/stm32f37x_adc.c **** void ADC_ResetCalibration(ADC_TypeDef* ADCx)
+ 277:./stdperiph/source/stm32f37x_adc.c **** {
+ 225              		.loc 1 277 0
+ 226              		.cfi_startproc
+ 227              		@ args = 0, pretend = 0, frame = 0
+ 228              		@ frame_needed = 0, uses_anonymous_args = 0
+ 229              		@ link register save eliminated.
+ 230              	.LVL20:
+ 278:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 279:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 280:./stdperiph/source/stm32f37x_adc.c ****   /* Resets the selected ADC calibration registers */  
+ 281:./stdperiph/source/stm32f37x_adc.c ****   ADCx->CR2 |= ADC_CR2_RSTCAL;
+ 231              		.loc 1 281 0
+ 232 0000 8368     		ldr	r3, [r0, #8]
+ 233 0002 43F00803 		orr	r3, r3, #8
+ 234 0006 8360     		str	r3, [r0, #8]
+ 235 0008 7047     		bx	lr
+ 236              		.cfi_endproc
+ 237              	.LFE116:
+ 239 000a 00BF     		.section	.text.ADC_AnalogWatchdogCmd,"ax",%progbits
+ 240              		.align	2
+ 241              		.global	ADC_AnalogWatchdogCmd
+ 242              		.thumb
+ 243              		.thumb_func
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 10
+
+
+ 245              	ADC_AnalogWatchdogCmd:
+ 246              	.LFB117:
+ 282:./stdperiph/source/stm32f37x_adc.c **** }
+ 283:./stdperiph/source/stm32f37x_adc.c **** 
+ 284:./stdperiph/source/stm32f37x_adc.c **** /**
+ 285:./stdperiph/source/stm32f37x_adc.c ****   * @}
+ 286:./stdperiph/source/stm32f37x_adc.c ****   */
+ 287:./stdperiph/source/stm32f37x_adc.c **** 
+ 288:./stdperiph/source/stm32f37x_adc.c **** /** @defgroup ADC_Group2 Analog Watchdog configuration functions
+ 289:./stdperiph/source/stm32f37x_adc.c ****  *  @brief   Analog Watchdog configuration functions 
+ 290:./stdperiph/source/stm32f37x_adc.c ****  *
+ 291:./stdperiph/source/stm32f37x_adc.c **** @verbatim   
+ 292:./stdperiph/source/stm32f37x_adc.c ****  ===============================================================================
+ 293:./stdperiph/source/stm32f37x_adc.c ****           ##### Analog Watchdog configuration functions ##### 
+ 294:./stdperiph/source/stm32f37x_adc.c ****  ===============================================================================  
+ 295:./stdperiph/source/stm32f37x_adc.c **** 
+ 296:./stdperiph/source/stm32f37x_adc.c ****     [..] This section provides functions allowing to configure the Analog Watchdog
+ 297:./stdperiph/source/stm32f37x_adc.c ****          (AWD) feature in the ADC.
+ 298:./stdperiph/source/stm32f37x_adc.c ****   
+ 299:./stdperiph/source/stm32f37x_adc.c ****     [..] A typical configuration Analog Watchdog is done following these steps :
+ 300:./stdperiph/source/stm32f37x_adc.c ****          (#) The ADC guarded channel(s) is (are) selected using the 
+ 301:./stdperiph/source/stm32f37x_adc.c ****              ADC_AnalogWatchdogSingleChannelConfig() function.
+ 302:./stdperiph/source/stm32f37x_adc.c ****          (#) The Analog watchdog lower and higher threshold are configured using
+ 303:./stdperiph/source/stm32f37x_adc.c ****              the ADC_AnalogWatchdogThresholdsConfig() function.
+ 304:./stdperiph/source/stm32f37x_adc.c ****          (#) The Analog watchdog is enabled and configured to enable the check,
+ 305:./stdperiph/source/stm32f37x_adc.c ****              on one or more channels, using the  ADC_AnalogWatchdogCmd() function.
+ 306:./stdperiph/source/stm32f37x_adc.c **** 
+ 307:./stdperiph/source/stm32f37x_adc.c **** @endverbatim
+ 308:./stdperiph/source/stm32f37x_adc.c ****   * @{
+ 309:./stdperiph/source/stm32f37x_adc.c ****   */
+ 310:./stdperiph/source/stm32f37x_adc.c **** 
+ 311:./stdperiph/source/stm32f37x_adc.c **** /**
+ 312:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Enables or disables the analog watchdog on single/all regular
+ 313:./stdperiph/source/stm32f37x_adc.c ****   *         or injected channels
+ 314:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 315:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_AnalogWatchdog: the ADC analog watchdog configuration.
+ 316:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be one of the following values:
+ 317:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_AnalogWatchdog_SingleRegEnable: Analog watchdog on a single regular channel
+ 318:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_AnalogWatchdog_SingleInjecEnable: Analog watchdog on a single injected chan
+ 319:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_AnalogWatchdog_SingleRegOrInjecEnable: Analog watchdog on a single regular 
+ 320:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_AnalogWatchdog_AllRegEnable: Analog watchdog on  all regular channel
+ 321:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_AnalogWatchdog_AllInjecEnable: Analog watchdog on  all injected channel
+ 322:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_AnalogWatchdog_AllRegAllInjecEnable: Analog watchdog on all regular and inj
+ 323:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_AnalogWatchdog_None: No channel guarded by the analog watchdog
+ 324:./stdperiph/source/stm32f37x_adc.c ****   * @retval None	  
+ 325:./stdperiph/source/stm32f37x_adc.c ****   */
+ 326:./stdperiph/source/stm32f37x_adc.c **** void ADC_AnalogWatchdogCmd(ADC_TypeDef* ADCx, uint32_t ADC_AnalogWatchdog)
+ 327:./stdperiph/source/stm32f37x_adc.c **** {
+ 247              		.loc 1 327 0
+ 248              		.cfi_startproc
+ 249              		@ args = 0, pretend = 0, frame = 0
+ 250              		@ frame_needed = 0, uses_anonymous_args = 0
+ 251              		@ link register save eliminated.
+ 252              	.LVL21:
+ 328:./stdperiph/source/stm32f37x_adc.c ****   uint32_t tmpreg = 0;
+ 329:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 330:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 11
+
+
+ 331:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ANALOG_WATCHDOG(ADC_AnalogWatchdog));
+ 332:./stdperiph/source/stm32f37x_adc.c ****   /* Get the old register value */
+ 333:./stdperiph/source/stm32f37x_adc.c ****   tmpreg = ADCx->CR1;
+ 253              		.loc 1 333 0
+ 254 0000 4368     		ldr	r3, [r0, #4]
+ 255              	.LVL22:
+ 334:./stdperiph/source/stm32f37x_adc.c ****   /* Clear AWDEN, AWDENJ and AWDSGL bits */
+ 335:./stdperiph/source/stm32f37x_adc.c ****   tmpreg &= (uint32_t) (~(ADC_CR1_JAWDEN | ADC_CR1_AWDEN | ADC_CR1_AWDSGL));
+ 256              		.loc 1 335 0
+ 257 0002 23F44003 		bic	r3, r3, #12582912
+ 258              	.LVL23:
+ 259 0006 23F40073 		bic	r3, r3, #512
+ 260              	.LVL24:
+ 336:./stdperiph/source/stm32f37x_adc.c ****   /* Set the analog watchdog enable mode */
+ 337:./stdperiph/source/stm32f37x_adc.c ****   tmpreg |= ADC_AnalogWatchdog;
+ 261              		.loc 1 337 0
+ 262 000a 1943     		orrs	r1, r1, r3
+ 263              	.LVL25:
+ 338:./stdperiph/source/stm32f37x_adc.c ****   /* Store the new register value */
+ 339:./stdperiph/source/stm32f37x_adc.c ****   ADCx->CR1 = tmpreg;
+ 264              		.loc 1 339 0
+ 265 000c 4160     		str	r1, [r0, #4]
+ 266 000e 7047     		bx	lr
+ 267              		.cfi_endproc
+ 268              	.LFE117:
+ 270              		.section	.text.ADC_AnalogWatchdogThresholdsConfig,"ax",%progbits
+ 271              		.align	2
+ 272              		.global	ADC_AnalogWatchdogThresholdsConfig
+ 273              		.thumb
+ 274              		.thumb_func
+ 276              	ADC_AnalogWatchdogThresholdsConfig:
+ 277              	.LFB118:
+ 340:./stdperiph/source/stm32f37x_adc.c **** }
+ 341:./stdperiph/source/stm32f37x_adc.c **** 
+ 342:./stdperiph/source/stm32f37x_adc.c **** /**
+ 343:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Configures the high and low thresholds of the analog watchdog.
+ 344:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 345:./stdperiph/source/stm32f37x_adc.c ****   * @param  HighThreshold: the ADC analog watchdog High threshold value.
+ 346:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter must be a 12bit value.
+ 347:./stdperiph/source/stm32f37x_adc.c ****   * @param  LowThreshold: the ADC analog watchdog Low threshold value.
+ 348:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter must be a 12bit value.
+ 349:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 350:./stdperiph/source/stm32f37x_adc.c ****   */
+ 351:./stdperiph/source/stm32f37x_adc.c **** void ADC_AnalogWatchdogThresholdsConfig(ADC_TypeDef* ADCx, uint16_t HighThreshold,
+ 352:./stdperiph/source/stm32f37x_adc.c ****                                         uint16_t LowThreshold)
+ 353:./stdperiph/source/stm32f37x_adc.c **** {
+ 278              		.loc 1 353 0
+ 279              		.cfi_startproc
+ 280              		@ args = 0, pretend = 0, frame = 0
+ 281              		@ frame_needed = 0, uses_anonymous_args = 0
+ 282              		@ link register save eliminated.
+ 283              	.LVL26:
+ 354:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 355:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 356:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_THRESHOLD(HighThreshold));
+ 357:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_THRESHOLD(LowThreshold));
+ 358:./stdperiph/source/stm32f37x_adc.c ****   /* Set the ADCx high threshold */
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 12
+
+
+ 359:./stdperiph/source/stm32f37x_adc.c ****   ADCx->HTR = HighThreshold;
+ 284              		.loc 1 359 0
+ 285 0000 4162     		str	r1, [r0, #36]
+ 360:./stdperiph/source/stm32f37x_adc.c ****   /* Set the ADCx low threshold */
+ 361:./stdperiph/source/stm32f37x_adc.c ****   ADCx->LTR = LowThreshold;
+ 286              		.loc 1 361 0
+ 287 0002 8262     		str	r2, [r0, #40]
+ 288 0004 7047     		bx	lr
+ 289              		.cfi_endproc
+ 290              	.LFE118:
+ 292 0006 00BF     		.section	.text.ADC_AnalogWatchdogSingleChannelConfig,"ax",%progbits
+ 293              		.align	2
+ 294              		.global	ADC_AnalogWatchdogSingleChannelConfig
+ 295              		.thumb
+ 296              		.thumb_func
+ 298              	ADC_AnalogWatchdogSingleChannelConfig:
+ 299              	.LFB119:
+ 362:./stdperiph/source/stm32f37x_adc.c **** }
+ 363:./stdperiph/source/stm32f37x_adc.c **** 
+ 364:./stdperiph/source/stm32f37x_adc.c **** /**
+ 365:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Configures the analog watchdog guarded single channel
+ 366:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 367:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_Channel: the ADC channel to configure for the analog watchdog. 
+ 368:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be one of the following values:
+ 369:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_0: ADC Channel0 selected
+ 370:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_1: ADC Channel1 selected
+ 371:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_2: ADC Channel2 selected
+ 372:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_3: ADC Channel3 selected
+ 373:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_4: ADC Channel4 selected
+ 374:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_5: ADC Channel5 selected
+ 375:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_6: ADC Channel6 selected
+ 376:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_7: ADC Channel7 selected
+ 377:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_8: ADC Channel8 selected
+ 378:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_9: ADC Channel9 selected
+ 379:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_10: ADC Channel10 selected
+ 380:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_11: ADC Channel11 selected
+ 381:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_12: ADC Channel12 selected
+ 382:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_13: ADC Channel13 selected
+ 383:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_14: ADC Channel14 selected
+ 384:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_15: ADC Channel15 selected
+ 385:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_16: ADC Channel16 selected
+ 386:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_17: ADC Channel17 selected
+ 387:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 388:./stdperiph/source/stm32f37x_adc.c ****   */
+ 389:./stdperiph/source/stm32f37x_adc.c **** void ADC_AnalogWatchdogSingleChannelConfig(ADC_TypeDef* ADCx, uint8_t ADC_Channel)
+ 390:./stdperiph/source/stm32f37x_adc.c **** {
+ 300              		.loc 1 390 0
+ 301              		.cfi_startproc
+ 302              		@ args = 0, pretend = 0, frame = 0
+ 303              		@ frame_needed = 0, uses_anonymous_args = 0
+ 304              		@ link register save eliminated.
+ 305              	.LVL27:
+ 391:./stdperiph/source/stm32f37x_adc.c ****   uint32_t tmpreg = 0;
+ 392:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 393:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 394:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_CHANNEL(ADC_Channel));
+ 395:./stdperiph/source/stm32f37x_adc.c ****   /* Get the old register value */
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 13
+
+
+ 396:./stdperiph/source/stm32f37x_adc.c ****   tmpreg = ADCx->CR1;
+ 306              		.loc 1 396 0
+ 307 0000 4368     		ldr	r3, [r0, #4]
+ 308              	.LVL28:
+ 397:./stdperiph/source/stm32f37x_adc.c ****   /* Clear the Analog watchdog channel select bits */
+ 398:./stdperiph/source/stm32f37x_adc.c ****   tmpreg &= (uint32_t)(~ADC_CR1_AWDCH);
+ 309              		.loc 1 398 0
+ 310 0002 23F01F03 		bic	r3, r3, #31
+ 311              	.LVL29:
+ 399:./stdperiph/source/stm32f37x_adc.c ****   /* Set the Analog watchdog channel */
+ 400:./stdperiph/source/stm32f37x_adc.c ****   tmpreg |= ADC_Channel;
+ 312              		.loc 1 400 0
+ 313 0006 1943     		orrs	r1, r1, r3
+ 314              	.LVL30:
+ 401:./stdperiph/source/stm32f37x_adc.c ****   /* Store the new register value */
+ 402:./stdperiph/source/stm32f37x_adc.c ****   ADCx->CR1 = tmpreg;
+ 315              		.loc 1 402 0
+ 316 0008 4160     		str	r1, [r0, #4]
+ 317 000a 7047     		bx	lr
+ 318              		.cfi_endproc
+ 319              	.LFE119:
+ 321              		.section	.text.ADC_TempSensorVrefintCmd,"ax",%progbits
+ 322              		.align	2
+ 323              		.global	ADC_TempSensorVrefintCmd
+ 324              		.thumb
+ 325              		.thumb_func
+ 327              	ADC_TempSensorVrefintCmd:
+ 328              	.LFB120:
+ 403:./stdperiph/source/stm32f37x_adc.c **** }
+ 404:./stdperiph/source/stm32f37x_adc.c **** 
+ 405:./stdperiph/source/stm32f37x_adc.c **** /**
+ 406:./stdperiph/source/stm32f37x_adc.c ****   * @}
+ 407:./stdperiph/source/stm32f37x_adc.c ****   */
+ 408:./stdperiph/source/stm32f37x_adc.c **** 
+ 409:./stdperiph/source/stm32f37x_adc.c **** /** @defgroup ADC_Group3 Temperature Sensor- Vrefint (Internal Reference Voltage) and VBAT manageme
+ 410:./stdperiph/source/stm32f37x_adc.c ****  *  @brief   Temperature Sensor- Vrefint (Internal Reference Voltage) and VBAT management function
+ 411:./stdperiph/source/stm32f37x_adc.c ****  *
+ 412:./stdperiph/source/stm32f37x_adc.c **** @verbatim   
+ 413:./stdperiph/source/stm32f37x_adc.c ****  ===============================================================================
+ 414:./stdperiph/source/stm32f37x_adc.c ****  ##### Temperature Sensor, Vrefint and VBAT management function #####
+ 415:./stdperiph/source/stm32f37x_adc.c ****  ===============================================================================  
+ 416:./stdperiph/source/stm32f37x_adc.c **** 
+ 417:./stdperiph/source/stm32f37x_adc.c ****     [..]  This section provides a function allowing to enable/ disable the internal 
+ 418:./stdperiph/source/stm32f37x_adc.c ****           connections between the ADC and the Temperature Sensor, the Vrefint
+ 419:./stdperiph/source/stm32f37x_adc.c ****           and the VBAT sources.
+ 420:./stdperiph/source/stm32f37x_adc.c **** 
+ 421:./stdperiph/source/stm32f37x_adc.c ****     [..] A typical configuration to get the Temperature sensor and Vrefint channels 
+ 422:./stdperiph/source/stm32f37x_adc.c ****          voltages is done following these steps :
+ 423:./stdperiph/source/stm32f37x_adc.c ****          (#) Enable the internal connection of Temperature sensor and Vrefint sources 
+ 424:./stdperiph/source/stm32f37x_adc.c ****              with the ADC channels using ADC_TempSensorVrefintCmd() function.
+ 425:./stdperiph/source/stm32f37x_adc.c ****              Enable the internal connection of VBAT using SYSCFG_VBATMonitoringCmd(ENABLE);
+ 426:./stdperiph/source/stm32f37x_adc.c ****          (#) Select the ADC_Channel_TempSensor and/or ADC_Channel_Vrefint and/or 
+ 427:./stdperiph/source/stm32f37x_adc.c ****             ADC_Channel_Vbat using ADC_RegularChannelConfig()
+ 428:./stdperiph/source/stm32f37x_adc.c ****             or ADC_InjectedChannelConfig() functions 
+ 429:./stdperiph/source/stm32f37x_adc.c ****          (#) Get the voltage values, using ADC_GetConversionValue() or  
+ 430:./stdperiph/source/stm32f37x_adc.c ****              ADC_GetInjectedConversionValue().
+ 431:./stdperiph/source/stm32f37x_adc.c ****  
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 14
+
+
+ 432:./stdperiph/source/stm32f37x_adc.c **** @endverbatim
+ 433:./stdperiph/source/stm32f37x_adc.c ****   * @{
+ 434:./stdperiph/source/stm32f37x_adc.c ****   */
+ 435:./stdperiph/source/stm32f37x_adc.c **** 
+ 436:./stdperiph/source/stm32f37x_adc.c **** /**
+ 437:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Enables or disables the temperature sensor and Vrefint channel.
+ 438:./stdperiph/source/stm32f37x_adc.c ****   * @param  NewState: new state of the temperature sensor.
+ 439:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 440:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 441:./stdperiph/source/stm32f37x_adc.c ****   */
+ 442:./stdperiph/source/stm32f37x_adc.c **** void ADC_TempSensorVrefintCmd(FunctionalState NewState)
+ 443:./stdperiph/source/stm32f37x_adc.c **** {
+ 329              		.loc 1 443 0
+ 330              		.cfi_startproc
+ 331              		@ args = 0, pretend = 0, frame = 0
+ 332              		@ frame_needed = 0, uses_anonymous_args = 0
+ 333              		@ link register save eliminated.
+ 334              	.LVL31:
+ 444:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 445:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 446:./stdperiph/source/stm32f37x_adc.c **** 
+ 447:./stdperiph/source/stm32f37x_adc.c ****   if (NewState != DISABLE)
+ 335              		.loc 1 447 0
+ 336 0000 28B1     		cbz	r0, .L17
+ 448:./stdperiph/source/stm32f37x_adc.c ****   {
+ 449:./stdperiph/source/stm32f37x_adc.c ****     /* Enable the temperature sensor and Vrefint channel*/
+ 450:./stdperiph/source/stm32f37x_adc.c ****     ADC1->CR2 |= ADC_CR2_TSVREFE;
+ 337              		.loc 1 450 0
+ 338 0002 064A     		ldr	r2, .L19
+ 339 0004 9368     		ldr	r3, [r2, #8]
+ 340 0006 43F40003 		orr	r3, r3, #8388608
+ 341 000a 9360     		str	r3, [r2, #8]
+ 342 000c 7047     		bx	lr
+ 343              	.L17:
+ 451:./stdperiph/source/stm32f37x_adc.c ****   }
+ 452:./stdperiph/source/stm32f37x_adc.c ****   else
+ 453:./stdperiph/source/stm32f37x_adc.c ****   {
+ 454:./stdperiph/source/stm32f37x_adc.c ****     /* Disable the temperature sensor and Vrefint channel*/
+ 455:./stdperiph/source/stm32f37x_adc.c ****     ADC1->CR2 &= (uint32_t) (~ADC_CR2_TSVREFE);
+ 344              		.loc 1 455 0
+ 345 000e 034A     		ldr	r2, .L19
+ 346 0010 9368     		ldr	r3, [r2, #8]
+ 347 0012 23F40003 		bic	r3, r3, #8388608
+ 348 0016 9360     		str	r3, [r2, #8]
+ 349 0018 7047     		bx	lr
+ 350              	.L20:
+ 351 001a 00BF     		.align	2
+ 352              	.L19:
+ 353 001c 00240140 		.word	1073816576
+ 354              		.cfi_endproc
+ 355              	.LFE120:
+ 357              		.section	.text.ADC_RegularChannelConfig,"ax",%progbits
+ 358              		.align	2
+ 359              		.global	ADC_RegularChannelConfig
+ 360              		.thumb
+ 361              		.thumb_func
+ 363              	ADC_RegularChannelConfig:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 15
+
+
+ 364              	.LFB121:
+ 456:./stdperiph/source/stm32f37x_adc.c ****   }
+ 457:./stdperiph/source/stm32f37x_adc.c **** }
+ 458:./stdperiph/source/stm32f37x_adc.c **** 
+ 459:./stdperiph/source/stm32f37x_adc.c **** /**
+ 460:./stdperiph/source/stm32f37x_adc.c ****   * @}
+ 461:./stdperiph/source/stm32f37x_adc.c ****   */
+ 462:./stdperiph/source/stm32f37x_adc.c **** 
+ 463:./stdperiph/source/stm32f37x_adc.c **** /** @defgroup ADC_Group4 Regular Channels Configuration functions
+ 464:./stdperiph/source/stm32f37x_adc.c ****  *  @brief   Regular Channels Configuration functions 
+ 465:./stdperiph/source/stm32f37x_adc.c ****  *
+ 466:./stdperiph/source/stm32f37x_adc.c **** @verbatim   
+ 467:./stdperiph/source/stm32f37x_adc.c ****  ===============================================================================
+ 468:./stdperiph/source/stm32f37x_adc.c ****             ##### Regular Channels Configuration functions  #####
+ 469:./stdperiph/source/stm32f37x_adc.c ****  ===============================================================================  
+ 470:./stdperiph/source/stm32f37x_adc.c **** 
+ 471:./stdperiph/source/stm32f37x_adc.c ****     [..] This section provides functions allowing to manage the ADC regular channels,
+ 472:./stdperiph/source/stm32f37x_adc.c ****          it is composed of 2 sub sections : 
+ 473:./stdperiph/source/stm32f37x_adc.c ****   
+ 474:./stdperiph/source/stm32f37x_adc.c ****          (#) Configuration and management functions for regular channels: This subsection 
+ 475:./stdperiph/source/stm32f37x_adc.c ****              provides functions allowing to configure the ADC regular channels :    
+ 476:./stdperiph/source/stm32f37x_adc.c ****              (++) Configure the rank in the regular group sequencer for each channel
+ 477:./stdperiph/source/stm32f37x_adc.c ****              (++) Configure the sampling time for each channel
+ 478:./stdperiph/source/stm32f37x_adc.c ****              (++) select the conversion Trigger for regular channels
+ 479:./stdperiph/source/stm32f37x_adc.c ****              (++) select the desired EOC event behavior configuration
+ 480:./stdperiph/source/stm32f37x_adc.c ****              (++) Activate the continuous Mode  (*)
+ 481:./stdperiph/source/stm32f37x_adc.c ****              (++) Activate the Discontinuous Mode 
+ 482:./stdperiph/source/stm32f37x_adc.c ****              -@@- Please Note that the following features for regular channels
+ 483:./stdperiph/source/stm32f37x_adc.c ****                   are configured using the ADC_Init() function :
+ 484:./stdperiph/source/stm32f37x_adc.c ****                   (+@@) scan mode activation 
+ 485:./stdperiph/source/stm32f37x_adc.c ****                   (+@@) continuous mode activation (**) 
+ 486:./stdperiph/source/stm32f37x_adc.c ****                   (+@@) External trigger source  
+ 487:./stdperiph/source/stm32f37x_adc.c ****                   (+@@) External trigger edge 
+ 488:./stdperiph/source/stm32f37x_adc.c ****                   (+@@) number of conversion in the regular channels group sequencer.
+ 489:./stdperiph/source/stm32f37x_adc.c ****      
+ 490:./stdperiph/source/stm32f37x_adc.c ****              -@@- (*) and (**) are performing the same configuration
+ 491:./stdperiph/source/stm32f37x_adc.c ****      
+ 492:./stdperiph/source/stm32f37x_adc.c ****          (#) Get the conversion data: This subsection provides an important function in 
+ 493:./stdperiph/source/stm32f37x_adc.c ****              the ADC peripheral since it returns the converted data of the current 
+ 494:./stdperiph/source/stm32f37x_adc.c ****              regular channel. When the Conversion value is read, the EOC Flag is 
+ 495:./stdperiph/source/stm32f37x_adc.c ****              automatically cleared.
+ 496:./stdperiph/source/stm32f37x_adc.c ****   
+ 497:./stdperiph/source/stm32f37x_adc.c **** @endverbatim
+ 498:./stdperiph/source/stm32f37x_adc.c ****   * @{
+ 499:./stdperiph/source/stm32f37x_adc.c ****   */
+ 500:./stdperiph/source/stm32f37x_adc.c **** 
+ 501:./stdperiph/source/stm32f37x_adc.c **** /**
+ 502:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Configures for the selected ADC regular channel its corresponding
+ 503:./stdperiph/source/stm32f37x_adc.c ****   *         rank in the sequencer and its sample time.
+ 504:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 505:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_Channel: the ADC channel to configure. 
+ 506:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be one of the following values:
+ 507:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_0: ADC Channel0 selected
+ 508:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_1: ADC Channel1 selected
+ 509:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_2: ADC Channel2 selected
+ 510:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_3: ADC Channel3 selected
+ 511:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_4: ADC Channel4 selected
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 16
+
+
+ 512:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_5: ADC Channel5 selected
+ 513:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_6: ADC Channel6 selected
+ 514:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_7: ADC Channel7 selected
+ 515:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_8: ADC Channel8 selected
+ 516:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_9: ADC Channel9 selected
+ 517:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_10: ADC Channel10 selected
+ 518:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_11: ADC Channel11 selected
+ 519:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_12: ADC Channel12 selected
+ 520:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_13: ADC Channel13 selected
+ 521:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_14: ADC Channel14 selected
+ 522:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_15: ADC Channel15 selected
+ 523:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_16: ADC Channel16 selected
+ 524:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_17: ADC Channel17 selected
+ 525:./stdperiph/source/stm32f37x_adc.c ****   * @param  Rank: The rank in the regular group sequencer. This parameter must be between 1 to 16.
+ 526:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_SampleTime: The sample time value to be set for the selected channel. 
+ 527:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be one of the following values:
+ 528:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_1Cycles5: Sample time equal to 1.5 cycles
+ 529:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_7Cycles5: Sample time equal to 7.5 cycles
+ 530:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_13Cycles5: Sample time equal to 13.5 cycles
+ 531:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_28Cycles5: Sample time equal to 28.5 cycles	
+ 532:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_41Cycles5: Sample time equal to 41.5 cycles	
+ 533:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_55Cycles5: Sample time equal to 55.5 cycles	
+ 534:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_71Cycles5: Sample time equal to 71.5 cycles	
+ 535:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_239Cycles5: Sample time equal to 239.5 cycles	
+ 536:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 537:./stdperiph/source/stm32f37x_adc.c ****   */
+ 538:./stdperiph/source/stm32f37x_adc.c **** void ADC_RegularChannelConfig(ADC_TypeDef* ADCx, uint8_t ADC_Channel, uint8_t Rank, uint8_t ADC_Sam
+ 539:./stdperiph/source/stm32f37x_adc.c **** {
+ 365              		.loc 1 539 0
+ 366              		.cfi_startproc
+ 367              		@ args = 0, pretend = 0, frame = 0
+ 368              		@ frame_needed = 0, uses_anonymous_args = 0
+ 369              		@ link register save eliminated.
+ 370              	.LVL32:
+ 371 0000 70B4     		push	{r4, r5, r6}
+ 372              	.LCFI3:
+ 373              		.cfi_def_cfa_offset 12
+ 374              		.cfi_offset 4, -12
+ 375              		.cfi_offset 5, -8
+ 376              		.cfi_offset 6, -4
+ 377              	.LVL33:
+ 540:./stdperiph/source/stm32f37x_adc.c ****   uint32_t tmpreg1 = 0, tmpreg2 = 0;
+ 541:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 542:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 543:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_CHANNEL(ADC_Channel));
+ 544:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_REGULAR_RANK(Rank));
+ 545:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_SAMPLE_TIME(ADC_SampleTime));
+ 546:./stdperiph/source/stm32f37x_adc.c ****   /* if ADC_Channel_10 ... ADC_Channel_17 is selected */
+ 547:./stdperiph/source/stm32f37x_adc.c ****   if (ADC_Channel > ADC_Channel_9)
+ 378              		.loc 1 547 0
+ 379 0002 0929     		cmp	r1, #9
+ 380 0004 0DD9     		bls	.L22
+ 548:./stdperiph/source/stm32f37x_adc.c ****   {
+ 549:./stdperiph/source/stm32f37x_adc.c ****     /* Get the old register value */
+ 550:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 = ADCx->SMPR1;
+ 381              		.loc 1 550 0
+ 382 0006 C668     		ldr	r6, [r0, #12]
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 17
+
+
+ 383              	.LVL34:
+ 551:./stdperiph/source/stm32f37x_adc.c ****     /* Calculate the mask to clear */
+ 552:./stdperiph/source/stm32f37x_adc.c ****     tmpreg2 = ADC_SMPR_SMP_SET << (3 * (ADC_Channel - 10));
+ 384              		.loc 1 552 0
+ 385 0008 A1F10A04 		sub	r4, r1, #10
+ 386 000c 04EB4404 		add	r4, r4, r4, lsl #1
+ 387 0010 0725     		movs	r5, #7
+ 388 0012 A540     		lsls	r5, r5, r4
+ 389              	.LVL35:
+ 553:./stdperiph/source/stm32f37x_adc.c ****     /* Clear the old channel sample time */
+ 554:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 &= ~tmpreg2;
+ 390              		.loc 1 554 0
+ 391 0014 26EA0505 		bic	r5, r6, r5
+ 392              	.LVL36:
+ 555:./stdperiph/source/stm32f37x_adc.c ****     /* Calculate the mask to set */
+ 556:./stdperiph/source/stm32f37x_adc.c ****     tmpreg2 = (uint32_t)ADC_SampleTime << (3 * (ADC_Channel - 10));
+ 393              		.loc 1 556 0
+ 394 0018 03FA04F4 		lsl	r4, r3, r4
+ 395              	.LVL37:
+ 557:./stdperiph/source/stm32f37x_adc.c ****     /* Set the new channel sample time */
+ 558:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 |= tmpreg2;
+ 396              		.loc 1 558 0
+ 397 001c 2C43     		orrs	r4, r4, r5
+ 398              	.LVL38:
+ 559:./stdperiph/source/stm32f37x_adc.c ****     /* Store the new register value */
+ 560:./stdperiph/source/stm32f37x_adc.c ****     ADCx->SMPR1 = tmpreg1;
+ 399              		.loc 1 560 0
+ 400 001e C460     		str	r4, [r0, #12]
+ 401 0020 0AE0     		b	.L23
+ 402              	.LVL39:
+ 403              	.L22:
+ 561:./stdperiph/source/stm32f37x_adc.c ****   }
+ 562:./stdperiph/source/stm32f37x_adc.c ****   else /* ADC_Channel include in ADC_Channel_[0..9] */
+ 563:./stdperiph/source/stm32f37x_adc.c ****   {
+ 564:./stdperiph/source/stm32f37x_adc.c ****     /* Get the old register value */
+ 565:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 = ADCx->SMPR2;
+ 404              		.loc 1 565 0
+ 405 0022 0669     		ldr	r6, [r0, #16]
+ 406              	.LVL40:
+ 566:./stdperiph/source/stm32f37x_adc.c ****     /* Calculate the mask to clear */
+ 567:./stdperiph/source/stm32f37x_adc.c ****     tmpreg2 = ADC_SMPR_SMP_SET << (3 * ADC_Channel);
+ 407              		.loc 1 567 0
+ 408 0024 01EB4104 		add	r4, r1, r1, lsl #1
+ 409 0028 0725     		movs	r5, #7
+ 410 002a A540     		lsls	r5, r5, r4
+ 411              	.LVL41:
+ 568:./stdperiph/source/stm32f37x_adc.c ****     /* Clear the old channel sample time */
+ 569:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 &= ~tmpreg2;
+ 412              		.loc 1 569 0
+ 413 002c 26EA0505 		bic	r5, r6, r5
+ 414              	.LVL42:
+ 570:./stdperiph/source/stm32f37x_adc.c ****     /* Calculate the mask to set */
+ 571:./stdperiph/source/stm32f37x_adc.c ****     tmpreg2 = (uint32_t)ADC_SampleTime << (3 * ADC_Channel);
+ 415              		.loc 1 571 0
+ 416 0030 03FA04F4 		lsl	r4, r3, r4
+ 417              	.LVL43:
+ 572:./stdperiph/source/stm32f37x_adc.c ****     /* Set the new channel sample time */
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 18
+
+
+ 573:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 |= tmpreg2;
+ 418              		.loc 1 573 0
+ 419 0034 2C43     		orrs	r4, r4, r5
+ 420              	.LVL44:
+ 574:./stdperiph/source/stm32f37x_adc.c ****     /* Store the new register value */
+ 575:./stdperiph/source/stm32f37x_adc.c ****     ADCx->SMPR2 = tmpreg1;
+ 421              		.loc 1 575 0
+ 422 0036 0461     		str	r4, [r0, #16]
+ 423              	.LVL45:
+ 424              	.L23:
+ 576:./stdperiph/source/stm32f37x_adc.c ****   }
+ 577:./stdperiph/source/stm32f37x_adc.c ****   /* For Rank 1 to 6 */
+ 578:./stdperiph/source/stm32f37x_adc.c ****   if (Rank < 7)
+ 425              		.loc 1 578 0
+ 426 0038 062A     		cmp	r2, #6
+ 427 003a 0BD8     		bhi	.L24
+ 579:./stdperiph/source/stm32f37x_adc.c ****   {
+ 580:./stdperiph/source/stm32f37x_adc.c ****     /* Get the old register value */
+ 581:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 = ADCx->SQR3;
+ 428              		.loc 1 581 0
+ 429 003c 446B     		ldr	r4, [r0, #52]
+ 430              	.LVL46:
+ 582:./stdperiph/source/stm32f37x_adc.c ****     /* Calculate the mask to clear */
+ 583:./stdperiph/source/stm32f37x_adc.c ****     tmpreg2 = ADC_SQR_SQ_SET << (5 * (Rank - 1));
+ 431              		.loc 1 583 0
+ 432 003e 013A     		subs	r2, r2, #1
+ 433              	.LVL47:
+ 434 0040 02EB8202 		add	r2, r2, r2, lsl #2
+ 435 0044 1F23     		movs	r3, #31
+ 436              	.LVL48:
+ 437 0046 9340     		lsls	r3, r3, r2
+ 438              	.LVL49:
+ 584:./stdperiph/source/stm32f37x_adc.c ****     /* Clear the old SQx bits for the selected rank */
+ 585:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 &= ~tmpreg2;
+ 439              		.loc 1 585 0
+ 440 0048 24EA0303 		bic	r3, r4, r3
+ 441              	.LVL50:
+ 586:./stdperiph/source/stm32f37x_adc.c ****     /* Calculate the mask to set */
+ 587:./stdperiph/source/stm32f37x_adc.c ****     tmpreg2 = (uint32_t)ADC_Channel << (5 * (Rank - 1));
+ 442              		.loc 1 587 0
+ 443 004c 9140     		lsls	r1, r1, r2
+ 444              	.LVL51:
+ 588:./stdperiph/source/stm32f37x_adc.c ****     /* Set the SQx bits for the selected rank */
+ 589:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 |= tmpreg2;
+ 445              		.loc 1 589 0
+ 446 004e 1943     		orrs	r1, r1, r3
+ 447              	.LVL52:
+ 590:./stdperiph/source/stm32f37x_adc.c ****     /* Store the new register value */
+ 591:./stdperiph/source/stm32f37x_adc.c ****     ADCx->SQR3 = tmpreg1;
+ 448              		.loc 1 591 0
+ 449 0050 4163     		str	r1, [r0, #52]
+ 450 0052 18E0     		b	.L21
+ 451              	.LVL53:
+ 452              	.L24:
+ 592:./stdperiph/source/stm32f37x_adc.c ****   }
+ 593:./stdperiph/source/stm32f37x_adc.c ****   /* For Rank 7 to 12 */
+ 594:./stdperiph/source/stm32f37x_adc.c ****   else if (Rank < 13)
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 19
+
+
+ 453              		.loc 1 594 0
+ 454 0054 0C2A     		cmp	r2, #12
+ 455 0056 0BD8     		bhi	.L26
+ 595:./stdperiph/source/stm32f37x_adc.c ****   {
+ 596:./stdperiph/source/stm32f37x_adc.c ****     /* Get the old register value */
+ 597:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 = ADCx->SQR2;
+ 456              		.loc 1 597 0
+ 457 0058 046B     		ldr	r4, [r0, #48]
+ 458              	.LVL54:
+ 598:./stdperiph/source/stm32f37x_adc.c ****     /* Calculate the mask to clear */
+ 599:./stdperiph/source/stm32f37x_adc.c ****     tmpreg2 = ADC_SQR_SQ_SET << (5 * (Rank - 7));
+ 459              		.loc 1 599 0
+ 460 005a 073A     		subs	r2, r2, #7
+ 461              	.LVL55:
+ 462 005c 02EB8202 		add	r2, r2, r2, lsl #2
+ 463 0060 1F23     		movs	r3, #31
+ 464              	.LVL56:
+ 465 0062 9340     		lsls	r3, r3, r2
+ 466              	.LVL57:
+ 600:./stdperiph/source/stm32f37x_adc.c ****     /* Clear the old SQx bits for the selected rank */
+ 601:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 &= ~tmpreg2;
+ 467              		.loc 1 601 0
+ 468 0064 24EA0303 		bic	r3, r4, r3
+ 469              	.LVL58:
+ 602:./stdperiph/source/stm32f37x_adc.c ****     /* Calculate the mask to set */
+ 603:./stdperiph/source/stm32f37x_adc.c ****     tmpreg2 = (uint32_t)ADC_Channel << (5 * (Rank - 7));
+ 470              		.loc 1 603 0
+ 471 0068 9140     		lsls	r1, r1, r2
+ 472              	.LVL59:
+ 604:./stdperiph/source/stm32f37x_adc.c ****     /* Set the SQx bits for the selected rank */
+ 605:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 |= tmpreg2;
+ 473              		.loc 1 605 0
+ 474 006a 1943     		orrs	r1, r1, r3
+ 475              	.LVL60:
+ 606:./stdperiph/source/stm32f37x_adc.c ****     /* Store the new register value */
+ 607:./stdperiph/source/stm32f37x_adc.c ****     ADCx->SQR2 = tmpreg1;
+ 476              		.loc 1 607 0
+ 477 006c 0163     		str	r1, [r0, #48]
+ 478 006e 0AE0     		b	.L21
+ 479              	.LVL61:
+ 480              	.L26:
+ 608:./stdperiph/source/stm32f37x_adc.c ****   }
+ 609:./stdperiph/source/stm32f37x_adc.c ****   /* For Rank 13 to 16 */
+ 610:./stdperiph/source/stm32f37x_adc.c ****   else
+ 611:./stdperiph/source/stm32f37x_adc.c ****   {
+ 612:./stdperiph/source/stm32f37x_adc.c ****     /* Get the old register value */
+ 613:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 = ADCx->SQR1;
+ 481              		.loc 1 613 0
+ 482 0070 C46A     		ldr	r4, [r0, #44]
+ 483              	.LVL62:
+ 614:./stdperiph/source/stm32f37x_adc.c ****     /* Calculate the mask to clear */
+ 615:./stdperiph/source/stm32f37x_adc.c ****     tmpreg2 = ADC_SQR_SQ_SET << (5 * (Rank - 13));
+ 484              		.loc 1 615 0
+ 485 0072 0D3A     		subs	r2, r2, #13
+ 486              	.LVL63:
+ 487 0074 02EB8202 		add	r2, r2, r2, lsl #2
+ 488 0078 1F23     		movs	r3, #31
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 20
+
+
+ 489              	.LVL64:
+ 490 007a 9340     		lsls	r3, r3, r2
+ 491              	.LVL65:
+ 616:./stdperiph/source/stm32f37x_adc.c ****     /* Clear the old SQx bits for the selected rank */
+ 617:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 &= ~tmpreg2;
+ 492              		.loc 1 617 0
+ 493 007c 24EA0303 		bic	r3, r4, r3
+ 494              	.LVL66:
+ 618:./stdperiph/source/stm32f37x_adc.c ****     /* Calculate the mask to set */
+ 619:./stdperiph/source/stm32f37x_adc.c ****     tmpreg2 = (uint32_t)ADC_Channel << (5 * (Rank - 13));
+ 495              		.loc 1 619 0
+ 496 0080 9140     		lsls	r1, r1, r2
+ 497              	.LVL67:
+ 620:./stdperiph/source/stm32f37x_adc.c ****     /* Set the SQx bits for the selected rank */
+ 621:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 |= tmpreg2;
+ 498              		.loc 1 621 0
+ 499 0082 1943     		orrs	r1, r1, r3
+ 500              	.LVL68:
+ 622:./stdperiph/source/stm32f37x_adc.c ****     /* Store the new register value */
+ 623:./stdperiph/source/stm32f37x_adc.c ****     ADCx->SQR1 = tmpreg1;
+ 501              		.loc 1 623 0
+ 502 0084 C162     		str	r1, [r0, #44]
+ 503              	.L21:
+ 624:./stdperiph/source/stm32f37x_adc.c ****   }
+ 625:./stdperiph/source/stm32f37x_adc.c **** }
+ 504              		.loc 1 625 0
+ 505 0086 70BC     		pop	{r4, r5, r6}
+ 506              	.LCFI4:
+ 507              		.cfi_restore 6
+ 508              		.cfi_restore 5
+ 509              		.cfi_restore 4
+ 510              		.cfi_def_cfa_offset 0
+ 511 0088 7047     		bx	lr
+ 512              		.cfi_endproc
+ 513              	.LFE121:
+ 515 008a 00BF     		.section	.text.ADC_ExternalTrigConvCmd,"ax",%progbits
+ 516              		.align	2
+ 517              		.global	ADC_ExternalTrigConvCmd
+ 518              		.thumb
+ 519              		.thumb_func
+ 521              	ADC_ExternalTrigConvCmd:
+ 522              	.LFB122:
+ 626:./stdperiph/source/stm32f37x_adc.c **** 
+ 627:./stdperiph/source/stm32f37x_adc.c **** /**
+ 628:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Enables or disables the ADCx conversion through external trigger.
+ 629:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 630:./stdperiph/source/stm32f37x_adc.c ****   * @param  NewState: new state of the selected ADC external trigger start of conversion.
+ 631:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 632:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 633:./stdperiph/source/stm32f37x_adc.c ****   */
+ 634:./stdperiph/source/stm32f37x_adc.c **** void ADC_ExternalTrigConvCmd(ADC_TypeDef* ADCx, FunctionalState NewState)
+ 635:./stdperiph/source/stm32f37x_adc.c **** {
+ 523              		.loc 1 635 0
+ 524              		.cfi_startproc
+ 525              		@ args = 0, pretend = 0, frame = 0
+ 526              		@ frame_needed = 0, uses_anonymous_args = 0
+ 527              		@ link register save eliminated.
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 21
+
+
+ 528              	.LVL69:
+ 636:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 637:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 638:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 639:./stdperiph/source/stm32f37x_adc.c ****   if (NewState != DISABLE)
+ 529              		.loc 1 639 0
+ 530 0000 21B1     		cbz	r1, .L29
+ 640:./stdperiph/source/stm32f37x_adc.c ****   {
+ 641:./stdperiph/source/stm32f37x_adc.c ****     /* Enable the selected ADC conversion on external event */
+ 642:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR2 |= ADC_CR2_EXTTRIG;
+ 531              		.loc 1 642 0
+ 532 0002 8368     		ldr	r3, [r0, #8]
+ 533 0004 43F48013 		orr	r3, r3, #1048576
+ 534 0008 8360     		str	r3, [r0, #8]
+ 535 000a 7047     		bx	lr
+ 536              	.L29:
+ 643:./stdperiph/source/stm32f37x_adc.c ****   }
+ 644:./stdperiph/source/stm32f37x_adc.c ****   else
+ 645:./stdperiph/source/stm32f37x_adc.c ****   {
+ 646:./stdperiph/source/stm32f37x_adc.c ****     /* Disable the selected ADC conversion on external event */
+ 647:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR2 &= (uint32_t) (~ADC_CR2_EXTTRIG);
+ 537              		.loc 1 647 0
+ 538 000c 8368     		ldr	r3, [r0, #8]
+ 539 000e 23F48013 		bic	r3, r3, #1048576
+ 540 0012 8360     		str	r3, [r0, #8]
+ 541 0014 7047     		bx	lr
+ 542              		.cfi_endproc
+ 543              	.LFE122:
+ 545 0016 00BF     		.section	.text.ADC_SoftwareStartConv,"ax",%progbits
+ 546              		.align	2
+ 547              		.global	ADC_SoftwareStartConv
+ 548              		.thumb
+ 549              		.thumb_func
+ 551              	ADC_SoftwareStartConv:
+ 552              	.LFB123:
+ 648:./stdperiph/source/stm32f37x_adc.c ****   }
+ 649:./stdperiph/source/stm32f37x_adc.c **** }
+ 650:./stdperiph/source/stm32f37x_adc.c **** 
+ 651:./stdperiph/source/stm32f37x_adc.c **** /**
+ 652:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Enables or disables the selected ADC software start conversion .
+ 653:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 654:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 655:./stdperiph/source/stm32f37x_adc.c ****   */
+ 656:./stdperiph/source/stm32f37x_adc.c **** void ADC_SoftwareStartConv(ADC_TypeDef* ADCx)
+ 657:./stdperiph/source/stm32f37x_adc.c **** {
+ 553              		.loc 1 657 0
+ 554              		.cfi_startproc
+ 555              		@ args = 0, pretend = 0, frame = 0
+ 556              		@ frame_needed = 0, uses_anonymous_args = 0
+ 557              		@ link register save eliminated.
+ 558              	.LVL70:
+ 658:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 659:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 660:./stdperiph/source/stm32f37x_adc.c **** 
+ 661:./stdperiph/source/stm32f37x_adc.c ****   /* Enable the selected ADC conversion on external event and start the selected
+ 662:./stdperiph/source/stm32f37x_adc.c ****      ADC conversion */
+ 663:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR2 |= (uint32_t)(ADC_CR2_SWSTART | ADC_CR2_EXTTRIG);
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 22
+
+
+ 559              		.loc 1 663 0
+ 560 0000 8368     		ldr	r3, [r0, #8]
+ 561 0002 43F4A003 		orr	r3, r3, #5242880
+ 562 0006 8360     		str	r3, [r0, #8]
+ 563 0008 7047     		bx	lr
+ 564              		.cfi_endproc
+ 565              	.LFE123:
+ 567 000a 00BF     		.section	.text.ADC_GetSoftwareStartConvStatus,"ax",%progbits
+ 568              		.align	2
+ 569              		.global	ADC_GetSoftwareStartConvStatus
+ 570              		.thumb
+ 571              		.thumb_func
+ 573              	ADC_GetSoftwareStartConvStatus:
+ 574              	.LFB124:
+ 664:./stdperiph/source/stm32f37x_adc.c **** 
+ 665:./stdperiph/source/stm32f37x_adc.c **** }
+ 666:./stdperiph/source/stm32f37x_adc.c **** 
+ 667:./stdperiph/source/stm32f37x_adc.c **** /**
+ 668:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Gets the selected ADC Software start conversion Status.
+ 669:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 670:./stdperiph/source/stm32f37x_adc.c ****   * @retval The new state of ADC software start conversion (SET or RESET).
+ 671:./stdperiph/source/stm32f37x_adc.c ****   */
+ 672:./stdperiph/source/stm32f37x_adc.c **** FlagStatus ADC_GetSoftwareStartConvStatus(ADC_TypeDef* ADCx)
+ 673:./stdperiph/source/stm32f37x_adc.c **** {
+ 575              		.loc 1 673 0
+ 576              		.cfi_startproc
+ 577              		@ args = 0, pretend = 0, frame = 0
+ 578              		@ frame_needed = 0, uses_anonymous_args = 0
+ 579              		@ link register save eliminated.
+ 580              	.LVL71:
+ 674:./stdperiph/source/stm32f37x_adc.c ****   FlagStatus bitstatus = RESET;
+ 675:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 676:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 677:./stdperiph/source/stm32f37x_adc.c ****   /* Check the status of SWSTART bit */
+ 678:./stdperiph/source/stm32f37x_adc.c ****   if ((ADCx->CR2 & ADC_CR2_SWSTART) != (uint32_t)RESET)
+ 581              		.loc 1 678 0
+ 582 0000 8368     		ldr	r3, [r0, #8]
+ 583 0002 13F4800F 		tst	r3, #4194304
+ 584 0006 01D0     		beq	.L34
+ 679:./stdperiph/source/stm32f37x_adc.c ****   {
+ 680:./stdperiph/source/stm32f37x_adc.c ****     /* SWSTART bit is set */
+ 681:./stdperiph/source/stm32f37x_adc.c ****     bitstatus = SET;
+ 585              		.loc 1 681 0
+ 586 0008 0120     		movs	r0, #1
+ 587              	.LVL72:
+ 588 000a 7047     		bx	lr
+ 589              	.LVL73:
+ 590              	.L34:
+ 682:./stdperiph/source/stm32f37x_adc.c ****   }
+ 683:./stdperiph/source/stm32f37x_adc.c ****   else
+ 684:./stdperiph/source/stm32f37x_adc.c ****   {
+ 685:./stdperiph/source/stm32f37x_adc.c ****     /* SWSTART bit is reset */
+ 686:./stdperiph/source/stm32f37x_adc.c ****     bitstatus = RESET;
+ 591              		.loc 1 686 0
+ 592 000c 0020     		movs	r0, #0
+ 593              	.LVL74:
+ 687:./stdperiph/source/stm32f37x_adc.c ****   }
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 23
+
+
+ 688:./stdperiph/source/stm32f37x_adc.c ****   /* Return the SWSTART bit status */
+ 689:./stdperiph/source/stm32f37x_adc.c ****   return  bitstatus;
+ 690:./stdperiph/source/stm32f37x_adc.c **** }
+ 594              		.loc 1 690 0
+ 595 000e 7047     		bx	lr
+ 596              		.cfi_endproc
+ 597              	.LFE124:
+ 599              		.section	.text.ADC_ContinuousModeCmd,"ax",%progbits
+ 600              		.align	2
+ 601              		.global	ADC_ContinuousModeCmd
+ 602              		.thumb
+ 603              		.thumb_func
+ 605              	ADC_ContinuousModeCmd:
+ 606              	.LFB125:
+ 691:./stdperiph/source/stm32f37x_adc.c **** 
+ 692:./stdperiph/source/stm32f37x_adc.c **** /**
+ 693:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Enables or disables the ADC continuous conversion mode 
+ 694:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 695:./stdperiph/source/stm32f37x_adc.c ****   * @param  NewState: new state of the selected ADC continuous conversion mode
+ 696:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 697:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 698:./stdperiph/source/stm32f37x_adc.c ****   */
+ 699:./stdperiph/source/stm32f37x_adc.c **** void ADC_ContinuousModeCmd(ADC_TypeDef* ADCx, FunctionalState NewState)
+ 700:./stdperiph/source/stm32f37x_adc.c **** {
+ 607              		.loc 1 700 0
+ 608              		.cfi_startproc
+ 609              		@ args = 0, pretend = 0, frame = 0
+ 610              		@ frame_needed = 0, uses_anonymous_args = 0
+ 611              		@ link register save eliminated.
+ 612              	.LVL75:
+ 701:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 702:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 703:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 704:./stdperiph/source/stm32f37x_adc.c ****   
+ 705:./stdperiph/source/stm32f37x_adc.c ****   if (NewState != DISABLE)
+ 613              		.loc 1 705 0
+ 614 0000 21B1     		cbz	r1, .L36
+ 706:./stdperiph/source/stm32f37x_adc.c ****   {
+ 707:./stdperiph/source/stm32f37x_adc.c ****     /* Enable the selected ADC continuous conversion mode */
+ 708:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR2 |= (uint32_t)ADC_CR2_CONT;
+ 615              		.loc 1 708 0
+ 616 0002 8368     		ldr	r3, [r0, #8]
+ 617 0004 43F00203 		orr	r3, r3, #2
+ 618 0008 8360     		str	r3, [r0, #8]
+ 619 000a 7047     		bx	lr
+ 620              	.L36:
+ 709:./stdperiph/source/stm32f37x_adc.c ****   }
+ 710:./stdperiph/source/stm32f37x_adc.c ****   else
+ 711:./stdperiph/source/stm32f37x_adc.c ****   {
+ 712:./stdperiph/source/stm32f37x_adc.c ****     /* Disable the selected ADC continuous conversion mode */
+ 713:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR2 &= (uint32_t)(~ADC_CR2_CONT);
+ 621              		.loc 1 713 0
+ 622 000c 8368     		ldr	r3, [r0, #8]
+ 623 000e 23F00203 		bic	r3, r3, #2
+ 624 0012 8360     		str	r3, [r0, #8]
+ 625 0014 7047     		bx	lr
+ 626              		.cfi_endproc
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 24
+
+
+ 627              	.LFE125:
+ 629 0016 00BF     		.section	.text.ADC_DiscModeChannelCountConfig,"ax",%progbits
+ 630              		.align	2
+ 631              		.global	ADC_DiscModeChannelCountConfig
+ 632              		.thumb
+ 633              		.thumb_func
+ 635              	ADC_DiscModeChannelCountConfig:
+ 636              	.LFB126:
+ 714:./stdperiph/source/stm32f37x_adc.c ****   }
+ 715:./stdperiph/source/stm32f37x_adc.c **** }
+ 716:./stdperiph/source/stm32f37x_adc.c **** 
+ 717:./stdperiph/source/stm32f37x_adc.c **** /**
+ 718:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Configures the discontinuous mode for the selected ADC regular
+ 719:./stdperiph/source/stm32f37x_adc.c ****   *         group channel.
+ 720:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 721:./stdperiph/source/stm32f37x_adc.c ****   * @param  Number: specifies the discontinuous mode regular channel
+ 722:./stdperiph/source/stm32f37x_adc.c ****   *         count value. This number must be between 1 and 8.
+ 723:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 724:./stdperiph/source/stm32f37x_adc.c ****   */
+ 725:./stdperiph/source/stm32f37x_adc.c **** void ADC_DiscModeChannelCountConfig(ADC_TypeDef* ADCx, uint8_t Number)
+ 726:./stdperiph/source/stm32f37x_adc.c **** {
+ 637              		.loc 1 726 0
+ 638              		.cfi_startproc
+ 639              		@ args = 0, pretend = 0, frame = 0
+ 640              		@ frame_needed = 0, uses_anonymous_args = 0
+ 641              		@ link register save eliminated.
+ 642              	.LVL76:
+ 727:./stdperiph/source/stm32f37x_adc.c ****   uint32_t tmpreg1 = 0;
+ 728:./stdperiph/source/stm32f37x_adc.c ****   uint32_t tmpreg2 = 0;
+ 729:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 730:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 731:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_REGULAR_DISC_NUMBER(Number));
+ 732:./stdperiph/source/stm32f37x_adc.c ****   /* Get the old register value */
+ 733:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 = ADCx->CR1;
+ 643              		.loc 1 733 0
+ 644 0000 4368     		ldr	r3, [r0, #4]
+ 645              	.LVL77:
+ 734:./stdperiph/source/stm32f37x_adc.c ****   /* Clear the old discontinuous mode channel count */
+ 735:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 &= (uint32_t)(~ADC_CR1_DISCNUM);
+ 646              		.loc 1 735 0
+ 647 0002 23F46043 		bic	r3, r3, #57344
+ 648              	.LVL78:
+ 736:./stdperiph/source/stm32f37x_adc.c ****   /* Set the discontinuous mode channel count */
+ 737:./stdperiph/source/stm32f37x_adc.c ****   tmpreg2 = Number - 1;
+ 649              		.loc 1 737 0
+ 650 0006 0139     		subs	r1, r1, #1
+ 651              	.LVL79:
+ 738:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 |= tmpreg2 << 13;
+ 652              		.loc 1 738 0
+ 653 0008 43EA4133 		orr	r3, r3, r1, lsl #13
+ 654              	.LVL80:
+ 739:./stdperiph/source/stm32f37x_adc.c ****   /* Store the new register value */
+ 740:./stdperiph/source/stm32f37x_adc.c ****   ADCx->CR1 = tmpreg1;
+ 655              		.loc 1 740 0
+ 656 000c 4360     		str	r3, [r0, #4]
+ 657 000e 7047     		bx	lr
+ 658              		.cfi_endproc
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 25
+
+
+ 659              	.LFE126:
+ 661              		.section	.text.ADC_DiscModeCmd,"ax",%progbits
+ 662              		.align	2
+ 663              		.global	ADC_DiscModeCmd
+ 664              		.thumb
+ 665              		.thumb_func
+ 667              	ADC_DiscModeCmd:
+ 668              	.LFB127:
+ 741:./stdperiph/source/stm32f37x_adc.c **** }
+ 742:./stdperiph/source/stm32f37x_adc.c **** 
+ 743:./stdperiph/source/stm32f37x_adc.c **** /**
+ 744:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Enables or disables the discontinuous mode on regular group
+ 745:./stdperiph/source/stm32f37x_adc.c ****   *         channel for the specified ADC
+ 746:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 747:./stdperiph/source/stm32f37x_adc.c ****   * @param  NewState: new state of the selected ADC discontinuous mode
+ 748:./stdperiph/source/stm32f37x_adc.c ****   *         on regular group channel.
+ 749:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 750:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 751:./stdperiph/source/stm32f37x_adc.c ****   */
+ 752:./stdperiph/source/stm32f37x_adc.c **** void ADC_DiscModeCmd(ADC_TypeDef* ADCx, FunctionalState NewState)
+ 753:./stdperiph/source/stm32f37x_adc.c **** {
+ 669              		.loc 1 753 0
+ 670              		.cfi_startproc
+ 671              		@ args = 0, pretend = 0, frame = 0
+ 672              		@ frame_needed = 0, uses_anonymous_args = 0
+ 673              		@ link register save eliminated.
+ 674              	.LVL81:
+ 754:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 755:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 756:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 757:./stdperiph/source/stm32f37x_adc.c ****   if (NewState != DISABLE)
+ 675              		.loc 1 757 0
+ 676 0000 21B1     		cbz	r1, .L40
+ 758:./stdperiph/source/stm32f37x_adc.c ****   {
+ 759:./stdperiph/source/stm32f37x_adc.c ****     /* Enable the selected ADC regular discontinuous mode */
+ 760:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR1 |= ADC_CR1_DISCEN;
+ 677              		.loc 1 760 0
+ 678 0002 4368     		ldr	r3, [r0, #4]
+ 679 0004 43F40063 		orr	r3, r3, #2048
+ 680 0008 4360     		str	r3, [r0, #4]
+ 681 000a 7047     		bx	lr
+ 682              	.L40:
+ 761:./stdperiph/source/stm32f37x_adc.c ****   }
+ 762:./stdperiph/source/stm32f37x_adc.c ****   else
+ 763:./stdperiph/source/stm32f37x_adc.c ****   {
+ 764:./stdperiph/source/stm32f37x_adc.c ****     /* Disable the selected ADC regular discontinuous mode */
+ 765:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR1 &= (uint32_t)(~ADC_CR1_DISCEN);
+ 683              		.loc 1 765 0
+ 684 000c 4368     		ldr	r3, [r0, #4]
+ 685 000e 23F40063 		bic	r3, r3, #2048
+ 686 0012 4360     		str	r3, [r0, #4]
+ 687 0014 7047     		bx	lr
+ 688              		.cfi_endproc
+ 689              	.LFE127:
+ 691 0016 00BF     		.section	.text.ADC_GetConversionValue,"ax",%progbits
+ 692              		.align	2
+ 693              		.global	ADC_GetConversionValue
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 26
+
+
+ 694              		.thumb
+ 695              		.thumb_func
+ 697              	ADC_GetConversionValue:
+ 698              	.LFB128:
+ 766:./stdperiph/source/stm32f37x_adc.c ****   }
+ 767:./stdperiph/source/stm32f37x_adc.c **** }
+ 768:./stdperiph/source/stm32f37x_adc.c **** 
+ 769:./stdperiph/source/stm32f37x_adc.c **** /**
+ 770:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Returns the last ADCx conversion result data for regular channel.
+ 771:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 772:./stdperiph/source/stm32f37x_adc.c ****   * @retval The Data conversion value.
+ 773:./stdperiph/source/stm32f37x_adc.c ****   */
+ 774:./stdperiph/source/stm32f37x_adc.c **** uint16_t ADC_GetConversionValue(ADC_TypeDef* ADCx)
+ 775:./stdperiph/source/stm32f37x_adc.c **** {
+ 699              		.loc 1 775 0
+ 700              		.cfi_startproc
+ 701              		@ args = 0, pretend = 0, frame = 0
+ 702              		@ frame_needed = 0, uses_anonymous_args = 0
+ 703              		@ link register save eliminated.
+ 704              	.LVL82:
+ 776:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 777:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 778:./stdperiph/source/stm32f37x_adc.c ****   /* Return the selected ADC conversion value */
+ 779:./stdperiph/source/stm32f37x_adc.c ****   return (uint16_t) ADCx->DR;
+ 705              		.loc 1 779 0
+ 706 0000 C06C     		ldr	r0, [r0, #76]
+ 707              	.LVL83:
+ 780:./stdperiph/source/stm32f37x_adc.c **** }
+ 708              		.loc 1 780 0
+ 709 0002 80B2     		uxth	r0, r0
+ 710 0004 7047     		bx	lr
+ 711              		.cfi_endproc
+ 712              	.LFE128:
+ 714 0006 00BF     		.section	.text.ADC_DMACmd,"ax",%progbits
+ 715              		.align	2
+ 716              		.global	ADC_DMACmd
+ 717              		.thumb
+ 718              		.thumb_func
+ 720              	ADC_DMACmd:
+ 721              	.LFB129:
+ 781:./stdperiph/source/stm32f37x_adc.c **** 
+ 782:./stdperiph/source/stm32f37x_adc.c **** /**
+ 783:./stdperiph/source/stm32f37x_adc.c ****   * @}
+ 784:./stdperiph/source/stm32f37x_adc.c ****   */
+ 785:./stdperiph/source/stm32f37x_adc.c **** 
+ 786:./stdperiph/source/stm32f37x_adc.c **** /** @defgroup ADC_Group5 Regular Channels DMA Configuration functions
+ 787:./stdperiph/source/stm32f37x_adc.c ****  *  @brief   Regular Channels DMA Configuration functions 
+ 788:./stdperiph/source/stm32f37x_adc.c ****  *
+ 789:./stdperiph/source/stm32f37x_adc.c **** @verbatim   
+ 790:./stdperiph/source/stm32f37x_adc.c ****  ===============================================================================
+ 791:./stdperiph/source/stm32f37x_adc.c ****           ##### Regular Channels DMA Configuration functions #####
+ 792:./stdperiph/source/stm32f37x_adc.c ****  =============================================================================== 
+ 793:./stdperiph/source/stm32f37x_adc.c **** 
+ 794:./stdperiph/source/stm32f37x_adc.c ****     [..] This section provides functions allowing to configure the DMA for
+ 795:./stdperiph/source/stm32f37x_adc.c ****          ADC regular channels. Since converted regular channel values are stored
+ 796:./stdperiph/source/stm32f37x_adc.c ****          into a unique data register, it is useful to use DMA for conversion of
+ 797:./stdperiph/source/stm32f37x_adc.c ****          more than one regular channel. This avoids the loss of the data already
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 27
+
+
+ 798:./stdperiph/source/stm32f37x_adc.c ****          stored in the ADC Data register. 
+ 799:./stdperiph/source/stm32f37x_adc.c ****          When the DMA mode is enabled (using the ADC_DMACmd() function), after
+ 800:./stdperiph/source/stm32f37x_adc.c ****          each conversion of a regular channel, a DMA request is generated.
+ 801:./stdperiph/source/stm32f37x_adc.c **** 
+ 802:./stdperiph/source/stm32f37x_adc.c **** @endverbatim
+ 803:./stdperiph/source/stm32f37x_adc.c ****   * @{
+ 804:./stdperiph/source/stm32f37x_adc.c ****   */
+ 805:./stdperiph/source/stm32f37x_adc.c **** 
+ 806:./stdperiph/source/stm32f37x_adc.c **** /**
+ 807:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Enables or disables the specified ADC DMA request.
+ 808:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 809:./stdperiph/source/stm32f37x_adc.c ****   * @param  NewState: new state of the selected ADC DMA transfer.
+ 810:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 811:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 812:./stdperiph/source/stm32f37x_adc.c ****   */
+ 813:./stdperiph/source/stm32f37x_adc.c **** void ADC_DMACmd(ADC_TypeDef* ADCx, FunctionalState NewState)
+ 814:./stdperiph/source/stm32f37x_adc.c **** {
+ 722              		.loc 1 814 0
+ 723              		.cfi_startproc
+ 724              		@ args = 0, pretend = 0, frame = 0
+ 725              		@ frame_needed = 0, uses_anonymous_args = 0
+ 726              		@ link register save eliminated.
+ 727              	.LVL84:
+ 815:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 816:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_DMA_PERIPH(ADCx));
+ 817:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 818:./stdperiph/source/stm32f37x_adc.c ****   if (NewState != DISABLE)
+ 728              		.loc 1 818 0
+ 729 0000 21B1     		cbz	r1, .L44
+ 819:./stdperiph/source/stm32f37x_adc.c ****   {
+ 820:./stdperiph/source/stm32f37x_adc.c ****     /* Enable the selected ADC DMA request */
+ 821:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR2 |= ADC_CR2_DMA;
+ 730              		.loc 1 821 0
+ 731 0002 8368     		ldr	r3, [r0, #8]
+ 732 0004 43F48073 		orr	r3, r3, #256
+ 733 0008 8360     		str	r3, [r0, #8]
+ 734 000a 7047     		bx	lr
+ 735              	.L44:
+ 822:./stdperiph/source/stm32f37x_adc.c ****   }
+ 823:./stdperiph/source/stm32f37x_adc.c ****   else
+ 824:./stdperiph/source/stm32f37x_adc.c ****   {
+ 825:./stdperiph/source/stm32f37x_adc.c ****     /* Disable the selected ADC DMA request */
+ 826:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR2 &= (uint32_t) (~ADC_CR2_DMA);
+ 736              		.loc 1 826 0
+ 737 000c 8368     		ldr	r3, [r0, #8]
+ 738 000e 23F48073 		bic	r3, r3, #256
+ 739 0012 8360     		str	r3, [r0, #8]
+ 740 0014 7047     		bx	lr
+ 741              		.cfi_endproc
+ 742              	.LFE129:
+ 744 0016 00BF     		.section	.text.ADC_InjectedChannelConfig,"ax",%progbits
+ 745              		.align	2
+ 746              		.global	ADC_InjectedChannelConfig
+ 747              		.thumb
+ 748              		.thumb_func
+ 750              	ADC_InjectedChannelConfig:
+ 751              	.LFB130:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 28
+
+
+ 827:./stdperiph/source/stm32f37x_adc.c ****   }
+ 828:./stdperiph/source/stm32f37x_adc.c **** }
+ 829:./stdperiph/source/stm32f37x_adc.c **** 
+ 830:./stdperiph/source/stm32f37x_adc.c **** /**
+ 831:./stdperiph/source/stm32f37x_adc.c ****   * @}
+ 832:./stdperiph/source/stm32f37x_adc.c ****   */
+ 833:./stdperiph/source/stm32f37x_adc.c **** 
+ 834:./stdperiph/source/stm32f37x_adc.c **** /** @defgroup ADC_Group6 Injected channels Configuration functions
+ 835:./stdperiph/source/stm32f37x_adc.c ****  *  @brief   Injected channels Configuration functions 
+ 836:./stdperiph/source/stm32f37x_adc.c ****  *
+ 837:./stdperiph/source/stm32f37x_adc.c **** @verbatim   
+ 838:./stdperiph/source/stm32f37x_adc.c ****  ===============================================================================
+ 839:./stdperiph/source/stm32f37x_adc.c ****             ##### Injected channels Configuration functions #####
+ 840:./stdperiph/source/stm32f37x_adc.c ****  ===============================================================================  
+ 841:./stdperiph/source/stm32f37x_adc.c **** 
+ 842:./stdperiph/source/stm32f37x_adc.c ****     [..] This section provide functions allowing to configure the ADC Injected
+ 843:./stdperiph/source/stm32f37x_adc.c ****          channels, it is composed of 2 sub sections : 
+ 844:./stdperiph/source/stm32f37x_adc.c ****          (#) Configuration functions for Injected channels: This subsection provides 
+ 845:./stdperiph/source/stm32f37x_adc.c ****              functions allowing to configure the ADC injected channels :    
+ 846:./stdperiph/source/stm32f37x_adc.c ****              (++) Configure the rank in the injected group sequencer for each channel
+ 847:./stdperiph/source/stm32f37x_adc.c ****              (++) Configure the sampling time for each channel    
+ 848:./stdperiph/source/stm32f37x_adc.c ****              (++) Activate the Auto injected Mode  
+ 849:./stdperiph/source/stm32f37x_adc.c ****              (++) Activate the Discontinuous Mode 
+ 850:./stdperiph/source/stm32f37x_adc.c ****              (++) Scan mode activation  
+ 851:./stdperiph/source/stm32f37x_adc.c ****              (++) External/software trigger source   
+ 852:./stdperiph/source/stm32f37x_adc.c ****              (++) External trigger edge 
+ 853:./stdperiph/source/stm32f37x_adc.c ****              (++) Injected channels sequencer.
+ 854:./stdperiph/source/stm32f37x_adc.c ****     
+ 855:./stdperiph/source/stm32f37x_adc.c ****          (#) Get the Specified Injected channel conversion data: This subsection 
+ 856:./stdperiph/source/stm32f37x_adc.c ****              provides an important function in the ADC peripheral since it returns
+ 857:./stdperiph/source/stm32f37x_adc.c ****              the converted data of the specific injected channel.
+ 858:./stdperiph/source/stm32f37x_adc.c **** 
+ 859:./stdperiph/source/stm32f37x_adc.c **** @endverbatim
+ 860:./stdperiph/source/stm32f37x_adc.c ****   * @{
+ 861:./stdperiph/source/stm32f37x_adc.c ****   */ 
+ 862:./stdperiph/source/stm32f37x_adc.c **** 
+ 863:./stdperiph/source/stm32f37x_adc.c **** /**
+ 864:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Configures for the selected ADC injected channel its corresponding
+ 865:./stdperiph/source/stm32f37x_adc.c ****   *         rank in the sequencer and its sample time.
+ 866:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 867:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_Channel: the ADC channel to configure. 
+ 868:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be one of the following values:
+ 869:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_0: ADC Channel0 selected
+ 870:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_1: ADC Channel1 selected
+ 871:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_2: ADC Channel2 selected
+ 872:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_3: ADC Channel3 selected
+ 873:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_4: ADC Channel4 selected
+ 874:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_5: ADC Channel5 selected
+ 875:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_6: ADC Channel6 selected
+ 876:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_7: ADC Channel7 selected
+ 877:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_8: ADC Channel8 selected
+ 878:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_9: ADC Channel9 selected
+ 879:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_10: ADC Channel10 selected
+ 880:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_11: ADC Channel11 selected
+ 881:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_12: ADC Channel12 selected
+ 882:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_13: ADC Channel13 selected
+ 883:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_14: ADC Channel14 selected
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 29
+
+
+ 884:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_15: ADC Channel15 selected
+ 885:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_16: ADC Channel16 selected
+ 886:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_Channel_17: ADC Channel17 selected
+ 887:./stdperiph/source/stm32f37x_adc.c ****   * @param  Rank: The rank in the injected group sequencer. This parameter must be between 1 and 4.
+ 888:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_SampleTime: The sample time value to be set for the selected channel. 
+ 889:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be one of the following values:
+ 890:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_1Cycles5: Sample time equal to 1.5 cycles
+ 891:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_7Cycles5: Sample time equal to 7.5 cycles
+ 892:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_13Cycles5: Sample time equal to 13.5 cycles
+ 893:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_28Cycles5: Sample time equal to 28.5 cycles	
+ 894:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_41Cycles5: Sample time equal to 41.5 cycles	
+ 895:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_55Cycles5: Sample time equal to 55.5 cycles	
+ 896:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_71Cycles5: Sample time equal to 71.5 cycles	
+ 897:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_SampleTime_239Cycles5: Sample time equal to 239.5 cycles	
+ 898:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 899:./stdperiph/source/stm32f37x_adc.c ****   */
+ 900:./stdperiph/source/stm32f37x_adc.c **** void ADC_InjectedChannelConfig(ADC_TypeDef* ADCx, uint8_t ADC_Channel, uint8_t Rank, uint8_t ADC_Sa
+ 901:./stdperiph/source/stm32f37x_adc.c **** {
+ 752              		.loc 1 901 0
+ 753              		.cfi_startproc
+ 754              		@ args = 0, pretend = 0, frame = 0
+ 755              		@ frame_needed = 0, uses_anonymous_args = 0
+ 756              		@ link register save eliminated.
+ 757              	.LVL85:
+ 758 0000 70B4     		push	{r4, r5, r6}
+ 759              	.LCFI5:
+ 760              		.cfi_def_cfa_offset 12
+ 761              		.cfi_offset 4, -12
+ 762              		.cfi_offset 5, -8
+ 763              		.cfi_offset 6, -4
+ 764              	.LVL86:
+ 902:./stdperiph/source/stm32f37x_adc.c ****   uint32_t tmpreg1 = 0, tmpreg2 = 0, tmpreg3 = 0;
+ 903:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 904:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 905:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_CHANNEL(ADC_Channel));
+ 906:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_INJECTED_RANK(Rank));
+ 907:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_SAMPLE_TIME(ADC_SampleTime));
+ 908:./stdperiph/source/stm32f37x_adc.c ****   /* if ADC_Channel_10 ... ADC_Channel_17 is selected */
+ 909:./stdperiph/source/stm32f37x_adc.c ****   if (ADC_Channel > ADC_Channel_9)
+ 765              		.loc 1 909 0
+ 766 0002 0929     		cmp	r1, #9
+ 767 0004 0CD9     		bls	.L47
+ 910:./stdperiph/source/stm32f37x_adc.c ****   {
+ 911:./stdperiph/source/stm32f37x_adc.c ****     /* Get the old register value */
+ 912:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 = ADCx->SMPR1;
+ 768              		.loc 1 912 0
+ 769 0006 C668     		ldr	r6, [r0, #12]
+ 770              	.LVL87:
+ 913:./stdperiph/source/stm32f37x_adc.c ****     /* Calculate the mask to clear */
+ 914:./stdperiph/source/stm32f37x_adc.c ****     tmpreg2 = ADC_SMPR_SMP_SET << (3*(ADC_Channel - 10));
+ 771              		.loc 1 914 0
+ 772 0008 A1F10A04 		sub	r4, r1, #10
+ 773 000c 04EB4404 		add	r4, r4, r4, lsl #1
+ 774 0010 0725     		movs	r5, #7
+ 775 0012 A540     		lsls	r5, r5, r4
+ 776              	.LVL88:
+ 915:./stdperiph/source/stm32f37x_adc.c ****     /* Clear the old channel sample time */
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 30
+
+
+ 916:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 &= ~tmpreg2;
+ 777              		.loc 1 916 0
+ 778 0014 26EA0505 		bic	r5, r6, r5
+ 779              	.LVL89:
+ 917:./stdperiph/source/stm32f37x_adc.c ****     /* Calculate the mask to set */
+ 918:./stdperiph/source/stm32f37x_adc.c ****     tmpreg2 = (uint32_t)ADC_SampleTime << (3*(ADC_Channel - 10));
+ 780              		.loc 1 918 0
+ 781 0018 A340     		lsls	r3, r3, r4
+ 782              	.LVL90:
+ 919:./stdperiph/source/stm32f37x_adc.c ****     /* Set the new channel sample time */
+ 920:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 |= tmpreg2;
+ 783              		.loc 1 920 0
+ 784 001a 2B43     		orrs	r3, r3, r5
+ 785              	.LVL91:
+ 921:./stdperiph/source/stm32f37x_adc.c ****     /* Store the new register value */
+ 922:./stdperiph/source/stm32f37x_adc.c ****     ADCx->SMPR1 = tmpreg1;
+ 786              		.loc 1 922 0
+ 787 001c C360     		str	r3, [r0, #12]
+ 788 001e 09E0     		b	.L48
+ 789              	.LVL92:
+ 790              	.L47:
+ 923:./stdperiph/source/stm32f37x_adc.c ****   }
+ 924:./stdperiph/source/stm32f37x_adc.c ****   else /* ADC_Channel include in ADC_Channel_[0..9] */
+ 925:./stdperiph/source/stm32f37x_adc.c ****   {
+ 926:./stdperiph/source/stm32f37x_adc.c ****     /* Get the old register value */
+ 927:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 = ADCx->SMPR2;
+ 791              		.loc 1 927 0
+ 792 0020 0569     		ldr	r5, [r0, #16]
+ 793              	.LVL93:
+ 928:./stdperiph/source/stm32f37x_adc.c ****     /* Calculate the mask to clear */
+ 929:./stdperiph/source/stm32f37x_adc.c ****     tmpreg2 = ADC_SMPR_SMP_SET << (3 * ADC_Channel);
+ 794              		.loc 1 929 0
+ 795 0022 01EB4106 		add	r6, r1, r1, lsl #1
+ 796 0026 0724     		movs	r4, #7
+ 797 0028 B440     		lsls	r4, r4, r6
+ 798              	.LVL94:
+ 930:./stdperiph/source/stm32f37x_adc.c ****     /* Clear the old channel sample time */
+ 931:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 &= ~tmpreg2;
+ 799              		.loc 1 931 0
+ 800 002a 25EA0404 		bic	r4, r5, r4
+ 801              	.LVL95:
+ 932:./stdperiph/source/stm32f37x_adc.c ****     /* Calculate the mask to set */
+ 933:./stdperiph/source/stm32f37x_adc.c ****     tmpreg2 = (uint32_t)ADC_SampleTime << (3 * ADC_Channel);
+ 802              		.loc 1 933 0
+ 803 002e B340     		lsls	r3, r3, r6
+ 804              	.LVL96:
+ 934:./stdperiph/source/stm32f37x_adc.c ****     /* Set the new channel sample time */
+ 935:./stdperiph/source/stm32f37x_adc.c ****     tmpreg1 |= tmpreg2;
+ 805              		.loc 1 935 0
+ 806 0030 2343     		orrs	r3, r3, r4
+ 807              	.LVL97:
+ 936:./stdperiph/source/stm32f37x_adc.c ****     /* Store the new register value */
+ 937:./stdperiph/source/stm32f37x_adc.c ****     ADCx->SMPR2 = tmpreg1;
+ 808              		.loc 1 937 0
+ 809 0032 0361     		str	r3, [r0, #16]
+ 810              	.L48:
+ 938:./stdperiph/source/stm32f37x_adc.c ****   }
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 31
+
+
+ 939:./stdperiph/source/stm32f37x_adc.c ****   /* Rank configuration */
+ 940:./stdperiph/source/stm32f37x_adc.c ****   /* Get the old register value */
+ 941:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 = ADCx->JSQR;
+ 811              		.loc 1 941 0
+ 812 0034 836B     		ldr	r3, [r0, #56]
+ 813              	.LVL98:
+ 942:./stdperiph/source/stm32f37x_adc.c ****   /* Get JL value: Number = JL+1 */
+ 943:./stdperiph/source/stm32f37x_adc.c ****   tmpreg3 =  (tmpreg1 & ADC_JSQR_JL)>> 20;
+ 814              		.loc 1 943 0
+ 815 0036 C3F30154 		ubfx	r4, r3, #20, #2
+ 816              	.LVL99:
+ 944:./stdperiph/source/stm32f37x_adc.c ****   /* Calculate the mask to clear: ((Rank-1)+(4-JL-1)) */
+ 945:./stdperiph/source/stm32f37x_adc.c ****   tmpreg2 = ADC_JSQR_JSQ_SET << (5 * (uint8_t)((Rank + 3) - (tmpreg3 + 1)));
+ 817              		.loc 1 945 0
+ 818 003a 121B     		subs	r2, r2, r4
+ 819              	.LVL100:
+ 820 003c 0232     		adds	r2, r2, #2
+ 821 003e D2B2     		uxtb	r2, r2
+ 822 0040 02EB8202 		add	r2, r2, r2, lsl #2
+ 823 0044 1F24     		movs	r4, #31
+ 824              	.LVL101:
+ 825 0046 9440     		lsls	r4, r4, r2
+ 826              	.LVL102:
+ 946:./stdperiph/source/stm32f37x_adc.c ****   /* Clear the old JSQx bits for the selected rank */
+ 947:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 &= ~tmpreg2;
+ 827              		.loc 1 947 0
+ 828 0048 23EA0403 		bic	r3, r3, r4
+ 829              	.LVL103:
+ 948:./stdperiph/source/stm32f37x_adc.c ****   /* Calculate the mask to set: ((Rank-1)+(4-JL-1)) */
+ 949:./stdperiph/source/stm32f37x_adc.c ****   tmpreg2 = (uint32_t)ADC_Channel << (5 * (uint8_t)((Rank + 3) - (tmpreg3 + 1)));
+ 830              		.loc 1 949 0
+ 831 004c 9140     		lsls	r1, r1, r2
+ 832              	.LVL104:
+ 950:./stdperiph/source/stm32f37x_adc.c ****   /* Set the JSQx bits for the selected rank */
+ 951:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 |= tmpreg2;
+ 833              		.loc 1 951 0
+ 834 004e 1943     		orrs	r1, r1, r3
+ 835              	.LVL105:
+ 952:./stdperiph/source/stm32f37x_adc.c ****   /* Store the new register value */
+ 953:./stdperiph/source/stm32f37x_adc.c ****   ADCx->JSQR = tmpreg1;
+ 836              		.loc 1 953 0
+ 837 0050 8163     		str	r1, [r0, #56]
+ 954:./stdperiph/source/stm32f37x_adc.c **** }
+ 838              		.loc 1 954 0
+ 839 0052 70BC     		pop	{r4, r5, r6}
+ 840              	.LCFI6:
+ 841              		.cfi_restore 6
+ 842              		.cfi_restore 5
+ 843              		.cfi_restore 4
+ 844              		.cfi_def_cfa_offset 0
+ 845 0054 7047     		bx	lr
+ 846              		.cfi_endproc
+ 847              	.LFE130:
+ 849 0056 00BF     		.section	.text.ADC_InjectedSequencerLengthConfig,"ax",%progbits
+ 850              		.align	2
+ 851              		.global	ADC_InjectedSequencerLengthConfig
+ 852              		.thumb
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 32
+
+
+ 853              		.thumb_func
+ 855              	ADC_InjectedSequencerLengthConfig:
+ 856              	.LFB131:
+ 955:./stdperiph/source/stm32f37x_adc.c **** 
+ 956:./stdperiph/source/stm32f37x_adc.c **** /**
+ 957:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Configures the sequencer length for injected channels
+ 958:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 959:./stdperiph/source/stm32f37x_adc.c ****   * @param  Length: The sequencer length. 
+ 960:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter must be a number between 1 to 4.
+ 961:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 962:./stdperiph/source/stm32f37x_adc.c ****   */
+ 963:./stdperiph/source/stm32f37x_adc.c **** void ADC_InjectedSequencerLengthConfig(ADC_TypeDef* ADCx, uint8_t Length)
+ 964:./stdperiph/source/stm32f37x_adc.c **** {
+ 857              		.loc 1 964 0
+ 858              		.cfi_startproc
+ 859              		@ args = 0, pretend = 0, frame = 0
+ 860              		@ frame_needed = 0, uses_anonymous_args = 0
+ 861              		@ link register save eliminated.
+ 862              	.LVL106:
+ 965:./stdperiph/source/stm32f37x_adc.c ****   uint32_t tmpreg1 = 0;
+ 966:./stdperiph/source/stm32f37x_adc.c ****   uint32_t tmpreg2 = 0;
+ 967:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+ 968:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+ 969:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_INJECTED_LENGTH(Length));
+ 970:./stdperiph/source/stm32f37x_adc.c ****   
+ 971:./stdperiph/source/stm32f37x_adc.c ****   /* Get the old register value */
+ 972:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 = ADCx->JSQR;
+ 863              		.loc 1 972 0
+ 864 0000 836B     		ldr	r3, [r0, #56]
+ 865              	.LVL107:
+ 973:./stdperiph/source/stm32f37x_adc.c ****   /* Clear the old injected sequence length JL bits */
+ 974:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 &= (uint32_t)(~ADC_JSQR_JL);
+ 866              		.loc 1 974 0
+ 867 0002 23F44013 		bic	r3, r3, #3145728
+ 868              	.LVL108:
+ 975:./stdperiph/source/stm32f37x_adc.c ****   /* Set the injected sequence length JL bits */
+ 976:./stdperiph/source/stm32f37x_adc.c ****   tmpreg2 = Length - 1; 
+ 869              		.loc 1 976 0
+ 870 0006 0139     		subs	r1, r1, #1
+ 871              	.LVL109:
+ 977:./stdperiph/source/stm32f37x_adc.c ****   tmpreg1 |= tmpreg2 << 20;
+ 872              		.loc 1 977 0
+ 873 0008 43EA0153 		orr	r3, r3, r1, lsl #20
+ 874              	.LVL110:
+ 978:./stdperiph/source/stm32f37x_adc.c ****   /* Store the new register value */
+ 979:./stdperiph/source/stm32f37x_adc.c ****   ADCx->JSQR = tmpreg1;
+ 875              		.loc 1 979 0
+ 876 000c 8363     		str	r3, [r0, #56]
+ 877 000e 7047     		bx	lr
+ 878              		.cfi_endproc
+ 879              	.LFE131:
+ 881              		.section	.text.ADC_SetInjectedOffset,"ax",%progbits
+ 882              		.align	2
+ 883              		.global	ADC_SetInjectedOffset
+ 884              		.thumb
+ 885              		.thumb_func
+ 887              	ADC_SetInjectedOffset:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 33
+
+
+ 888              	.LFB132:
+ 980:./stdperiph/source/stm32f37x_adc.c **** }
+ 981:./stdperiph/source/stm32f37x_adc.c **** 
+ 982:./stdperiph/source/stm32f37x_adc.c **** /**
+ 983:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Set the injected channels conversion value offset
+ 984:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+ 985:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_InjectedChannel: the ADC injected channel to set its offset. 
+ 986:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be one of the following values:
+ 987:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_InjectedChannel_1: Injected Channel1 selected
+ 988:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_InjectedChannel_2: Injected Channel2 selected
+ 989:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_InjectedChannel_3: Injected Channel3 selected
+ 990:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_InjectedChannel_4: Injected Channel4 selected
+ 991:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_Offset: the offset value for the selected ADC injected channel
+ 992:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter must be a 12bit value.
+ 993:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+ 994:./stdperiph/source/stm32f37x_adc.c ****   */
+ 995:./stdperiph/source/stm32f37x_adc.c **** void ADC_SetInjectedOffset(ADC_TypeDef* ADCx, uint8_t ADC_InjectedChannel, uint16_t ADC_Offset)
+ 996:./stdperiph/source/stm32f37x_adc.c **** {
+ 889              		.loc 1 996 0
+ 890              		.cfi_startproc
+ 891              		@ args = 0, pretend = 0, frame = 8
+ 892              		@ frame_needed = 0, uses_anonymous_args = 0
+ 893              		@ link register save eliminated.
+ 894              	.LVL111:
+ 895 0000 82B0     		sub	sp, sp, #8
+ 896              	.LCFI7:
+ 897              		.cfi_def_cfa_offset 8
+ 997:./stdperiph/source/stm32f37x_adc.c ****   __IO uint32_t tmp = 0;
+ 898              		.loc 1 997 0
+ 899 0002 0023     		movs	r3, #0
+ 900 0004 0193     		str	r3, [sp, #4]
+ 998:./stdperiph/source/stm32f37x_adc.c ****   
+ 999:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1000:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1001:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_INJECTED_CHANNEL(ADC_InjectedChannel));
+1002:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_OFFSET(ADC_Offset));  
+1003:./stdperiph/source/stm32f37x_adc.c ****   
+1004:./stdperiph/source/stm32f37x_adc.c ****   tmp = (uint32_t)ADCx;
+ 901              		.loc 1 1004 0
+ 902 0006 0190     		str	r0, [sp, #4]
+1005:./stdperiph/source/stm32f37x_adc.c ****   tmp += ADC_InjectedChannel;
+ 903              		.loc 1 1005 0
+ 904 0008 019B     		ldr	r3, [sp, #4]
+ 905 000a 1944     		add	r1, r1, r3
+ 906              	.LVL112:
+ 907 000c 0191     		str	r1, [sp, #4]
+1006:./stdperiph/source/stm32f37x_adc.c ****   
+1007:./stdperiph/source/stm32f37x_adc.c ****   /* Set the selected injected channel data offset */
+1008:./stdperiph/source/stm32f37x_adc.c ****   *(__IO uint32_t *) tmp = (uint32_t)ADC_Offset;
+ 908              		.loc 1 1008 0
+ 909 000e 019B     		ldr	r3, [sp, #4]
+ 910 0010 1A60     		str	r2, [r3]
+1009:./stdperiph/source/stm32f37x_adc.c **** }
+ 911              		.loc 1 1009 0
+ 912 0012 02B0     		add	sp, sp, #8
+ 913              	.LCFI8:
+ 914              		.cfi_def_cfa_offset 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 34
+
+
+ 915              		@ sp needed
+ 916 0014 7047     		bx	lr
+ 917              		.cfi_endproc
+ 918              	.LFE132:
+ 920 0016 00BF     		.section	.text.ADC_ExternalTrigInjectedConvConfig,"ax",%progbits
+ 921              		.align	2
+ 922              		.global	ADC_ExternalTrigInjectedConvConfig
+ 923              		.thumb
+ 924              		.thumb_func
+ 926              	ADC_ExternalTrigInjectedConvConfig:
+ 927              	.LFB133:
+1010:./stdperiph/source/stm32f37x_adc.c **** 
+1011:./stdperiph/source/stm32f37x_adc.c **** /**
+1012:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Configures the ADCx external trigger for injected channels conversion.
+1013:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+1014:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_ExternalTrigInjecConv: specifies the ADC trigger to start injected conversion. 
+1015:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be one of the following values:
+1016:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_ExternalTrigInjecConv_T1_TRGO: Timer1 TRGO event selected (for ADC1, ADC2 a
+1017:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_ExternalTrigInjecConv_T1_CC4: Timer1 capture compare4 selected (for ADC1, A
+1018:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_ExternalTrigInjecConv_T2_TRGO: Timer2 TRGO event selected (for ADC1 and ADC
+1019:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_ExternalTrigInjecConv_T2_CC1: Timer2 capture compare1 selected (for ADC1 an
+1020:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_ExternalTrigInjecConv_T3_CC4: Timer3 capture compare4 selected (for ADC1 an
+1021:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_ExternalTrigInjecConv_T4_TRGO: Timer4 TRGO event selected (for ADC1 and ADC
+1022:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_ExternalTrigInjecConv_Ext_IT15_TIM8_CC4: External interrupt line 15 or Time
+1023:./stdperiph/source/stm32f37x_adc.c ****   *                                                       capture compare4 event selected (for ADC1
+1024:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_ExternalTrigInjecConv_T4_CC3: Timer4 capture compare3 selected (for ADC3 on
+1025:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_ExternalTrigInjecConv_T8_CC2: Timer8 capture compare2 selected (for ADC3 on
+1026:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_ExternalTrigInjecConv_T8_CC4: Timer8 capture compare4 selected (for ADC3 on
+1027:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_ExternalTrigInjecConv_T5_TRGO: Timer5 TRGO event selected (for ADC3 only)  
+1028:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_ExternalTrigInjecConv_T5_CC4: Timer5 capture compare4 selected (for ADC3 on
+1029:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_ExternalTrigInjecConv_None: Injected conversion started by software and not
+1030:./stdperiph/source/stm32f37x_adc.c ****   *                                          by external trigger (for ADC1, ADC2 and ADC3)
+1031:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+1032:./stdperiph/source/stm32f37x_adc.c ****   */
+1033:./stdperiph/source/stm32f37x_adc.c **** void ADC_ExternalTrigInjectedConvConfig(ADC_TypeDef* ADCx, uint32_t ADC_ExternalTrigInjecConv)
+1034:./stdperiph/source/stm32f37x_adc.c **** {
+ 928              		.loc 1 1034 0
+ 929              		.cfi_startproc
+ 930              		@ args = 0, pretend = 0, frame = 0
+ 931              		@ frame_needed = 0, uses_anonymous_args = 0
+ 932              		@ link register save eliminated.
+ 933              	.LVL113:
+1035:./stdperiph/source/stm32f37x_adc.c ****   uint32_t tmpreg = 0;
+1036:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1037:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1038:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_EXT_INJEC_TRIG(ADC_ExternalTrigInjecConv));
+1039:./stdperiph/source/stm32f37x_adc.c ****   /* Get the old register value */
+1040:./stdperiph/source/stm32f37x_adc.c ****   tmpreg = ADCx->CR2;
+ 934              		.loc 1 1040 0
+ 935 0000 8368     		ldr	r3, [r0, #8]
+ 936              	.LVL114:
+1041:./stdperiph/source/stm32f37x_adc.c ****   /* Clear the old external event selection for injected group */
+1042:./stdperiph/source/stm32f37x_adc.c ****   tmpreg &= (uint32_t) (~ADC_CR2_JEXTSEL);
+ 937              		.loc 1 1042 0
+ 938 0002 23F4E043 		bic	r3, r3, #28672
+ 939              	.LVL115:
+1043:./stdperiph/source/stm32f37x_adc.c ****   /* Set the external event selection for injected group */
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 35
+
+
+1044:./stdperiph/source/stm32f37x_adc.c ****   tmpreg |= ADC_ExternalTrigInjecConv;
+ 940              		.loc 1 1044 0
+ 941 0006 1943     		orrs	r1, r1, r3
+ 942              	.LVL116:
+1045:./stdperiph/source/stm32f37x_adc.c ****   /* Store the new register value */
+1046:./stdperiph/source/stm32f37x_adc.c ****   ADCx->CR2 = tmpreg;
+ 943              		.loc 1 1046 0
+ 944 0008 8160     		str	r1, [r0, #8]
+ 945 000a 7047     		bx	lr
+ 946              		.cfi_endproc
+ 947              	.LFE133:
+ 949              		.section	.text.ADC_ExternalTrigInjectedConvCmd,"ax",%progbits
+ 950              		.align	2
+ 951              		.global	ADC_ExternalTrigInjectedConvCmd
+ 952              		.thumb
+ 953              		.thumb_func
+ 955              	ADC_ExternalTrigInjectedConvCmd:
+ 956              	.LFB134:
+1047:./stdperiph/source/stm32f37x_adc.c **** }
+1048:./stdperiph/source/stm32f37x_adc.c **** 
+1049:./stdperiph/source/stm32f37x_adc.c **** /**
+1050:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Enables or disables the ADCx injected channels conversion through
+1051:./stdperiph/source/stm32f37x_adc.c ****   *         external trigger
+1052:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+1053:./stdperiph/source/stm32f37x_adc.c ****   * @param  NewState: new state of the selected ADC external trigger start of
+1054:./stdperiph/source/stm32f37x_adc.c ****   *         injected conversion.
+1055:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be: ENABLE or DISABLE.
+1056:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+1057:./stdperiph/source/stm32f37x_adc.c ****   */
+1058:./stdperiph/source/stm32f37x_adc.c **** void ADC_ExternalTrigInjectedConvCmd(ADC_TypeDef* ADCx, FunctionalState NewState)
+1059:./stdperiph/source/stm32f37x_adc.c **** {
+ 957              		.loc 1 1059 0
+ 958              		.cfi_startproc
+ 959              		@ args = 0, pretend = 0, frame = 0
+ 960              		@ frame_needed = 0, uses_anonymous_args = 0
+ 961              		@ link register save eliminated.
+ 962              	.LVL117:
+1060:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1061:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1062:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+1063:./stdperiph/source/stm32f37x_adc.c ****   if (NewState != DISABLE)
+ 963              		.loc 1 1063 0
+ 964 0000 21B1     		cbz	r1, .L55
+1064:./stdperiph/source/stm32f37x_adc.c ****   {
+1065:./stdperiph/source/stm32f37x_adc.c ****     /* Enable the selected ADC external event selection for injected group */
+1066:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR2 |= ADC_CR2_JEXTTRIG;
+ 965              		.loc 1 1066 0
+ 966 0002 8368     		ldr	r3, [r0, #8]
+ 967 0004 43F40043 		orr	r3, r3, #32768
+ 968 0008 8360     		str	r3, [r0, #8]
+ 969 000a 7047     		bx	lr
+ 970              	.L55:
+1067:./stdperiph/source/stm32f37x_adc.c ****   }
+1068:./stdperiph/source/stm32f37x_adc.c ****   else
+1069:./stdperiph/source/stm32f37x_adc.c ****   {
+1070:./stdperiph/source/stm32f37x_adc.c ****     /* Disable the selected ADC external event selection for injected group */
+1071:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR2 &= (uint32_t)(~ADC_CR2_JEXTTRIG);
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 36
+
+
+ 971              		.loc 1 1071 0
+ 972 000c 8368     		ldr	r3, [r0, #8]
+ 973 000e 23F40043 		bic	r3, r3, #32768
+ 974 0012 8360     		str	r3, [r0, #8]
+ 975 0014 7047     		bx	lr
+ 976              		.cfi_endproc
+ 977              	.LFE134:
+ 979 0016 00BF     		.section	.text.ADC_SoftwareStartInjectedConvCmd,"ax",%progbits
+ 980              		.align	2
+ 981              		.global	ADC_SoftwareStartInjectedConvCmd
+ 982              		.thumb
+ 983              		.thumb_func
+ 985              	ADC_SoftwareStartInjectedConvCmd:
+ 986              	.LFB135:
+1072:./stdperiph/source/stm32f37x_adc.c ****   }
+1073:./stdperiph/source/stm32f37x_adc.c **** }
+1074:./stdperiph/source/stm32f37x_adc.c **** 
+1075:./stdperiph/source/stm32f37x_adc.c **** /**
+1076:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Enables or disables the selected ADC start of the injected 
+1077:./stdperiph/source/stm32f37x_adc.c ****   *         channels conversion.
+1078:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+1079:./stdperiph/source/stm32f37x_adc.c ****   * @param  NewState: new state of the selected ADC software start injected conversion.
+1080:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be: ENABLE or DISABLE.
+1081:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+1082:./stdperiph/source/stm32f37x_adc.c ****   */
+1083:./stdperiph/source/stm32f37x_adc.c **** void ADC_SoftwareStartInjectedConvCmd(ADC_TypeDef* ADCx, FunctionalState NewState)
+1084:./stdperiph/source/stm32f37x_adc.c **** {
+ 987              		.loc 1 1084 0
+ 988              		.cfi_startproc
+ 989              		@ args = 0, pretend = 0, frame = 0
+ 990              		@ frame_needed = 0, uses_anonymous_args = 0
+ 991              		@ link register save eliminated.
+ 992              	.LVL118:
+1085:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1086:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1087:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+1088:./stdperiph/source/stm32f37x_adc.c ****   if (NewState != DISABLE)
+ 993              		.loc 1 1088 0
+ 994 0000 21B1     		cbz	r1, .L58
+1089:./stdperiph/source/stm32f37x_adc.c ****   {
+1090:./stdperiph/source/stm32f37x_adc.c ****     /* Enable the selected ADC conversion for injected group on external event and start the select
+1091:./stdperiph/source/stm32f37x_adc.c ****        ADC injected conversion */
+1092:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR2 |= (ADC_CR2_JSWSTART | ADC_CR2_JEXTTRIG);
+ 995              		.loc 1 1092 0
+ 996 0002 8368     		ldr	r3, [r0, #8]
+ 997 0004 43F40213 		orr	r3, r3, #2129920
+ 998 0008 8360     		str	r3, [r0, #8]
+ 999 000a 7047     		bx	lr
+ 1000              	.L58:
+1093:./stdperiph/source/stm32f37x_adc.c ****   }
+1094:./stdperiph/source/stm32f37x_adc.c ****   else
+1095:./stdperiph/source/stm32f37x_adc.c ****   {
+1096:./stdperiph/source/stm32f37x_adc.c ****     /* Disable the selected ADC conversion on external event for injected group and stop the select
+1097:./stdperiph/source/stm32f37x_adc.c ****        ADC injected conversion */
+1098:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR2 &= (uint32_t) ~(ADC_CR2_JSWSTART | ADC_CR2_JEXTTRIG);
+ 1001              		.loc 1 1098 0
+ 1002 000c 8368     		ldr	r3, [r0, #8]
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 37
+
+
+ 1003 000e 23F40213 		bic	r3, r3, #2129920
+ 1004 0012 8360     		str	r3, [r0, #8]
+ 1005 0014 7047     		bx	lr
+ 1006              		.cfi_endproc
+ 1007              	.LFE135:
+ 1009 0016 00BF     		.section	.text.ADC_GetSoftwareStartInjectedConvCmdStatus,"ax",%progbits
+ 1010              		.align	2
+ 1011              		.global	ADC_GetSoftwareStartInjectedConvCmdStatus
+ 1012              		.thumb
+ 1013              		.thumb_func
+ 1015              	ADC_GetSoftwareStartInjectedConvCmdStatus:
+ 1016              	.LFB136:
+1099:./stdperiph/source/stm32f37x_adc.c ****   }
+1100:./stdperiph/source/stm32f37x_adc.c **** }
+1101:./stdperiph/source/stm32f37x_adc.c **** 
+1102:./stdperiph/source/stm32f37x_adc.c **** /**
+1103:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Gets the selected ADC Software start injected conversion Status.
+1104:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+1105:./stdperiph/source/stm32f37x_adc.c ****   * @retval The new state of ADC software start injected conversion (SET or RESET).
+1106:./stdperiph/source/stm32f37x_adc.c ****   */
+1107:./stdperiph/source/stm32f37x_adc.c **** FlagStatus ADC_GetSoftwareStartInjectedConvCmdStatus(ADC_TypeDef* ADCx)
+1108:./stdperiph/source/stm32f37x_adc.c **** {
+ 1017              		.loc 1 1108 0
+ 1018              		.cfi_startproc
+ 1019              		@ args = 0, pretend = 0, frame = 0
+ 1020              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1021              		@ link register save eliminated.
+ 1022              	.LVL119:
+1109:./stdperiph/source/stm32f37x_adc.c ****   FlagStatus bitstatus = RESET;
+1110:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1111:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1112:./stdperiph/source/stm32f37x_adc.c ****   /* Check the status of JSWSTART bit */
+1113:./stdperiph/source/stm32f37x_adc.c ****   if ((ADCx->CR2 & ADC_CR2_JSWSTART) != (uint32_t)RESET)
+ 1023              		.loc 1 1113 0
+ 1024 0000 8368     		ldr	r3, [r0, #8]
+ 1025 0002 13F4001F 		tst	r3, #2097152
+ 1026 0006 01D0     		beq	.L62
+1114:./stdperiph/source/stm32f37x_adc.c ****   {
+1115:./stdperiph/source/stm32f37x_adc.c ****     /* JSWSTART bit is set */
+1116:./stdperiph/source/stm32f37x_adc.c ****     bitstatus = SET;
+ 1027              		.loc 1 1116 0
+ 1028 0008 0120     		movs	r0, #1
+ 1029              	.LVL120:
+ 1030 000a 7047     		bx	lr
+ 1031              	.LVL121:
+ 1032              	.L62:
+1117:./stdperiph/source/stm32f37x_adc.c ****   }
+1118:./stdperiph/source/stm32f37x_adc.c ****   else
+1119:./stdperiph/source/stm32f37x_adc.c ****   {
+1120:./stdperiph/source/stm32f37x_adc.c ****     /* JSWSTART bit is reset */
+1121:./stdperiph/source/stm32f37x_adc.c ****     bitstatus = RESET;
+ 1033              		.loc 1 1121 0
+ 1034 000c 0020     		movs	r0, #0
+ 1035              	.LVL122:
+1122:./stdperiph/source/stm32f37x_adc.c ****   }
+1123:./stdperiph/source/stm32f37x_adc.c ****   /* Return the JSWSTART bit status */
+1124:./stdperiph/source/stm32f37x_adc.c ****   return  bitstatus;
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 38
+
+
+1125:./stdperiph/source/stm32f37x_adc.c **** }
+ 1036              		.loc 1 1125 0
+ 1037 000e 7047     		bx	lr
+ 1038              		.cfi_endproc
+ 1039              	.LFE136:
+ 1041              		.section	.text.ADC_AutoInjectedConvCmd,"ax",%progbits
+ 1042              		.align	2
+ 1043              		.global	ADC_AutoInjectedConvCmd
+ 1044              		.thumb
+ 1045              		.thumb_func
+ 1047              	ADC_AutoInjectedConvCmd:
+ 1048              	.LFB137:
+1126:./stdperiph/source/stm32f37x_adc.c **** 
+1127:./stdperiph/source/stm32f37x_adc.c **** /**
+1128:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Enables or disables the selected ADC automatic injected group
+1129:./stdperiph/source/stm32f37x_adc.c ****   *         conversion after regular one.
+1130:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+1131:./stdperiph/source/stm32f37x_adc.c ****   * @param  NewState: new state of the selected ADC auto injected conversion
+1132:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be: ENABLE or DISABLE.
+1133:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+1134:./stdperiph/source/stm32f37x_adc.c ****   */
+1135:./stdperiph/source/stm32f37x_adc.c **** void ADC_AutoInjectedConvCmd(ADC_TypeDef* ADCx, FunctionalState NewState)
+1136:./stdperiph/source/stm32f37x_adc.c **** {
+ 1049              		.loc 1 1136 0
+ 1050              		.cfi_startproc
+ 1051              		@ args = 0, pretend = 0, frame = 0
+ 1052              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1053              		@ link register save eliminated.
+ 1054              	.LVL123:
+1137:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1138:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1139:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+1140:./stdperiph/source/stm32f37x_adc.c ****   if (NewState != DISABLE)
+ 1055              		.loc 1 1140 0
+ 1056 0000 21B1     		cbz	r1, .L64
+1141:./stdperiph/source/stm32f37x_adc.c ****   {
+1142:./stdperiph/source/stm32f37x_adc.c ****     /* Enable the selected ADC automatic injected group conversion */
+1143:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR1 |= ADC_CR1_JAUTO;
+ 1057              		.loc 1 1143 0
+ 1058 0002 4368     		ldr	r3, [r0, #4]
+ 1059 0004 43F48063 		orr	r3, r3, #1024
+ 1060 0008 4360     		str	r3, [r0, #4]
+ 1061 000a 7047     		bx	lr
+ 1062              	.L64:
+1144:./stdperiph/source/stm32f37x_adc.c ****   }
+1145:./stdperiph/source/stm32f37x_adc.c ****   else
+1146:./stdperiph/source/stm32f37x_adc.c ****   {
+1147:./stdperiph/source/stm32f37x_adc.c ****     /* Disable the selected ADC automatic injected group conversion */
+1148:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR1 &= (uint32_t)(~ADC_CR1_JAUTO);
+ 1063              		.loc 1 1148 0
+ 1064 000c 4368     		ldr	r3, [r0, #4]
+ 1065 000e 23F48063 		bic	r3, r3, #1024
+ 1066 0012 4360     		str	r3, [r0, #4]
+ 1067 0014 7047     		bx	lr
+ 1068              		.cfi_endproc
+ 1069              	.LFE137:
+ 1071 0016 00BF     		.section	.text.ADC_InjectedDiscModeCmd,"ax",%progbits
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 39
+
+
+ 1072              		.align	2
+ 1073              		.global	ADC_InjectedDiscModeCmd
+ 1074              		.thumb
+ 1075              		.thumb_func
+ 1077              	ADC_InjectedDiscModeCmd:
+ 1078              	.LFB138:
+1149:./stdperiph/source/stm32f37x_adc.c ****   }
+1150:./stdperiph/source/stm32f37x_adc.c **** }
+1151:./stdperiph/source/stm32f37x_adc.c **** 
+1152:./stdperiph/source/stm32f37x_adc.c **** /**
+1153:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Enables or disables the discontinuous mode for injected group
+1154:./stdperiph/source/stm32f37x_adc.c ****   *         channel for the specified ADC
+1155:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+1156:./stdperiph/source/stm32f37x_adc.c ****   * @param  NewState: new state of the selected ADC discontinuous mode
+1157:./stdperiph/source/stm32f37x_adc.c ****   *         on injected group channel.
+1158:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be: ENABLE or DISABLE.
+1159:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+1160:./stdperiph/source/stm32f37x_adc.c ****   */
+1161:./stdperiph/source/stm32f37x_adc.c **** void ADC_InjectedDiscModeCmd(ADC_TypeDef* ADCx, FunctionalState NewState)
+1162:./stdperiph/source/stm32f37x_adc.c **** {
+ 1079              		.loc 1 1162 0
+ 1080              		.cfi_startproc
+ 1081              		@ args = 0, pretend = 0, frame = 0
+ 1082              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1083              		@ link register save eliminated.
+ 1084              	.LVL124:
+1163:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1164:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1165:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+1166:./stdperiph/source/stm32f37x_adc.c ****   if (NewState != DISABLE)
+ 1085              		.loc 1 1166 0
+ 1086 0000 21B1     		cbz	r1, .L67
+1167:./stdperiph/source/stm32f37x_adc.c ****   {
+1168:./stdperiph/source/stm32f37x_adc.c ****     /* Enable the selected ADC injected discontinuous mode */
+1169:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR1 |= ADC_CR1_JDISCEN;
+ 1087              		.loc 1 1169 0
+ 1088 0002 4368     		ldr	r3, [r0, #4]
+ 1089 0004 43F48053 		orr	r3, r3, #4096
+ 1090 0008 4360     		str	r3, [r0, #4]
+ 1091 000a 7047     		bx	lr
+ 1092              	.L67:
+1170:./stdperiph/source/stm32f37x_adc.c ****   }
+1171:./stdperiph/source/stm32f37x_adc.c ****   else
+1172:./stdperiph/source/stm32f37x_adc.c ****   {
+1173:./stdperiph/source/stm32f37x_adc.c ****     /* Disable the selected ADC injected discontinuous mode */
+1174:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR1 &= (uint32_t) (~ADC_CR1_JDISCEN);
+ 1093              		.loc 1 1174 0
+ 1094 000c 4368     		ldr	r3, [r0, #4]
+ 1095 000e 23F48053 		bic	r3, r3, #4096
+ 1096 0012 4360     		str	r3, [r0, #4]
+ 1097 0014 7047     		bx	lr
+ 1098              		.cfi_endproc
+ 1099              	.LFE138:
+ 1101 0016 00BF     		.section	.text.ADC_GetInjectedConversionValue,"ax",%progbits
+ 1102              		.align	2
+ 1103              		.global	ADC_GetInjectedConversionValue
+ 1104              		.thumb
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 40
+
+
+ 1105              		.thumb_func
+ 1107              	ADC_GetInjectedConversionValue:
+ 1108              	.LFB139:
+1175:./stdperiph/source/stm32f37x_adc.c ****   }
+1176:./stdperiph/source/stm32f37x_adc.c **** }
+1177:./stdperiph/source/stm32f37x_adc.c **** 
+1178:./stdperiph/source/stm32f37x_adc.c **** /**
+1179:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Returns the ADC injected channel conversion result
+1180:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+1181:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_InjectedChannel: the converted ADC injected channel.
+1182:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be one of the following values:
+1183:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_InjectedChannel_1: Injected Channel1 selected
+1184:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_InjectedChannel_2: Injected Channel2 selected
+1185:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_InjectedChannel_3: Injected Channel3 selected
+1186:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_InjectedChannel_4: Injected Channel4 selected
+1187:./stdperiph/source/stm32f37x_adc.c ****   * @retval The Data conversion value.
+1188:./stdperiph/source/stm32f37x_adc.c ****   */
+1189:./stdperiph/source/stm32f37x_adc.c **** uint16_t ADC_GetInjectedConversionValue(ADC_TypeDef* ADCx, uint8_t ADC_InjectedChannel)
+1190:./stdperiph/source/stm32f37x_adc.c **** {
+ 1109              		.loc 1 1190 0
+ 1110              		.cfi_startproc
+ 1111              		@ args = 0, pretend = 0, frame = 8
+ 1112              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1113              		@ link register save eliminated.
+ 1114              	.LVL125:
+ 1115 0000 82B0     		sub	sp, sp, #8
+ 1116              	.LCFI9:
+ 1117              		.cfi_def_cfa_offset 8
+1191:./stdperiph/source/stm32f37x_adc.c ****   __IO uint32_t tmp = 0;
+ 1118              		.loc 1 1191 0
+ 1119 0002 0023     		movs	r3, #0
+ 1120 0004 0193     		str	r3, [sp, #4]
+1192:./stdperiph/source/stm32f37x_adc.c ****   
+1193:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1194:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1195:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_INJECTED_CHANNEL(ADC_InjectedChannel));
+1196:./stdperiph/source/stm32f37x_adc.c **** 
+1197:./stdperiph/source/stm32f37x_adc.c ****   tmp = (uint32_t)ADCx;
+ 1121              		.loc 1 1197 0
+ 1122 0006 0190     		str	r0, [sp, #4]
+1198:./stdperiph/source/stm32f37x_adc.c ****   tmp += ADC_InjectedChannel + ADC_JDR_OFFSET;
+ 1123              		.loc 1 1198 0
+ 1124 0008 019B     		ldr	r3, [sp, #4]
+ 1125 000a 1944     		add	r1, r1, r3
+ 1126              	.LVL126:
+ 1127 000c 2831     		adds	r1, r1, #40
+ 1128 000e 0191     		str	r1, [sp, #4]
+1199:./stdperiph/source/stm32f37x_adc.c ****   
+1200:./stdperiph/source/stm32f37x_adc.c ****   /* Returns the selected injected channel conversion data value */
+1201:./stdperiph/source/stm32f37x_adc.c ****   return (uint16_t) (*(__IO uint32_t*)  tmp);   
+ 1129              		.loc 1 1201 0
+ 1130 0010 019B     		ldr	r3, [sp, #4]
+ 1131 0012 1868     		ldr	r0, [r3]
+ 1132              	.LVL127:
+1202:./stdperiph/source/stm32f37x_adc.c **** }
+ 1133              		.loc 1 1202 0
+ 1134 0014 80B2     		uxth	r0, r0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 41
+
+
+ 1135 0016 02B0     		add	sp, sp, #8
+ 1136              	.LCFI10:
+ 1137              		.cfi_def_cfa_offset 0
+ 1138              		@ sp needed
+ 1139 0018 7047     		bx	lr
+ 1140              		.cfi_endproc
+ 1141              	.LFE139:
+ 1143 001a 00BF     		.section	.text.ADC_ITConfig,"ax",%progbits
+ 1144              		.align	2
+ 1145              		.global	ADC_ITConfig
+ 1146              		.thumb
+ 1147              		.thumb_func
+ 1149              	ADC_ITConfig:
+ 1150              	.LFB140:
+1203:./stdperiph/source/stm32f37x_adc.c **** 
+1204:./stdperiph/source/stm32f37x_adc.c **** /**
+1205:./stdperiph/source/stm32f37x_adc.c ****   * @}
+1206:./stdperiph/source/stm32f37x_adc.c ****   */
+1207:./stdperiph/source/stm32f37x_adc.c **** 
+1208:./stdperiph/source/stm32f37x_adc.c **** /** @defgroup ADC_Group7 Interrupts and flags management functions
+1209:./stdperiph/source/stm32f37x_adc.c ****  *  @brief   Interrupts and flags management functions
+1210:./stdperiph/source/stm32f37x_adc.c ****  *
+1211:./stdperiph/source/stm32f37x_adc.c **** @verbatim   
+1212:./stdperiph/source/stm32f37x_adc.c ****  ===============================================================================
+1213:./stdperiph/source/stm32f37x_adc.c ****             ##### Interrupts and flags management functions #####
+1214:./stdperiph/source/stm32f37x_adc.c ****  =============================================================================== 
+1215:./stdperiph/source/stm32f37x_adc.c **** 
+1216:./stdperiph/source/stm32f37x_adc.c ****     [..] This section provides functions allowing to configure the ADC Interrupts,
+1217:./stdperiph/source/stm32f37x_adc.c ****          get the status and clear flags and Interrupts pending bits.
+1218:./stdperiph/source/stm32f37x_adc.c ****   
+1219:./stdperiph/source/stm32f37x_adc.c ****     [..] The ADC provide 4 Interrupts sources and 9 Flags which can be divided
+1220:./stdperiph/source/stm32f37x_adc.c ****          into 3 groups:
+1221:./stdperiph/source/stm32f37x_adc.c ****   
+1222:./stdperiph/source/stm32f37x_adc.c ****   *** Flags and Interrupts for ADC regular channels ***
+1223:./stdperiph/source/stm32f37x_adc.c ****   =====================================================
+1224:./stdperiph/source/stm32f37x_adc.c ****     [..]
+1225:./stdperiph/source/stm32f37x_adc.c ****         (+)Flags :
+1226:./stdperiph/source/stm32f37x_adc.c ****            (##) ADC_FLAG_EOC : Regular channel end of conversion to indicate 
+1227:./stdperiph/source/stm32f37x_adc.c ****                 the end of sequence of regular GROUP conversions
+1228:./stdperiph/source/stm32f37x_adc.c ****            (##) ADC_FLAG_STRT: Regular channel start to indicate when regular
+1229:./stdperiph/source/stm32f37x_adc.c ****                 CHANNEL conversion starts.
+1230:./stdperiph/source/stm32f37x_adc.c **** 
+1231:./stdperiph/source/stm32f37x_adc.c ****         (+)Interrupts :
+1232:./stdperiph/source/stm32f37x_adc.c ****            (##) ADC_IT_EOC : specifies the interrupt source for Regular channel
+1233:./stdperiph/source/stm32f37x_adc.c ****                 end of conversion event.
+1234:./stdperiph/source/stm32f37x_adc.c ****   
+1235:./stdperiph/source/stm32f37x_adc.c ****   
+1236:./stdperiph/source/stm32f37x_adc.c ****   *** Flags and Interrupts for ADC Injected channels ***
+1237:./stdperiph/source/stm32f37x_adc.c ****   ======================================================
+1238:./stdperiph/source/stm32f37x_adc.c ****     [..]
+1239:./stdperiph/source/stm32f37x_adc.c ****         (+)Flags :
+1240:./stdperiph/source/stm32f37x_adc.c ****            (##) ADC_FLAG_JEOC : Injected channel end of conversion to indicate
+1241:./stdperiph/source/stm32f37x_adc.c ****                 at the end of injected GROUP conversion
+1242:./stdperiph/source/stm32f37x_adc.c ****            (##) ADC_FLAG_JSTRT : Injected channel start to indicate when injected
+1243:./stdperiph/source/stm32f37x_adc.c ****                 GROUP conversion starts.
+1244:./stdperiph/source/stm32f37x_adc.c **** 
+1245:./stdperiph/source/stm32f37x_adc.c ****         (+)Interrupts :
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 42
+
+
+1246:./stdperiph/source/stm32f37x_adc.c ****            (##) ADC_IT_JEOC : specifies the interrupt source for Injected channel
+1247:./stdperiph/source/stm32f37x_adc.c ****                 end of conversion event.
+1248:./stdperiph/source/stm32f37x_adc.c **** 
+1249:./stdperiph/source/stm32f37x_adc.c ****   *** General Flags and Interrupts for the ADC ***
+1250:./stdperiph/source/stm32f37x_adc.c ****   ================================================
+1251:./stdperiph/source/stm32f37x_adc.c ****     [..]
+1252:./stdperiph/source/stm32f37x_adc.c ****         (+)Flags :
+1253:./stdperiph/source/stm32f37x_adc.c ****            (##) ADC_FLAG_AWD : Analog watchdog + to indicate if the converted voltage
+1254:./stdperiph/source/stm32f37x_adc.c ****                               crosses the programmed thresholds values.
+1255:./stdperiph/source/stm32f37x_adc.c ****         (+)Interrupts :
+1256:./stdperiph/source/stm32f37x_adc.c ****            (##) ADC_IT_AWD : specifies the interrupt source for Analog watchdog event.  
+1257:./stdperiph/source/stm32f37x_adc.c **** 
+1258:./stdperiph/source/stm32f37x_adc.c ****     [..] The user should identify which mode will be used in his application to
+1259:./stdperiph/source/stm32f37x_adc.c ****          manage the ADC controller events: Polling mode or Interrupt mode.
+1260:./stdperiph/source/stm32f37x_adc.c ****   
+1261:./stdperiph/source/stm32f37x_adc.c ****     [..] In the Polling Mode it is advised to use the following functions:
+1262:./stdperiph/source/stm32f37x_adc.c ****          (+) ADC_GetFlagStatus() : to check if flags events occur. 
+1263:./stdperiph/source/stm32f37x_adc.c ****          (+) ADC_ClearFlag()     : to clear the flags events.
+1264:./stdperiph/source/stm32f37x_adc.c ****       
+1265:./stdperiph/source/stm32f37x_adc.c ****     [..] In the Interrupt Mode it is advised to use the following functions:
+1266:./stdperiph/source/stm32f37x_adc.c ****          (+) ADC_ITConfig()       : to enable or disable the interrupt source.
+1267:./stdperiph/source/stm32f37x_adc.c ****          (+) ADC_GetITStatus()    : to check if Interrupt occurs.
+1268:./stdperiph/source/stm32f37x_adc.c ****          (+) ADC_ClearITPendingBit() : to clear the Interrupt pending Bit 
+1269:./stdperiph/source/stm32f37x_adc.c ****                                        (corresponding Flag). 
+1270:./stdperiph/source/stm32f37x_adc.c **** @endverbatim
+1271:./stdperiph/source/stm32f37x_adc.c ****   * @{
+1272:./stdperiph/source/stm32f37x_adc.c ****   */ 
+1273:./stdperiph/source/stm32f37x_adc.c **** 
+1274:./stdperiph/source/stm32f37x_adc.c **** /**
+1275:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Enables or disables the specified ADC interrupts.
+1276:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+1277:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_IT: specifies the ADC interrupt sources to be enabled or disabled. 
+1278:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be any combination of the following values:
+1279:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_IT_EOC: End of conversion interrupt mask
+1280:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_IT_AWD: Analog watchdog interrupt mask
+1281:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_IT_JEOC: End of injected conversion interrupt mask
+1282:./stdperiph/source/stm32f37x_adc.c ****   * @param  NewState: new state of the specified ADC interrupts.
+1283:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be: ENABLE or DISABLE.
+1284:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+1285:./stdperiph/source/stm32f37x_adc.c ****   */
+1286:./stdperiph/source/stm32f37x_adc.c **** void ADC_ITConfig(ADC_TypeDef* ADCx, uint16_t ADC_IT, FunctionalState NewState)
+1287:./stdperiph/source/stm32f37x_adc.c **** {
+ 1151              		.loc 1 1287 0
+ 1152              		.cfi_startproc
+ 1153              		@ args = 0, pretend = 0, frame = 0
+ 1154              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1155              		@ link register save eliminated.
+ 1156              	.LVL128:
+1288:./stdperiph/source/stm32f37x_adc.c ****   uint8_t itmask = 0;
+1289:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1290:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1291:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+1292:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_IT(ADC_IT));
+1293:./stdperiph/source/stm32f37x_adc.c ****   /* Get the ADC IT index */
+1294:./stdperiph/source/stm32f37x_adc.c ****   itmask = (uint8_t)ADC_IT;
+ 1157              		.loc 1 1294 0
+ 1158 0000 C9B2     		uxtb	r1, r1
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 43
+
+
+ 1159              	.LVL129:
+1295:./stdperiph/source/stm32f37x_adc.c ****   if (NewState != DISABLE)
+ 1160              		.loc 1 1295 0
+ 1161 0002 1AB1     		cbz	r2, .L72
+1296:./stdperiph/source/stm32f37x_adc.c ****   {
+1297:./stdperiph/source/stm32f37x_adc.c ****     /* Enable the selected ADC interrupts */
+1298:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR1 |= itmask;
+ 1162              		.loc 1 1298 0
+ 1163 0004 4368     		ldr	r3, [r0, #4]
+ 1164 0006 1943     		orrs	r1, r1, r3
+ 1165              	.LVL130:
+ 1166 0008 4160     		str	r1, [r0, #4]
+ 1167 000a 7047     		bx	lr
+ 1168              	.LVL131:
+ 1169              	.L72:
+1299:./stdperiph/source/stm32f37x_adc.c ****   }
+1300:./stdperiph/source/stm32f37x_adc.c ****   else
+1301:./stdperiph/source/stm32f37x_adc.c ****   {
+1302:./stdperiph/source/stm32f37x_adc.c ****     /* Disable the selected ADC interrupts */
+1303:./stdperiph/source/stm32f37x_adc.c ****     ADCx->CR1 &= (~(uint32_t)itmask);
+ 1170              		.loc 1 1303 0
+ 1171 000c 4368     		ldr	r3, [r0, #4]
+ 1172 000e 23EA0101 		bic	r1, r3, r1
+ 1173              	.LVL132:
+ 1174 0012 4160     		str	r1, [r0, #4]
+ 1175 0014 7047     		bx	lr
+ 1176              		.cfi_endproc
+ 1177              	.LFE140:
+ 1179 0016 00BF     		.section	.text.ADC_GetFlagStatus,"ax",%progbits
+ 1180              		.align	2
+ 1181              		.global	ADC_GetFlagStatus
+ 1182              		.thumb
+ 1183              		.thumb_func
+ 1185              	ADC_GetFlagStatus:
+ 1186              	.LFB141:
+1304:./stdperiph/source/stm32f37x_adc.c ****   }
+1305:./stdperiph/source/stm32f37x_adc.c **** }
+1306:./stdperiph/source/stm32f37x_adc.c **** 
+1307:./stdperiph/source/stm32f37x_adc.c **** /**
+1308:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Checks whether the specified ADC flag is set or not.
+1309:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+1310:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_FLAG: specifies the flag to check. 
+1311:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be one of the following values:
+1312:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_FLAG_AWD: Analog watchdog flag
+1313:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_FLAG_EOC: End of conversion flag
+1314:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_FLAG_JEOC: End of injected group conversion flag
+1315:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_FLAG_JSTRT: Start of injected group conversion flag
+1316:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_FLAG_STRT: Start of regular group conversion flag
+1317:./stdperiph/source/stm32f37x_adc.c ****   * @retval The new state of ADC_FLAG (SET or RESET).
+1318:./stdperiph/source/stm32f37x_adc.c ****   */
+1319:./stdperiph/source/stm32f37x_adc.c **** FlagStatus ADC_GetFlagStatus(ADC_TypeDef* ADCx, uint8_t ADC_FLAG)
+1320:./stdperiph/source/stm32f37x_adc.c **** {
+ 1187              		.loc 1 1320 0
+ 1188              		.cfi_startproc
+ 1189              		@ args = 0, pretend = 0, frame = 0
+ 1190              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1191              		@ link register save eliminated.
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 44
+
+
+ 1192              	.LVL133:
+1321:./stdperiph/source/stm32f37x_adc.c ****   FlagStatus bitstatus = RESET;
+1322:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1323:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1324:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_GET_FLAG(ADC_FLAG));
+1325:./stdperiph/source/stm32f37x_adc.c ****   /* Check the status of the specified ADC flag */
+1326:./stdperiph/source/stm32f37x_adc.c ****   if ((ADCx->SR & ADC_FLAG) != (uint8_t)RESET)
+ 1193              		.loc 1 1326 0
+ 1194 0000 0368     		ldr	r3, [r0]
+ 1195 0002 1942     		tst	r1, r3
+ 1196 0004 01D0     		beq	.L76
+1327:./stdperiph/source/stm32f37x_adc.c ****   {
+1328:./stdperiph/source/stm32f37x_adc.c ****     /* ADC_FLAG is set */
+1329:./stdperiph/source/stm32f37x_adc.c ****     bitstatus = SET;
+ 1197              		.loc 1 1329 0
+ 1198 0006 0120     		movs	r0, #1
+ 1199              	.LVL134:
+ 1200 0008 7047     		bx	lr
+ 1201              	.LVL135:
+ 1202              	.L76:
+1330:./stdperiph/source/stm32f37x_adc.c ****   }
+1331:./stdperiph/source/stm32f37x_adc.c ****   else
+1332:./stdperiph/source/stm32f37x_adc.c ****   {
+1333:./stdperiph/source/stm32f37x_adc.c ****     /* ADC_FLAG is reset */
+1334:./stdperiph/source/stm32f37x_adc.c ****     bitstatus = RESET;
+ 1203              		.loc 1 1334 0
+ 1204 000a 0020     		movs	r0, #0
+ 1205              	.LVL136:
+1335:./stdperiph/source/stm32f37x_adc.c ****   }
+1336:./stdperiph/source/stm32f37x_adc.c ****   /* Return the ADC_FLAG status */
+1337:./stdperiph/source/stm32f37x_adc.c ****   return  bitstatus;
+1338:./stdperiph/source/stm32f37x_adc.c **** }
+ 1206              		.loc 1 1338 0
+ 1207 000c 7047     		bx	lr
+ 1208              		.cfi_endproc
+ 1209              	.LFE141:
+ 1211 000e 00BF     		.section	.text.ADC_ClearFlag,"ax",%progbits
+ 1212              		.align	2
+ 1213              		.global	ADC_ClearFlag
+ 1214              		.thumb
+ 1215              		.thumb_func
+ 1217              	ADC_ClearFlag:
+ 1218              	.LFB142:
+1339:./stdperiph/source/stm32f37x_adc.c **** 
+1340:./stdperiph/source/stm32f37x_adc.c **** /**
+1341:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Clears the ADCx's pending flags.
+1342:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+1343:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_FLAG: specifies the flag to clear. 
+1344:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be any combination of the following values:
+1345:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_FLAG_AWD: Analog watchdog flag
+1346:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_FLAG_EOC: End of conversion flag
+1347:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_FLAG_JEOC: End of injected group conversion flag
+1348:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_FLAG_JSTRT: Start of injected group conversion flag
+1349:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_FLAG_STRT: Start of regular group conversion flag
+1350:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+1351:./stdperiph/source/stm32f37x_adc.c ****   */
+1352:./stdperiph/source/stm32f37x_adc.c **** void ADC_ClearFlag(ADC_TypeDef* ADCx, uint8_t ADC_FLAG)
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 45
+
+
+1353:./stdperiph/source/stm32f37x_adc.c **** {
+ 1219              		.loc 1 1353 0
+ 1220              		.cfi_startproc
+ 1221              		@ args = 0, pretend = 0, frame = 0
+ 1222              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1223              		@ link register save eliminated.
+ 1224              	.LVL137:
+1354:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1355:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1356:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_CLEAR_FLAG(ADC_FLAG));
+1357:./stdperiph/source/stm32f37x_adc.c ****   /* Clear the selected ADC flags */
+1358:./stdperiph/source/stm32f37x_adc.c ****   ADCx->SR = ~(uint32_t)ADC_FLAG;
+ 1225              		.loc 1 1358 0
+ 1226 0000 C943     		mvns	r1, r1
+ 1227              	.LVL138:
+ 1228 0002 0160     		str	r1, [r0]
+ 1229 0004 7047     		bx	lr
+ 1230              		.cfi_endproc
+ 1231              	.LFE142:
+ 1233 0006 00BF     		.section	.text.ADC_GetITStatus,"ax",%progbits
+ 1234              		.align	2
+ 1235              		.global	ADC_GetITStatus
+ 1236              		.thumb
+ 1237              		.thumb_func
+ 1239              	ADC_GetITStatus:
+ 1240              	.LFB143:
+1359:./stdperiph/source/stm32f37x_adc.c **** }
+1360:./stdperiph/source/stm32f37x_adc.c **** 
+1361:./stdperiph/source/stm32f37x_adc.c **** /**
+1362:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Checks whether the specified ADC interrupt has occurred or not.
+1363:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+1364:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_IT: specifies the ADC interrupt source to check. 
+1365:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be one of the following values:
+1366:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_IT_EOC: End of conversion interrupt mask
+1367:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_IT_AWD: Analog watchdog interrupt mask
+1368:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_IT_JEOC: End of injected conversion interrupt mask
+1369:./stdperiph/source/stm32f37x_adc.c ****   * @retval The new state of ADC_IT (SET or RESET).
+1370:./stdperiph/source/stm32f37x_adc.c ****   */
+1371:./stdperiph/source/stm32f37x_adc.c **** ITStatus ADC_GetITStatus(ADC_TypeDef* ADCx, uint16_t ADC_IT)
+1372:./stdperiph/source/stm32f37x_adc.c **** {
+ 1241              		.loc 1 1372 0
+ 1242              		.cfi_startproc
+ 1243              		@ args = 0, pretend = 0, frame = 0
+ 1244              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1245              		@ link register save eliminated.
+ 1246              	.LVL139:
+1373:./stdperiph/source/stm32f37x_adc.c ****   ITStatus bitstatus = RESET;
+1374:./stdperiph/source/stm32f37x_adc.c ****   uint32_t itmask = 0, enablestatus = 0;
+1375:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1376:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1377:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_GET_IT(ADC_IT));
+1378:./stdperiph/source/stm32f37x_adc.c ****   /* Get the ADC IT index */
+1379:./stdperiph/source/stm32f37x_adc.c ****   itmask = ADC_IT >> 8;
+1380:./stdperiph/source/stm32f37x_adc.c ****   /* Get the ADC_IT enable bit status */
+1381:./stdperiph/source/stm32f37x_adc.c ****   enablestatus = (ADCx->CR1 & (uint8_t)ADC_IT) ;
+ 1247              		.loc 1 1381 0
+ 1248 0000 4268     		ldr	r2, [r0, #4]
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 46
+
+
+ 1249 0002 CBB2     		uxtb	r3, r1
+ 1250 0004 1340     		ands	r3, r3, r2
+ 1251              	.LVL140:
+1382:./stdperiph/source/stm32f37x_adc.c ****   /* Check the status of the specified ADC interrupt */
+1383:./stdperiph/source/stm32f37x_adc.c ****   if (((ADCx->SR & itmask) != (uint32_t)RESET) && enablestatus)
+ 1252              		.loc 1 1383 0
+ 1253 0006 0268     		ldr	r2, [r0]
+ 1254 0008 12EA1122 		ands	r2, r2, r1, lsr #8
+ 1255 000c 02D0     		beq	.L80
+ 1256              		.loc 1 1383 0 is_stmt 0 discriminator 1
+ 1257 000e 1BB9     		cbnz	r3, .L81
+1384:./stdperiph/source/stm32f37x_adc.c ****   {
+1385:./stdperiph/source/stm32f37x_adc.c ****     /* ADC_IT is set */
+1386:./stdperiph/source/stm32f37x_adc.c ****     bitstatus = SET;
+1387:./stdperiph/source/stm32f37x_adc.c ****   }
+1388:./stdperiph/source/stm32f37x_adc.c ****   else
+1389:./stdperiph/source/stm32f37x_adc.c ****   {
+1390:./stdperiph/source/stm32f37x_adc.c ****     /* ADC_IT is reset */
+1391:./stdperiph/source/stm32f37x_adc.c ****     bitstatus = RESET;
+ 1258              		.loc 1 1391 0 is_stmt 1
+ 1259 0010 0020     		movs	r0, #0
+ 1260              	.LVL141:
+ 1261 0012 7047     		bx	lr
+ 1262              	.LVL142:
+ 1263              	.L80:
+ 1264 0014 0020     		movs	r0, #0
+ 1265              	.LVL143:
+ 1266 0016 7047     		bx	lr
+ 1267              	.LVL144:
+ 1268              	.L81:
+1386:./stdperiph/source/stm32f37x_adc.c ****   }
+ 1269              		.loc 1 1386 0
+ 1270 0018 0120     		movs	r0, #1
+ 1271              	.LVL145:
+1392:./stdperiph/source/stm32f37x_adc.c ****   }
+1393:./stdperiph/source/stm32f37x_adc.c ****   /* Return the ADC_IT status */
+1394:./stdperiph/source/stm32f37x_adc.c ****   return  bitstatus;
+1395:./stdperiph/source/stm32f37x_adc.c **** }
+ 1272              		.loc 1 1395 0
+ 1273 001a 7047     		bx	lr
+ 1274              		.cfi_endproc
+ 1275              	.LFE143:
+ 1277              		.section	.text.ADC_ClearITPendingBit,"ax",%progbits
+ 1278              		.align	2
+ 1279              		.global	ADC_ClearITPendingBit
+ 1280              		.thumb
+ 1281              		.thumb_func
+ 1283              	ADC_ClearITPendingBit:
+ 1284              	.LFB144:
+1396:./stdperiph/source/stm32f37x_adc.c **** 
+1397:./stdperiph/source/stm32f37x_adc.c **** /**
+1398:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Clears the ADCx's interrupt pending bits.
+1399:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+1400:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADC_IT: specifies the ADC interrupt pending bit to clear.
+1401:./stdperiph/source/stm32f37x_adc.c ****   *          This parameter can be any combination of the following values:
+1402:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_IT_EOC: End of conversion interrupt mask
+1403:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_IT_AWD: Analog watchdog interrupt mask
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 47
+
+
+1404:./stdperiph/source/stm32f37x_adc.c ****   *            @arg ADC_IT_JEOC: End of injected conversion interrupt mask
+1405:./stdperiph/source/stm32f37x_adc.c ****   * @retval None
+1406:./stdperiph/source/stm32f37x_adc.c ****   */
+1407:./stdperiph/source/stm32f37x_adc.c **** void ADC_ClearITPendingBit(ADC_TypeDef* ADCx, uint16_t ADC_IT)
+1408:./stdperiph/source/stm32f37x_adc.c **** {
+ 1285              		.loc 1 1408 0
+ 1286              		.cfi_startproc
+ 1287              		@ args = 0, pretend = 0, frame = 0
+ 1288              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1289              		@ link register save eliminated.
+ 1290              	.LVL146:
+1409:./stdperiph/source/stm32f37x_adc.c ****   uint8_t itmask = 0;
+1410:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1411:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1412:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_IT(ADC_IT));
+1413:./stdperiph/source/stm32f37x_adc.c ****   /* Get the ADC IT index */
+1414:./stdperiph/source/stm32f37x_adc.c ****   itmask = (uint8_t)(ADC_IT >> 8);
+1415:./stdperiph/source/stm32f37x_adc.c ****   /* Clear the selected ADC interrupt pending bits */
+1416:./stdperiph/source/stm32f37x_adc.c ****   ADCx->SR = ~(uint32_t)itmask;
+ 1291              		.loc 1 1416 0
+ 1292 0000 6FEA1121 		mvn	r1, r1, lsr #8
+ 1293              	.LVL147:
+ 1294 0004 0160     		str	r1, [r0]
+ 1295 0006 7047     		bx	lr
+ 1296              		.cfi_endproc
+ 1297              	.LFE144:
+ 1299              		.section	.text.ADC_GetCalibrationStatus,"ax",%progbits
+ 1300              		.align	2
+ 1301              		.global	ADC_GetCalibrationStatus
+ 1302              		.thumb
+ 1303              		.thumb_func
+ 1305              	ADC_GetCalibrationStatus:
+ 1306              	.LFB145:
+1417:./stdperiph/source/stm32f37x_adc.c **** }
+1418:./stdperiph/source/stm32f37x_adc.c **** 
+1419:./stdperiph/source/stm32f37x_adc.c **** /**
+1420:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Gets the selected ADC calibration status.
+1421:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+1422:./stdperiph/source/stm32f37x_adc.c ****   * @retval The new state of ADC calibration (SET or RESET).
+1423:./stdperiph/source/stm32f37x_adc.c ****   */
+1424:./stdperiph/source/stm32f37x_adc.c **** FlagStatus ADC_GetCalibrationStatus(ADC_TypeDef* ADCx)
+1425:./stdperiph/source/stm32f37x_adc.c **** {
+ 1307              		.loc 1 1425 0
+ 1308              		.cfi_startproc
+ 1309              		@ args = 0, pretend = 0, frame = 0
+ 1310              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1311              		@ link register save eliminated.
+ 1312              	.LVL148:
+1426:./stdperiph/source/stm32f37x_adc.c ****   FlagStatus bitstatus = RESET;
+1427:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1428:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1429:./stdperiph/source/stm32f37x_adc.c ****   /* Check the status of CAL bit */
+1430:./stdperiph/source/stm32f37x_adc.c ****   if ((ADCx->CR2 & ADC_CR2_CAL) != (uint32_t)RESET)
+ 1313              		.loc 1 1430 0
+ 1314 0000 8368     		ldr	r3, [r0, #8]
+ 1315 0002 13F0040F 		tst	r3, #4
+ 1316 0006 01D0     		beq	.L85
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 48
+
+
+1431:./stdperiph/source/stm32f37x_adc.c ****   {
+1432:./stdperiph/source/stm32f37x_adc.c ****     /* CAL bit is set: calibration on going */
+1433:./stdperiph/source/stm32f37x_adc.c ****     bitstatus = SET;
+ 1317              		.loc 1 1433 0
+ 1318 0008 0120     		movs	r0, #1
+ 1319              	.LVL149:
+ 1320 000a 7047     		bx	lr
+ 1321              	.LVL150:
+ 1322              	.L85:
+1434:./stdperiph/source/stm32f37x_adc.c ****   }
+1435:./stdperiph/source/stm32f37x_adc.c ****   else
+1436:./stdperiph/source/stm32f37x_adc.c ****   {
+1437:./stdperiph/source/stm32f37x_adc.c ****     /* CAL bit is reset: end of calibration */
+1438:./stdperiph/source/stm32f37x_adc.c ****     bitstatus = RESET;
+ 1323              		.loc 1 1438 0
+ 1324 000c 0020     		movs	r0, #0
+ 1325              	.LVL151:
+1439:./stdperiph/source/stm32f37x_adc.c ****   }
+1440:./stdperiph/source/stm32f37x_adc.c ****   /* Return the CAL bit status */
+1441:./stdperiph/source/stm32f37x_adc.c ****   return  bitstatus;
+1442:./stdperiph/source/stm32f37x_adc.c **** }
+ 1326              		.loc 1 1442 0
+ 1327 000e 7047     		bx	lr
+ 1328              		.cfi_endproc
+ 1329              	.LFE145:
+ 1331              		.section	.text.ADC_GetResetCalibrationStatus,"ax",%progbits
+ 1332              		.align	2
+ 1333              		.global	ADC_GetResetCalibrationStatus
+ 1334              		.thumb
+ 1335              		.thumb_func
+ 1337              	ADC_GetResetCalibrationStatus:
+ 1338              	.LFB146:
+1443:./stdperiph/source/stm32f37x_adc.c **** 
+1444:./stdperiph/source/stm32f37x_adc.c **** /**
+1445:./stdperiph/source/stm32f37x_adc.c ****   * @brief  Gets the selected ADC reset calibration registers status.
+1446:./stdperiph/source/stm32f37x_adc.c ****   * @param  ADCx: where x can be 1 to select the ADC peripheral.
+1447:./stdperiph/source/stm32f37x_adc.c ****   * @retval The new state of ADC reset calibration registers (SET or RESET).
+1448:./stdperiph/source/stm32f37x_adc.c ****   */
+1449:./stdperiph/source/stm32f37x_adc.c **** FlagStatus ADC_GetResetCalibrationStatus(ADC_TypeDef* ADCx)
+1450:./stdperiph/source/stm32f37x_adc.c **** {
+ 1339              		.loc 1 1450 0
+ 1340              		.cfi_startproc
+ 1341              		@ args = 0, pretend = 0, frame = 0
+ 1342              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1343              		@ link register save eliminated.
+ 1344              	.LVL152:
+1451:./stdperiph/source/stm32f37x_adc.c ****   FlagStatus bitstatus = RESET;
+1452:./stdperiph/source/stm32f37x_adc.c ****   /* Check the parameters */
+1453:./stdperiph/source/stm32f37x_adc.c ****   assert_param(IS_ADC_ALL_PERIPH(ADCx));
+1454:./stdperiph/source/stm32f37x_adc.c ****   /* Check the status of RSTCAL bit */
+1455:./stdperiph/source/stm32f37x_adc.c ****   if ((ADCx->CR2 & ADC_CR2_RSTCAL) != (uint32_t)RESET)
+ 1345              		.loc 1 1455 0
+ 1346 0000 8368     		ldr	r3, [r0, #8]
+ 1347 0002 13F0080F 		tst	r3, #8
+ 1348 0006 01D0     		beq	.L88
+1456:./stdperiph/source/stm32f37x_adc.c ****   {
+1457:./stdperiph/source/stm32f37x_adc.c ****     /* RSTCAL bit is set */
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 49
+
+
+1458:./stdperiph/source/stm32f37x_adc.c ****     bitstatus = SET;
+ 1349              		.loc 1 1458 0
+ 1350 0008 0120     		movs	r0, #1
+ 1351              	.LVL153:
+ 1352 000a 7047     		bx	lr
+ 1353              	.LVL154:
+ 1354              	.L88:
+1459:./stdperiph/source/stm32f37x_adc.c ****   }
+1460:./stdperiph/source/stm32f37x_adc.c ****   else
+1461:./stdperiph/source/stm32f37x_adc.c ****   {
+1462:./stdperiph/source/stm32f37x_adc.c ****     /* RSTCAL bit is reset */
+1463:./stdperiph/source/stm32f37x_adc.c ****     bitstatus = RESET;
+ 1355              		.loc 1 1463 0
+ 1356 000c 0020     		movs	r0, #0
+ 1357              	.LVL155:
+1464:./stdperiph/source/stm32f37x_adc.c ****   }
+1465:./stdperiph/source/stm32f37x_adc.c ****   /* Return the RSTCAL bit status */
+1466:./stdperiph/source/stm32f37x_adc.c ****   return  bitstatus;
+1467:./stdperiph/source/stm32f37x_adc.c **** }
+ 1358              		.loc 1 1467 0
+ 1359 000e 7047     		bx	lr
+ 1360              		.cfi_endproc
+ 1361              	.LFE146:
+ 1363              		.text
+ 1364              	.Letext0:
+ 1365              		.file 2 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\machine\\_defaul
+ 1366              		.file 3 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 1367              		.file 4 "cmsis/include/stm32f37x.h"
+ 1368              		.file 5 "stdperiph/include/stm32f37x_adc.h"
+ 1369              		.file 6 "cmsis/include/core_cm4.h"
+ 1370              		.file 7 "stdperiph/include/stm32f37x_rcc.h"
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 50
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f37x_adc.c
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:22     .text.ADC_DeInit:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:27     .text.ADC_DeInit:00000000 ADC_DeInit
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:56     .text.ADC_Init:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:61     .text.ADC_Init:00000000 ADC_Init
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:131    .text.ADC_Init:00000040 $d
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:136    .text.ADC_StructInit:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:141    .text.ADC_StructInit:00000000 ADC_StructInit
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:166    .text.ADC_Cmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:171    .text.ADC_Cmd:00000000 ADC_Cmd
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:196    .text.ADC_StartCalibration:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:201    .text.ADC_StartCalibration:00000000 ADC_StartCalibration
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:218    .text.ADC_ResetCalibration:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:223    .text.ADC_ResetCalibration:00000000 ADC_ResetCalibration
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:240    .text.ADC_AnalogWatchdogCmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:245    .text.ADC_AnalogWatchdogCmd:00000000 ADC_AnalogWatchdogCmd
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:271    .text.ADC_AnalogWatchdogThresholdsConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:276    .text.ADC_AnalogWatchdogThresholdsConfig:00000000 ADC_AnalogWatchdogThresholdsConfig
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:293    .text.ADC_AnalogWatchdogSingleChannelConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:298    .text.ADC_AnalogWatchdogSingleChannelConfig:00000000 ADC_AnalogWatchdogSingleChannelConfig
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:322    .text.ADC_TempSensorVrefintCmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:327    .text.ADC_TempSensorVrefintCmd:00000000 ADC_TempSensorVrefintCmd
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:353    .text.ADC_TempSensorVrefintCmd:0000001c $d
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:358    .text.ADC_RegularChannelConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:363    .text.ADC_RegularChannelConfig:00000000 ADC_RegularChannelConfig
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:516    .text.ADC_ExternalTrigConvCmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:521    .text.ADC_ExternalTrigConvCmd:00000000 ADC_ExternalTrigConvCmd
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:546    .text.ADC_SoftwareStartConv:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:551    .text.ADC_SoftwareStartConv:00000000 ADC_SoftwareStartConv
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:568    .text.ADC_GetSoftwareStartConvStatus:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:573    .text.ADC_GetSoftwareStartConvStatus:00000000 ADC_GetSoftwareStartConvStatus
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:600    .text.ADC_ContinuousModeCmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:605    .text.ADC_ContinuousModeCmd:00000000 ADC_ContinuousModeCmd
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:630    .text.ADC_DiscModeChannelCountConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:635    .text.ADC_DiscModeChannelCountConfig:00000000 ADC_DiscModeChannelCountConfig
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:662    .text.ADC_DiscModeCmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:667    .text.ADC_DiscModeCmd:00000000 ADC_DiscModeCmd
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:692    .text.ADC_GetConversionValue:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:697    .text.ADC_GetConversionValue:00000000 ADC_GetConversionValue
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:715    .text.ADC_DMACmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:720    .text.ADC_DMACmd:00000000 ADC_DMACmd
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:745    .text.ADC_InjectedChannelConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:750    .text.ADC_InjectedChannelConfig:00000000 ADC_InjectedChannelConfig
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:850    .text.ADC_InjectedSequencerLengthConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:855    .text.ADC_InjectedSequencerLengthConfig:00000000 ADC_InjectedSequencerLengthConfig
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:882    .text.ADC_SetInjectedOffset:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:887    .text.ADC_SetInjectedOffset:00000000 ADC_SetInjectedOffset
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:921    .text.ADC_ExternalTrigInjectedConvConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:926    .text.ADC_ExternalTrigInjectedConvConfig:00000000 ADC_ExternalTrigInjectedConvConfig
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:950    .text.ADC_ExternalTrigInjectedConvCmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:955    .text.ADC_ExternalTrigInjectedConvCmd:00000000 ADC_ExternalTrigInjectedConvCmd
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:980    .text.ADC_SoftwareStartInjectedConvCmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:985    .text.ADC_SoftwareStartInjectedConvCmd:00000000 ADC_SoftwareStartInjectedConvCmd
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1010   .text.ADC_GetSoftwareStartInjectedConvCmdStatus:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1015   .text.ADC_GetSoftwareStartInjectedConvCmdStatus:00000000 ADC_GetSoftwareStartInjectedConvCmdStatus
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1042   .text.ADC_AutoInjectedConvCmd:00000000 $t
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s 			page 51
+
+
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1047   .text.ADC_AutoInjectedConvCmd:00000000 ADC_AutoInjectedConvCmd
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1072   .text.ADC_InjectedDiscModeCmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1077   .text.ADC_InjectedDiscModeCmd:00000000 ADC_InjectedDiscModeCmd
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1102   .text.ADC_GetInjectedConversionValue:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1107   .text.ADC_GetInjectedConversionValue:00000000 ADC_GetInjectedConversionValue
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1144   .text.ADC_ITConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1149   .text.ADC_ITConfig:00000000 ADC_ITConfig
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1180   .text.ADC_GetFlagStatus:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1185   .text.ADC_GetFlagStatus:00000000 ADC_GetFlagStatus
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1212   .text.ADC_ClearFlag:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1217   .text.ADC_ClearFlag:00000000 ADC_ClearFlag
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1234   .text.ADC_GetITStatus:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1239   .text.ADC_GetITStatus:00000000 ADC_GetITStatus
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1278   .text.ADC_ClearITPendingBit:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1283   .text.ADC_ClearITPendingBit:00000000 ADC_ClearITPendingBit
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1300   .text.ADC_GetCalibrationStatus:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1305   .text.ADC_GetCalibrationStatus:00000000 ADC_GetCalibrationStatus
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1332   .text.ADC_GetResetCalibrationStatus:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccf8mYjy.s:1337   .text.ADC_GetResetCalibrationStatus:00000000 ADC_GetResetCalibrationStatus
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+RCC_APB2PeriphResetCmd

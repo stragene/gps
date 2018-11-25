@@ -1,0 +1,725 @@
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 1
+   4              		.eabi_attribute 28, 1
+   5              		.fpu fpv4-sp-d16
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.thumb
+  16              		.syntax unified
+  17              		.file	"stm32f37x_exti.c"
+  18              		.text
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.section	.text.EXTI_DeInit,"ax",%progbits
+  22              		.align	2
+  23              		.global	EXTI_DeInit
+  24              		.thumb
+  25              		.thumb_func
+  27              	EXTI_DeInit:
+  28              	.LFB111:
+  29              		.file 1 "./stdperiph/source/stm32f37x_exti.c"
+   1:./stdperiph/source/stm32f37x_exti.c **** /**
+   2:./stdperiph/source/stm32f37x_exti.c ****   ******************************************************************************
+   3:./stdperiph/source/stm32f37x_exti.c ****   * @file    stm32f37x_exti.c
+   4:./stdperiph/source/stm32f37x_exti.c ****   * @author  MCD Application Team
+   5:./stdperiph/source/stm32f37x_exti.c ****   * @version V1.0.0
+   6:./stdperiph/source/stm32f37x_exti.c ****   * @date    20-September-2012
+   7:./stdperiph/source/stm32f37x_exti.c ****   * @brief   This file provides firmware functions to manage the following 
+   8:./stdperiph/source/stm32f37x_exti.c ****   *          functionalities of the EXTI peripheral:
+   9:./stdperiph/source/stm32f37x_exti.c ****   *           + Initialization and Configuration
+  10:./stdperiph/source/stm32f37x_exti.c ****   *           + Interrupts and flags management
+  11:./stdperiph/source/stm32f37x_exti.c ****   *
+  12:./stdperiph/source/stm32f37x_exti.c ****   *  @verbatim
+  13:./stdperiph/source/stm32f37x_exti.c ****   ==============================================================================
+  14:./stdperiph/source/stm32f37x_exti.c ****                             ##### EXTI features ##### 
+  15:./stdperiph/source/stm32f37x_exti.c ****   ==============================================================================
+  16:./stdperiph/source/stm32f37x_exti.c ****     [..] External interrupt/event lines are mapped as following:
+  17:./stdperiph/source/stm32f37x_exti.c ****          (#) All available GPIO pins are connected to the 16 external 
+  18:./stdperiph/source/stm32f37x_exti.c ****              interrupt/event lines from EXTI0 to EXTI15.
+  19:./stdperiph/source/stm32f37x_exti.c ****          (#) EXTI line 16 is connected to the PVD output
+  20:./stdperiph/source/stm32f37x_exti.c ****          (#) EXTI line 17 is connected to the RTC Alarm event
+  21:./stdperiph/source/stm32f37x_exti.c ****          (#) EXTI line 18 is connected to USB Device wakeup event  
+  22:./stdperiph/source/stm32f37x_exti.c ****          (#) EXTI line 19 is connected to the RTC Tamper and TimeStamp events
+  23:./stdperiph/source/stm32f37x_exti.c ****          (#) EXTI line 20 is connected to the RTC wakeup event  
+  24:./stdperiph/source/stm32f37x_exti.c ****          (#) EXTI line 21 is connected to the Comparator 1 wakeup event 
+  25:./stdperiph/source/stm32f37x_exti.c ****          (#) EXTI line 22 is connected to the Comparator 2 wakeup event
+  26:./stdperiph/source/stm32f37x_exti.c ****          (#) EXTI line 23 is connected to the I2C1 wakeup event
+  27:./stdperiph/source/stm32f37x_exti.c ****          (#) EXTI line 24 is connected to the I2C2 wakeup event  
+  28:./stdperiph/source/stm32f37x_exti.c ****          (#) EXTI line 25 is connected to the USART1 wakeup event
+  29:./stdperiph/source/stm32f37x_exti.c ****          (#) EXTI line 26 is connected to the USART2 wakeup event  
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s 			page 2
+
+
+  30:./stdperiph/source/stm32f37x_exti.c ****          (#) EXTI line 27 is connected to the CEC wakeup event
+  31:./stdperiph/source/stm32f37x_exti.c ****          (#) EXTI line 28 is connected to the USART3 wakeup event 
+  32:./stdperiph/source/stm32f37x_exti.c **** 
+  33:./stdperiph/source/stm32f37x_exti.c ****                        ##### How to use this driver ##### 
+  34:./stdperiph/source/stm32f37x_exti.c ****   ==============================================================================
+  35:./stdperiph/source/stm32f37x_exti.c ****     [..] In order to use an I/O pin as an external interrupt source, follow
+  36:./stdperiph/source/stm32f37x_exti.c ****          steps below:
+  37:./stdperiph/source/stm32f37x_exti.c ****     (#) Configure the I/O in input mode using GPIO_Init()
+  38:./stdperiph/source/stm32f37x_exti.c ****     (#) Select the input source pin for the EXTI line using 
+  39:./stdperiph/source/stm32f37x_exti.c ****         SYSCFG_EXTILineConfig().
+  40:./stdperiph/source/stm32f37x_exti.c ****     (#) Select the mode(interrupt, event) and configure the trigger selection 
+  41:./stdperiph/source/stm32f37x_exti.c ****        (Rising, falling or both) using EXTI_Init(). For the internal interrupt,
+  42:./stdperiph/source/stm32f37x_exti.c ****        the trigger selection is not needed( the active edge is always the rising one).
+  43:./stdperiph/source/stm32f37x_exti.c ****     (#) Configure NVIC IRQ channel mapped to the EXTI line using NVIC_Init().
+  44:./stdperiph/source/stm32f37x_exti.c ****     (#) Optionally, you can generate a software interrupt using the function EXTI_GenerateSWInterru
+  45:./stdperiph/source/stm32f37x_exti.c ****     [..]
+  46:./stdperiph/source/stm32f37x_exti.c ****     (@) SYSCFG APB clock must be enabled to get write access to SYSCFG_EXTICRx
+  47:./stdperiph/source/stm32f37x_exti.c ****       registers using RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+  48:./stdperiph/source/stm32f37x_exti.c ****     @endverbatim
+  49:./stdperiph/source/stm32f37x_exti.c ****   *
+  50:./stdperiph/source/stm32f37x_exti.c ****   ******************************************************************************
+  51:./stdperiph/source/stm32f37x_exti.c ****   * @attention
+  52:./stdperiph/source/stm32f37x_exti.c ****   *
+  53:./stdperiph/source/stm32f37x_exti.c ****   * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
+  54:./stdperiph/source/stm32f37x_exti.c ****   *
+  55:./stdperiph/source/stm32f37x_exti.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  56:./stdperiph/source/stm32f37x_exti.c ****   * You may not use this file except in compliance with the License.
+  57:./stdperiph/source/stm32f37x_exti.c ****   * You may obtain a copy of the License at:
+  58:./stdperiph/source/stm32f37x_exti.c ****   *
+  59:./stdperiph/source/stm32f37x_exti.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  60:./stdperiph/source/stm32f37x_exti.c ****   *
+  61:./stdperiph/source/stm32f37x_exti.c ****   * Unless required by applicable law or agreed to in writing, software 
+  62:./stdperiph/source/stm32f37x_exti.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  63:./stdperiph/source/stm32f37x_exti.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  64:./stdperiph/source/stm32f37x_exti.c ****   * See the License for the specific language governing permissions and
+  65:./stdperiph/source/stm32f37x_exti.c ****   * limitations under the License.
+  66:./stdperiph/source/stm32f37x_exti.c ****   *
+  67:./stdperiph/source/stm32f37x_exti.c ****   ******************************************************************************
+  68:./stdperiph/source/stm32f37x_exti.c ****   */
+  69:./stdperiph/source/stm32f37x_exti.c **** 
+  70:./stdperiph/source/stm32f37x_exti.c **** /* Includes ------------------------------------------------------------------*/
+  71:./stdperiph/source/stm32f37x_exti.c **** #include "stm32f37x_exti.h"
+  72:./stdperiph/source/stm32f37x_exti.c **** 
+  73:./stdperiph/source/stm32f37x_exti.c **** /** @addtogroup STM32F37x_StdPeriph_Driver
+  74:./stdperiph/source/stm32f37x_exti.c ****   * @{
+  75:./stdperiph/source/stm32f37x_exti.c ****   */
+  76:./stdperiph/source/stm32f37x_exti.c **** 
+  77:./stdperiph/source/stm32f37x_exti.c **** /** @defgroup EXTI 
+  78:./stdperiph/source/stm32f37x_exti.c ****   * @brief EXTI driver modules
+  79:./stdperiph/source/stm32f37x_exti.c ****   * @{
+  80:./stdperiph/source/stm32f37x_exti.c ****   */
+  81:./stdperiph/source/stm32f37x_exti.c **** 
+  82:./stdperiph/source/stm32f37x_exti.c **** 
+  83:./stdperiph/source/stm32f37x_exti.c **** /* Private typedef -----------------------------------------------------------*/
+  84:./stdperiph/source/stm32f37x_exti.c **** /* Private define ------------------------------------------------------------*/
+  85:./stdperiph/source/stm32f37x_exti.c **** #define EXTI_LINENONE     ((uint32_t)0x00000)        /* No interrupt selected */
+  86:./stdperiph/source/stm32f37x_exti.c **** 
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s 			page 3
+
+
+  87:./stdperiph/source/stm32f37x_exti.c **** /* Private macro -------------------------------------------------------------*/
+  88:./stdperiph/source/stm32f37x_exti.c **** /* Private variables ---------------------------------------------------------*/
+  89:./stdperiph/source/stm32f37x_exti.c **** /* Private function prototypes -----------------------------------------------*/
+  90:./stdperiph/source/stm32f37x_exti.c **** /* Private functions ---------------------------------------------------------*/
+  91:./stdperiph/source/stm32f37x_exti.c **** 
+  92:./stdperiph/source/stm32f37x_exti.c **** /** @defgroup EXTI_Private_Functions
+  93:./stdperiph/source/stm32f37x_exti.c ****   * @{
+  94:./stdperiph/source/stm32f37x_exti.c ****   */
+  95:./stdperiph/source/stm32f37x_exti.c **** 
+  96:./stdperiph/source/stm32f37x_exti.c **** /** @defgroup EXTI_Group1 Initialization and Configuration functions
+  97:./stdperiph/source/stm32f37x_exti.c ****  *  @brief   Initialization and Configuration functions 
+  98:./stdperiph/source/stm32f37x_exti.c ****  *
+  99:./stdperiph/source/stm32f37x_exti.c **** @verbatim   
+ 100:./stdperiph/source/stm32f37x_exti.c ****   ==============================================================================
+ 101:./stdperiph/source/stm32f37x_exti.c ****             ##### Initialization and Configuration functions #####
+ 102:./stdperiph/source/stm32f37x_exti.c ****   ==============================================================================
+ 103:./stdperiph/source/stm32f37x_exti.c **** 
+ 104:./stdperiph/source/stm32f37x_exti.c **** @endverbatim
+ 105:./stdperiph/source/stm32f37x_exti.c ****   * @{
+ 106:./stdperiph/source/stm32f37x_exti.c ****   */
+ 107:./stdperiph/source/stm32f37x_exti.c **** 
+ 108:./stdperiph/source/stm32f37x_exti.c **** /**
+ 109:./stdperiph/source/stm32f37x_exti.c ****   * @brief  Deinitializes the EXTI peripheral registers to their default reset 
+ 110:./stdperiph/source/stm32f37x_exti.c ****   *         values.
+ 111:./stdperiph/source/stm32f37x_exti.c ****   * @param  None
+ 112:./stdperiph/source/stm32f37x_exti.c ****   * @retval None
+ 113:./stdperiph/source/stm32f37x_exti.c ****   */
+ 114:./stdperiph/source/stm32f37x_exti.c **** void EXTI_DeInit(void)
+ 115:./stdperiph/source/stm32f37x_exti.c **** {
+  30              		.loc 1 115 0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+ 116:./stdperiph/source/stm32f37x_exti.c ****   EXTI->IMR = 0x1F800000;
+  35              		.loc 1 116 0
+  36 0000 054B     		ldr	r3, .L2
+  37 0002 4FF0FC52 		mov	r2, #528482304
+  38 0006 1A60     		str	r2, [r3]
+ 117:./stdperiph/source/stm32f37x_exti.c ****   EXTI->EMR = 0x00000000;
+  39              		.loc 1 117 0
+  40 0008 0022     		movs	r2, #0
+  41 000a 5A60     		str	r2, [r3, #4]
+ 118:./stdperiph/source/stm32f37x_exti.c ****   EXTI->RTSR = 0x00000000;
+  42              		.loc 1 118 0
+  43 000c 9A60     		str	r2, [r3, #8]
+ 119:./stdperiph/source/stm32f37x_exti.c ****   EXTI->FTSR = 0x00000000;
+  44              		.loc 1 119 0
+  45 000e DA60     		str	r2, [r3, #12]
+ 120:./stdperiph/source/stm32f37x_exti.c ****   EXTI->PR = 0x01FFFFFF;
+  46              		.loc 1 120 0
+  47 0010 6FF07E42 		mvn	r2, #-33554432
+  48 0014 5A61     		str	r2, [r3, #20]
+  49 0016 7047     		bx	lr
+  50              	.L3:
+  51              		.align	2
+  52              	.L2:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s 			page 4
+
+
+  53 0018 00040140 		.word	1073808384
+  54              		.cfi_endproc
+  55              	.LFE111:
+  57              		.section	.text.EXTI_Init,"ax",%progbits
+  58              		.align	2
+  59              		.global	EXTI_Init
+  60              		.thumb
+  61              		.thumb_func
+  63              	EXTI_Init:
+  64              	.LFB112:
+ 121:./stdperiph/source/stm32f37x_exti.c **** }
+ 122:./stdperiph/source/stm32f37x_exti.c **** 
+ 123:./stdperiph/source/stm32f37x_exti.c **** /**
+ 124:./stdperiph/source/stm32f37x_exti.c ****   * @brief  Initializes the EXTI peripheral according to the specified
+ 125:./stdperiph/source/stm32f37x_exti.c ****   *         parameters in the EXTI_InitStruct.
+ 126:./stdperiph/source/stm32f37x_exti.c ****   *          - EXTI_Line specifies the EXTI line (EXTI0....EXTI28).
+ 127:./stdperiph/source/stm32f37x_exti.c ****   *          - EXTI_Mode specifies which EXTI line is used as interrupt or an event.
+ 128:./stdperiph/source/stm32f37x_exti.c ****   *          - EXTI_Trigger selects the trigger. When the trigger occurs, interrupt
+ 129:./stdperiph/source/stm32f37x_exti.c ****   *            pending bit will be set.
+ 130:./stdperiph/source/stm32f37x_exti.c ****   *          - EXTI_LineCmd controls (Enable/Disable) the EXTI line.
+ 131:./stdperiph/source/stm32f37x_exti.c ****   * @param  EXTI_InitStruct: pointer to a EXTI_InitTypeDef structure that 
+ 132:./stdperiph/source/stm32f37x_exti.c ****   *         contains the configuration information for the EXTI peripheral.
+ 133:./stdperiph/source/stm32f37x_exti.c ****   * @retval None
+ 134:./stdperiph/source/stm32f37x_exti.c ****   */
+ 135:./stdperiph/source/stm32f37x_exti.c **** void EXTI_Init(EXTI_InitTypeDef* EXTI_InitStruct)
+ 136:./stdperiph/source/stm32f37x_exti.c **** {
+  65              		.loc 1 136 0
+  66              		.cfi_startproc
+  67              		@ args = 0, pretend = 0, frame = 0
+  68              		@ frame_needed = 0, uses_anonymous_args = 0
+  69              		@ link register save eliminated.
+  70              	.LVL0:
+ 137:./stdperiph/source/stm32f37x_exti.c ****   uint32_t tmp = 0;
+ 138:./stdperiph/source/stm32f37x_exti.c **** 
+ 139:./stdperiph/source/stm32f37x_exti.c ****   /* Check the parameters */
+ 140:./stdperiph/source/stm32f37x_exti.c ****   assert_param(IS_EXTI_MODE(EXTI_InitStruct->EXTI_Mode));
+ 141:./stdperiph/source/stm32f37x_exti.c ****   assert_param(IS_EXTI_TRIGGER(EXTI_InitStruct->EXTI_Trigger));
+ 142:./stdperiph/source/stm32f37x_exti.c ****   assert_param(IS_EXTI_LINE(EXTI_InitStruct->EXTI_Line));
+ 143:./stdperiph/source/stm32f37x_exti.c ****   assert_param(IS_FUNCTIONAL_STATE(EXTI_InitStruct->EXTI_LineCmd));
+ 144:./stdperiph/source/stm32f37x_exti.c **** 
+ 145:./stdperiph/source/stm32f37x_exti.c ****   tmp = (uint32_t)EXTI_BASE;
+ 146:./stdperiph/source/stm32f37x_exti.c **** 
+ 147:./stdperiph/source/stm32f37x_exti.c ****   if (EXTI_InitStruct->EXTI_LineCmd != DISABLE)
+  71              		.loc 1 147 0
+  72 0000 8379     		ldrb	r3, [r0, #6]	@ zero_extendqisi2
+  73 0002 002B     		cmp	r3, #0
+  74 0004 34D0     		beq	.L5
+ 136:./stdperiph/source/stm32f37x_exti.c ****   uint32_t tmp = 0;
+  75              		.loc 1 136 0
+  76 0006 10B4     		push	{r4}
+  77              	.LCFI0:
+  78              		.cfi_def_cfa_offset 4
+  79              		.cfi_offset 4, -4
+ 148:./stdperiph/source/stm32f37x_exti.c ****   {
+ 149:./stdperiph/source/stm32f37x_exti.c ****     /* Clear EXTI line configuration */
+ 150:./stdperiph/source/stm32f37x_exti.c ****     EXTI->IMR &= ~EXTI_InitStruct->EXTI_Line;
+  80              		.loc 1 150 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s 			page 5
+
+
+  81 0008 204B     		ldr	r3, .L10
+  82 000a 1A68     		ldr	r2, [r3]
+  83 000c 0168     		ldr	r1, [r0]
+  84 000e 22EA0102 		bic	r2, r2, r1
+  85 0012 1A60     		str	r2, [r3]
+ 151:./stdperiph/source/stm32f37x_exti.c ****     EXTI->EMR &= ~EXTI_InitStruct->EXTI_Line;
+  86              		.loc 1 151 0
+  87 0014 5A68     		ldr	r2, [r3, #4]
+  88 0016 0168     		ldr	r1, [r0]
+  89 0018 22EA0102 		bic	r2, r2, r1
+  90 001c 5A60     		str	r2, [r3, #4]
+ 152:./stdperiph/source/stm32f37x_exti.c **** 
+ 153:./stdperiph/source/stm32f37x_exti.c ****     tmp += EXTI_InitStruct->EXTI_Mode;
+  91              		.loc 1 153 0
+  92 001e 0279     		ldrb	r2, [r0, #4]	@ zero_extendqisi2
+  93 0020 02F18042 		add	r2, r2, #1073741824
+  94 0024 02F58232 		add	r2, r2, #66560
+  95              	.LVL1:
+ 154:./stdperiph/source/stm32f37x_exti.c **** 
+ 155:./stdperiph/source/stm32f37x_exti.c ****     *(__IO uint32_t *) tmp |= EXTI_InitStruct->EXTI_Line;
+  96              		.loc 1 155 0
+  97 0028 1468     		ldr	r4, [r2]
+  98 002a 0168     		ldr	r1, [r0]
+  99 002c 2143     		orrs	r1, r1, r4
+ 100 002e 1160     		str	r1, [r2]
+ 156:./stdperiph/source/stm32f37x_exti.c **** 
+ 157:./stdperiph/source/stm32f37x_exti.c ****     /* Clear Rising Falling edge configuration */
+ 158:./stdperiph/source/stm32f37x_exti.c ****     EXTI->RTSR &= ~EXTI_InitStruct->EXTI_Line;
+ 101              		.loc 1 158 0
+ 102 0030 9A68     		ldr	r2, [r3, #8]
+ 103              	.LVL2:
+ 104 0032 0168     		ldr	r1, [r0]
+ 105 0034 22EA0102 		bic	r2, r2, r1
+ 106 0038 9A60     		str	r2, [r3, #8]
+ 159:./stdperiph/source/stm32f37x_exti.c ****     EXTI->FTSR &= ~EXTI_InitStruct->EXTI_Line;
+ 107              		.loc 1 159 0
+ 108 003a DA68     		ldr	r2, [r3, #12]
+ 109 003c 0168     		ldr	r1, [r0]
+ 110 003e 22EA0102 		bic	r2, r2, r1
+ 111 0042 DA60     		str	r2, [r3, #12]
+ 160:./stdperiph/source/stm32f37x_exti.c **** 
+ 161:./stdperiph/source/stm32f37x_exti.c ****     /* Select the trigger for the selected interrupts */
+ 162:./stdperiph/source/stm32f37x_exti.c ****     if (EXTI_InitStruct->EXTI_Trigger == EXTI_Trigger_Rising_Falling)
+ 112              		.loc 1 162 0
+ 113 0044 4379     		ldrb	r3, [r0, #5]	@ zero_extendqisi2
+ 114 0046 102B     		cmp	r3, #16
+ 115 0048 09D1     		bne	.L6
+ 163:./stdperiph/source/stm32f37x_exti.c ****     {
+ 164:./stdperiph/source/stm32f37x_exti.c ****       /* Rising Falling edge */
+ 165:./stdperiph/source/stm32f37x_exti.c ****       EXTI->RTSR |= EXTI_InitStruct->EXTI_Line;
+ 116              		.loc 1 165 0
+ 117 004a 104B     		ldr	r3, .L10
+ 118 004c 9968     		ldr	r1, [r3, #8]
+ 119 004e 0268     		ldr	r2, [r0]
+ 120 0050 0A43     		orrs	r2, r2, r1
+ 121 0052 9A60     		str	r2, [r3, #8]
+ 166:./stdperiph/source/stm32f37x_exti.c ****       EXTI->FTSR |= EXTI_InitStruct->EXTI_Line;
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s 			page 6
+
+
+ 122              		.loc 1 166 0
+ 123 0054 D968     		ldr	r1, [r3, #12]
+ 124 0056 0268     		ldr	r2, [r0]
+ 125 0058 0A43     		orrs	r2, r2, r1
+ 126 005a DA60     		str	r2, [r3, #12]
+ 127 005c 13E0     		b	.L4
+ 128              	.L6:
+ 129              	.LVL3:
+ 167:./stdperiph/source/stm32f37x_exti.c ****     }
+ 168:./stdperiph/source/stm32f37x_exti.c ****     else
+ 169:./stdperiph/source/stm32f37x_exti.c ****     {
+ 170:./stdperiph/source/stm32f37x_exti.c ****       tmp = (uint32_t)EXTI_BASE;
+ 171:./stdperiph/source/stm32f37x_exti.c ****       tmp += EXTI_InitStruct->EXTI_Trigger;
+ 130              		.loc 1 171 0
+ 131 005e 03F18043 		add	r3, r3, #1073741824
+ 132 0062 03F58233 		add	r3, r3, #66560
+ 133              	.LVL4:
+ 172:./stdperiph/source/stm32f37x_exti.c ****       *(__IO uint32_t *) tmp |= EXTI_InitStruct->EXTI_Line;
+ 134              		.loc 1 172 0
+ 135 0066 1968     		ldr	r1, [r3]
+ 136 0068 0268     		ldr	r2, [r0]
+ 137 006a 0A43     		orrs	r2, r2, r1
+ 138 006c 1A60     		str	r2, [r3]
+ 139 006e 0AE0     		b	.L4
+ 140              	.LVL5:
+ 141              	.L5:
+ 142              	.LCFI1:
+ 143              		.cfi_def_cfa_offset 0
+ 144              		.cfi_restore 4
+ 173:./stdperiph/source/stm32f37x_exti.c ****     }
+ 174:./stdperiph/source/stm32f37x_exti.c ****   }
+ 175:./stdperiph/source/stm32f37x_exti.c ****   else
+ 176:./stdperiph/source/stm32f37x_exti.c ****   {
+ 177:./stdperiph/source/stm32f37x_exti.c ****     tmp += EXTI_InitStruct->EXTI_Mode;
+ 145              		.loc 1 177 0
+ 146 0070 0379     		ldrb	r3, [r0, #4]	@ zero_extendqisi2
+ 147 0072 03F18043 		add	r3, r3, #1073741824
+ 148 0076 03F58233 		add	r3, r3, #66560
+ 149              	.LVL6:
+ 178:./stdperiph/source/stm32f37x_exti.c ****     /* Disable the selected external lines */
+ 179:./stdperiph/source/stm32f37x_exti.c ****     *(__IO uint32_t *) tmp &= ~EXTI_InitStruct->EXTI_Line;
+ 150              		.loc 1 179 0
+ 151 007a 1A68     		ldr	r2, [r3]
+ 152 007c 0168     		ldr	r1, [r0]
+ 153 007e 22EA0102 		bic	r2, r2, r1
+ 154 0082 1A60     		str	r2, [r3]
+ 180:./stdperiph/source/stm32f37x_exti.c ****   }
+ 181:./stdperiph/source/stm32f37x_exti.c **** }
+ 155              		.loc 1 181 0
+ 156 0084 7047     		bx	lr
+ 157              	.LVL7:
+ 158              	.L4:
+ 159              	.LCFI2:
+ 160              		.cfi_def_cfa_offset 4
+ 161              		.cfi_offset 4, -4
+ 162 0086 5DF8044B 		ldr	r4, [sp], #4
+ 163              	.LCFI3:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s 			page 7
+
+
+ 164              		.cfi_restore 4
+ 165              		.cfi_def_cfa_offset 0
+ 166 008a 7047     		bx	lr
+ 167              	.L11:
+ 168              		.align	2
+ 169              	.L10:
+ 170 008c 00040140 		.word	1073808384
+ 171              		.cfi_endproc
+ 172              	.LFE112:
+ 174              		.section	.text.EXTI_StructInit,"ax",%progbits
+ 175              		.align	2
+ 176              		.global	EXTI_StructInit
+ 177              		.thumb
+ 178              		.thumb_func
+ 180              	EXTI_StructInit:
+ 181              	.LFB113:
+ 182:./stdperiph/source/stm32f37x_exti.c **** 
+ 183:./stdperiph/source/stm32f37x_exti.c **** /**
+ 184:./stdperiph/source/stm32f37x_exti.c ****   * @brief  Fills each EXTI_InitStruct member with its reset value.
+ 185:./stdperiph/source/stm32f37x_exti.c ****   * @param  EXTI_InitStruct: pointer to a EXTI_InitTypeDef structure which will
+ 186:./stdperiph/source/stm32f37x_exti.c ****   *         be initialized.
+ 187:./stdperiph/source/stm32f37x_exti.c ****   * @retval None
+ 188:./stdperiph/source/stm32f37x_exti.c ****   */
+ 189:./stdperiph/source/stm32f37x_exti.c **** void EXTI_StructInit(EXTI_InitTypeDef* EXTI_InitStruct)
+ 190:./stdperiph/source/stm32f37x_exti.c **** {
+ 182              		.loc 1 190 0
+ 183              		.cfi_startproc
+ 184              		@ args = 0, pretend = 0, frame = 0
+ 185              		@ frame_needed = 0, uses_anonymous_args = 0
+ 186              		@ link register save eliminated.
+ 187              	.LVL8:
+ 191:./stdperiph/source/stm32f37x_exti.c ****   EXTI_InitStruct->EXTI_Line = EXTI_LINENONE;
+ 188              		.loc 1 191 0
+ 189 0000 0023     		movs	r3, #0
+ 190 0002 0360     		str	r3, [r0]
+ 192:./stdperiph/source/stm32f37x_exti.c ****   EXTI_InitStruct->EXTI_Mode = EXTI_Mode_Interrupt;
+ 191              		.loc 1 192 0
+ 192 0004 0371     		strb	r3, [r0, #4]
+ 193:./stdperiph/source/stm32f37x_exti.c ****   EXTI_InitStruct->EXTI_Trigger = EXTI_Trigger_Falling;
+ 193              		.loc 1 193 0
+ 194 0006 0C22     		movs	r2, #12
+ 195 0008 4271     		strb	r2, [r0, #5]
+ 194:./stdperiph/source/stm32f37x_exti.c ****   EXTI_InitStruct->EXTI_LineCmd = DISABLE;
+ 196              		.loc 1 194 0
+ 197 000a 8371     		strb	r3, [r0, #6]
+ 198 000c 7047     		bx	lr
+ 199              		.cfi_endproc
+ 200              	.LFE113:
+ 202 000e 00BF     		.section	.text.EXTI_GenerateSWInterrupt,"ax",%progbits
+ 203              		.align	2
+ 204              		.global	EXTI_GenerateSWInterrupt
+ 205              		.thumb
+ 206              		.thumb_func
+ 208              	EXTI_GenerateSWInterrupt:
+ 209              	.LFB114:
+ 195:./stdperiph/source/stm32f37x_exti.c **** }
+ 196:./stdperiph/source/stm32f37x_exti.c **** 
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s 			page 8
+
+
+ 197:./stdperiph/source/stm32f37x_exti.c **** /**
+ 198:./stdperiph/source/stm32f37x_exti.c ****   * @brief  Generates a Software interrupt on selected EXTI line.
+ 199:./stdperiph/source/stm32f37x_exti.c ****   * @param  EXTI_Line: specifies the EXTI line on which the software interrupt
+ 200:./stdperiph/source/stm32f37x_exti.c ****   *         will be generated.
+ 201:./stdperiph/source/stm32f37x_exti.c ****   *          This parameter can be any combination of EXTI_Linex where x can be (0..28).
+ 202:./stdperiph/source/stm32f37x_exti.c ****   * @retval None
+ 203:./stdperiph/source/stm32f37x_exti.c ****   */
+ 204:./stdperiph/source/stm32f37x_exti.c **** void EXTI_GenerateSWInterrupt(uint32_t EXTI_Line)
+ 205:./stdperiph/source/stm32f37x_exti.c **** {
+ 210              		.loc 1 205 0
+ 211              		.cfi_startproc
+ 212              		@ args = 0, pretend = 0, frame = 0
+ 213              		@ frame_needed = 0, uses_anonymous_args = 0
+ 214              		@ link register save eliminated.
+ 215              	.LVL9:
+ 206:./stdperiph/source/stm32f37x_exti.c ****   /* Check the parameters */
+ 207:./stdperiph/source/stm32f37x_exti.c ****   assert_param(IS_EXTI_LINE(EXTI_Line));
+ 208:./stdperiph/source/stm32f37x_exti.c **** 
+ 209:./stdperiph/source/stm32f37x_exti.c ****   EXTI->SWIER |= EXTI_Line;
+ 216              		.loc 1 209 0
+ 217 0000 024A     		ldr	r2, .L14
+ 218 0002 1369     		ldr	r3, [r2, #16]
+ 219 0004 1843     		orrs	r0, r0, r3
+ 220              	.LVL10:
+ 221 0006 1061     		str	r0, [r2, #16]
+ 222 0008 7047     		bx	lr
+ 223              	.L15:
+ 224 000a 00BF     		.align	2
+ 225              	.L14:
+ 226 000c 00040140 		.word	1073808384
+ 227              		.cfi_endproc
+ 228              	.LFE114:
+ 230              		.section	.text.EXTI_GetFlagStatus,"ax",%progbits
+ 231              		.align	2
+ 232              		.global	EXTI_GetFlagStatus
+ 233              		.thumb
+ 234              		.thumb_func
+ 236              	EXTI_GetFlagStatus:
+ 237              	.LFB115:
+ 210:./stdperiph/source/stm32f37x_exti.c **** }
+ 211:./stdperiph/source/stm32f37x_exti.c **** 
+ 212:./stdperiph/source/stm32f37x_exti.c **** /**
+ 213:./stdperiph/source/stm32f37x_exti.c ****   * @}
+ 214:./stdperiph/source/stm32f37x_exti.c ****   */
+ 215:./stdperiph/source/stm32f37x_exti.c **** 
+ 216:./stdperiph/source/stm32f37x_exti.c **** /** @defgroup EXTI_Group2 Interrupts and flags management functions
+ 217:./stdperiph/source/stm32f37x_exti.c ****  *  @brief    Interrupts and flags management functions 
+ 218:./stdperiph/source/stm32f37x_exti.c ****  *
+ 219:./stdperiph/source/stm32f37x_exti.c **** @verbatim   
+ 220:./stdperiph/source/stm32f37x_exti.c ****   ==============================================================================
+ 221:./stdperiph/source/stm32f37x_exti.c ****              ##### Interrupts and flags management functions #####
+ 222:./stdperiph/source/stm32f37x_exti.c ****   ==============================================================================
+ 223:./stdperiph/source/stm32f37x_exti.c ****   
+ 224:./stdperiph/source/stm32f37x_exti.c **** @endverbatim
+ 225:./stdperiph/source/stm32f37x_exti.c ****   * @{
+ 226:./stdperiph/source/stm32f37x_exti.c ****   */
+ 227:./stdperiph/source/stm32f37x_exti.c **** 
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s 			page 9
+
+
+ 228:./stdperiph/source/stm32f37x_exti.c **** /**
+ 229:./stdperiph/source/stm32f37x_exti.c ****   * @brief  Checks whether the specified EXTI line flag is set or not.
+ 230:./stdperiph/source/stm32f37x_exti.c ****   * @param  EXTI_Line: specifies the EXTI line flag to check.
+ 231:./stdperiph/source/stm32f37x_exti.c ****   *          This parameter can be EXTI_Linex where x(0..28).
+ 232:./stdperiph/source/stm32f37x_exti.c ****   * @retval The new state of EXTI_Line (SET or RESET).
+ 233:./stdperiph/source/stm32f37x_exti.c ****   */
+ 234:./stdperiph/source/stm32f37x_exti.c **** FlagStatus EXTI_GetFlagStatus(uint32_t EXTI_Line)
+ 235:./stdperiph/source/stm32f37x_exti.c **** {
+ 238              		.loc 1 235 0
+ 239              		.cfi_startproc
+ 240              		@ args = 0, pretend = 0, frame = 0
+ 241              		@ frame_needed = 0, uses_anonymous_args = 0
+ 242              		@ link register save eliminated.
+ 243              	.LVL11:
+ 236:./stdperiph/source/stm32f37x_exti.c ****    FlagStatus bitstatus = RESET;
+ 237:./stdperiph/source/stm32f37x_exti.c ****   /* Check the parameters */
+ 238:./stdperiph/source/stm32f37x_exti.c ****   assert_param(IS_GET_EXTI_LINE(EXTI_Line));
+ 239:./stdperiph/source/stm32f37x_exti.c **** 
+ 240:./stdperiph/source/stm32f37x_exti.c ****   if ((EXTI->PR & EXTI_Line) != (uint32_t)RESET)
+ 244              		.loc 1 240 0
+ 245 0000 034B     		ldr	r3, .L19
+ 246 0002 5B69     		ldr	r3, [r3, #20]
+ 247 0004 0342     		tst	r3, r0
+ 248 0006 01D0     		beq	.L18
+ 241:./stdperiph/source/stm32f37x_exti.c ****   {
+ 242:./stdperiph/source/stm32f37x_exti.c ****     bitstatus = SET;
+ 249              		.loc 1 242 0
+ 250 0008 0120     		movs	r0, #1
+ 251              	.LVL12:
+ 252 000a 7047     		bx	lr
+ 253              	.LVL13:
+ 254              	.L18:
+ 243:./stdperiph/source/stm32f37x_exti.c ****   }
+ 244:./stdperiph/source/stm32f37x_exti.c ****   else
+ 245:./stdperiph/source/stm32f37x_exti.c ****   {
+ 246:./stdperiph/source/stm32f37x_exti.c ****     bitstatus = RESET;
+ 255              		.loc 1 246 0
+ 256 000c 0020     		movs	r0, #0
+ 257              	.LVL14:
+ 247:./stdperiph/source/stm32f37x_exti.c ****   }
+ 248:./stdperiph/source/stm32f37x_exti.c ****   return bitstatus;
+ 249:./stdperiph/source/stm32f37x_exti.c **** }
+ 258              		.loc 1 249 0
+ 259 000e 7047     		bx	lr
+ 260              	.L20:
+ 261              		.align	2
+ 262              	.L19:
+ 263 0010 00040140 		.word	1073808384
+ 264              		.cfi_endproc
+ 265              	.LFE115:
+ 267              		.section	.text.EXTI_ClearFlag,"ax",%progbits
+ 268              		.align	2
+ 269              		.global	EXTI_ClearFlag
+ 270              		.thumb
+ 271              		.thumb_func
+ 273              	EXTI_ClearFlag:
+ 274              	.LFB116:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s 			page 10
+
+
+ 250:./stdperiph/source/stm32f37x_exti.c **** 
+ 251:./stdperiph/source/stm32f37x_exti.c **** /**
+ 252:./stdperiph/source/stm32f37x_exti.c ****   * @brief  Clears the EXTI's line pending flags.
+ 253:./stdperiph/source/stm32f37x_exti.c ****   * @param  EXTI_Line: specifies the EXTI lines flags to clear.
+ 254:./stdperiph/source/stm32f37x_exti.c ****   *          This parameter can be any combination of EXTI_Linex where x can be (0..28).
+ 255:./stdperiph/source/stm32f37x_exti.c ****   * @retval None
+ 256:./stdperiph/source/stm32f37x_exti.c ****   */
+ 257:./stdperiph/source/stm32f37x_exti.c **** void EXTI_ClearFlag(uint32_t EXTI_Line)
+ 258:./stdperiph/source/stm32f37x_exti.c **** {
+ 275              		.loc 1 258 0
+ 276              		.cfi_startproc
+ 277              		@ args = 0, pretend = 0, frame = 0
+ 278              		@ frame_needed = 0, uses_anonymous_args = 0
+ 279              		@ link register save eliminated.
+ 280              	.LVL15:
+ 259:./stdperiph/source/stm32f37x_exti.c ****   /* Check the parameters */
+ 260:./stdperiph/source/stm32f37x_exti.c ****   assert_param(IS_EXTI_LINE(EXTI_Line));
+ 261:./stdperiph/source/stm32f37x_exti.c **** 
+ 262:./stdperiph/source/stm32f37x_exti.c ****   EXTI->PR = EXTI_Line;
+ 281              		.loc 1 262 0
+ 282 0000 014B     		ldr	r3, .L22
+ 283 0002 5861     		str	r0, [r3, #20]
+ 284 0004 7047     		bx	lr
+ 285              	.L23:
+ 286 0006 00BF     		.align	2
+ 287              	.L22:
+ 288 0008 00040140 		.word	1073808384
+ 289              		.cfi_endproc
+ 290              	.LFE116:
+ 292              		.section	.text.EXTI_GetITStatus,"ax",%progbits
+ 293              		.align	2
+ 294              		.global	EXTI_GetITStatus
+ 295              		.thumb
+ 296              		.thumb_func
+ 298              	EXTI_GetITStatus:
+ 299              	.LFB117:
+ 263:./stdperiph/source/stm32f37x_exti.c **** }
+ 264:./stdperiph/source/stm32f37x_exti.c **** 
+ 265:./stdperiph/source/stm32f37x_exti.c **** /**
+ 266:./stdperiph/source/stm32f37x_exti.c ****   * @brief  Checks whether the specified EXTI line is asserted or not.
+ 267:./stdperiph/source/stm32f37x_exti.c ****   * @param  EXTI_Line: specifies the EXTI line to check.
+ 268:./stdperiph/source/stm32f37x_exti.c ****   *          This parameter can be EXTI_Linex where x can be (0..28).
+ 269:./stdperiph/source/stm32f37x_exti.c ****   * @retval The new state of EXTI_Line (SET or RESET).
+ 270:./stdperiph/source/stm32f37x_exti.c ****   */
+ 271:./stdperiph/source/stm32f37x_exti.c **** ITStatus EXTI_GetITStatus(uint32_t EXTI_Line)
+ 272:./stdperiph/source/stm32f37x_exti.c **** {
+ 300              		.loc 1 272 0
+ 301              		.cfi_startproc
+ 302              		@ args = 0, pretend = 0, frame = 0
+ 303              		@ frame_needed = 0, uses_anonymous_args = 0
+ 304              		@ link register save eliminated.
+ 305              	.LVL16:
+ 273:./stdperiph/source/stm32f37x_exti.c ****   ITStatus bitstatus = RESET;
+ 274:./stdperiph/source/stm32f37x_exti.c ****   uint32_t enablestatus = 0;
+ 275:./stdperiph/source/stm32f37x_exti.c ****   /* Check the parameters */
+ 276:./stdperiph/source/stm32f37x_exti.c ****   assert_param(IS_GET_EXTI_LINE(EXTI_Line));
+ 277:./stdperiph/source/stm32f37x_exti.c **** 
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s 			page 11
+
+
+ 278:./stdperiph/source/stm32f37x_exti.c ****   enablestatus =  EXTI->IMR & EXTI_Line;
+ 306              		.loc 1 278 0
+ 307 0000 064A     		ldr	r2, .L28
+ 308 0002 1368     		ldr	r3, [r2]
+ 309 0004 0340     		ands	r3, r3, r0
+ 310              	.LVL17:
+ 279:./stdperiph/source/stm32f37x_exti.c ****   if (((EXTI->PR & EXTI_Line) != (uint32_t)RESET) && (enablestatus != (uint32_t)RESET))
+ 311              		.loc 1 279 0
+ 312 0006 5269     		ldr	r2, [r2, #20]
+ 313 0008 1042     		tst	r0, r2
+ 314 000a 02D0     		beq	.L26
+ 315              		.loc 1 279 0 is_stmt 0 discriminator 1
+ 316 000c 1BB9     		cbnz	r3, .L27
+ 280:./stdperiph/source/stm32f37x_exti.c ****   {
+ 281:./stdperiph/source/stm32f37x_exti.c ****     bitstatus = SET;
+ 282:./stdperiph/source/stm32f37x_exti.c ****   }
+ 283:./stdperiph/source/stm32f37x_exti.c ****   else
+ 284:./stdperiph/source/stm32f37x_exti.c ****   {
+ 285:./stdperiph/source/stm32f37x_exti.c ****     bitstatus = RESET;
+ 317              		.loc 1 285 0 is_stmt 1
+ 318 000e 0020     		movs	r0, #0
+ 319              	.LVL18:
+ 320 0010 7047     		bx	lr
+ 321              	.LVL19:
+ 322              	.L26:
+ 323 0012 0020     		movs	r0, #0
+ 324              	.LVL20:
+ 325 0014 7047     		bx	lr
+ 326              	.LVL21:
+ 327              	.L27:
+ 281:./stdperiph/source/stm32f37x_exti.c ****   }
+ 328              		.loc 1 281 0
+ 329 0016 0120     		movs	r0, #1
+ 330              	.LVL22:
+ 286:./stdperiph/source/stm32f37x_exti.c ****   }
+ 287:./stdperiph/source/stm32f37x_exti.c ****   return bitstatus;
+ 288:./stdperiph/source/stm32f37x_exti.c **** }
+ 331              		.loc 1 288 0
+ 332 0018 7047     		bx	lr
+ 333              	.L29:
+ 334 001a 00BF     		.align	2
+ 335              	.L28:
+ 336 001c 00040140 		.word	1073808384
+ 337              		.cfi_endproc
+ 338              	.LFE117:
+ 340              		.section	.text.EXTI_ClearITPendingBit,"ax",%progbits
+ 341              		.align	2
+ 342              		.global	EXTI_ClearITPendingBit
+ 343              		.thumb
+ 344              		.thumb_func
+ 346              	EXTI_ClearITPendingBit:
+ 347              	.LFB118:
+ 289:./stdperiph/source/stm32f37x_exti.c **** 
+ 290:./stdperiph/source/stm32f37x_exti.c **** /**
+ 291:./stdperiph/source/stm32f37x_exti.c ****   * @brief  Clears the EXTI's line pending bits.
+ 292:./stdperiph/source/stm32f37x_exti.c ****   * @param  EXTI_Line: specifies the EXTI lines to clear.
+ 293:./stdperiph/source/stm32f37x_exti.c ****   *          This parameter can be any combination of EXTI_Linex where x can be (0..28).
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s 			page 12
+
+
+ 294:./stdperiph/source/stm32f37x_exti.c ****   * @retval None
+ 295:./stdperiph/source/stm32f37x_exti.c ****   */
+ 296:./stdperiph/source/stm32f37x_exti.c **** void EXTI_ClearITPendingBit(uint32_t EXTI_Line)
+ 297:./stdperiph/source/stm32f37x_exti.c **** {
+ 348              		.loc 1 297 0
+ 349              		.cfi_startproc
+ 350              		@ args = 0, pretend = 0, frame = 0
+ 351              		@ frame_needed = 0, uses_anonymous_args = 0
+ 352              		@ link register save eliminated.
+ 353              	.LVL23:
+ 298:./stdperiph/source/stm32f37x_exti.c ****   /* Check the parameters */
+ 299:./stdperiph/source/stm32f37x_exti.c ****   assert_param(IS_EXTI_LINE(EXTI_Line));
+ 300:./stdperiph/source/stm32f37x_exti.c **** 
+ 301:./stdperiph/source/stm32f37x_exti.c ****   EXTI->PR = EXTI_Line;
+ 354              		.loc 1 301 0
+ 355 0000 014B     		ldr	r3, .L31
+ 356 0002 5861     		str	r0, [r3, #20]
+ 357 0004 7047     		bx	lr
+ 358              	.L32:
+ 359 0006 00BF     		.align	2
+ 360              	.L31:
+ 361 0008 00040140 		.word	1073808384
+ 362              		.cfi_endproc
+ 363              	.LFE118:
+ 365              		.text
+ 366              	.Letext0:
+ 367              		.file 2 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\machine\\_defaul
+ 368              		.file 3 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 369              		.file 4 "cmsis/include/stm32f37x.h"
+ 370              		.file 5 "stdperiph/include/stm32f37x_exti.h"
+ 371              		.file 6 "cmsis/include/core_cm4.h"
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s 			page 13
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f37x_exti.c
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:22     .text.EXTI_DeInit:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:27     .text.EXTI_DeInit:00000000 EXTI_DeInit
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:53     .text.EXTI_DeInit:00000018 $d
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:58     .text.EXTI_Init:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:63     .text.EXTI_Init:00000000 EXTI_Init
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:170    .text.EXTI_Init:0000008c $d
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:175    .text.EXTI_StructInit:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:180    .text.EXTI_StructInit:00000000 EXTI_StructInit
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:203    .text.EXTI_GenerateSWInterrupt:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:208    .text.EXTI_GenerateSWInterrupt:00000000 EXTI_GenerateSWInterrupt
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:226    .text.EXTI_GenerateSWInterrupt:0000000c $d
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:231    .text.EXTI_GetFlagStatus:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:236    .text.EXTI_GetFlagStatus:00000000 EXTI_GetFlagStatus
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:263    .text.EXTI_GetFlagStatus:00000010 $d
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:268    .text.EXTI_ClearFlag:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:273    .text.EXTI_ClearFlag:00000000 EXTI_ClearFlag
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:288    .text.EXTI_ClearFlag:00000008 $d
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:293    .text.EXTI_GetITStatus:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:298    .text.EXTI_GetITStatus:00000000 EXTI_GetITStatus
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:336    .text.EXTI_GetITStatus:0000001c $d
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:341    .text.EXTI_ClearITPendingBit:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:346    .text.EXTI_ClearITPendingBit:00000000 EXTI_ClearITPendingBit
+C:\Users\strag\AppData\Local\Temp\ccJanZ6D.s:361    .text.EXTI_ClearITPendingBit:00000008 $d
+                     .debug_frame:00000010 $d
+
+NO UNDEFINED SYMBOLS

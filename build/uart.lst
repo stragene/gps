@@ -1,0 +1,1671 @@
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 1
+   4              		.eabi_attribute 28, 1
+   5              		.fpu fpv4-sp-d16
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.thumb
+  16              		.syntax unified
+  17              		.file	"uart.c"
+  18              		.text
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.section	.text.Uart_ITReadEnable,"ax",%progbits
+  22              		.align	2
+  23              		.global	Uart_ITReadEnable
+  24              		.thumb
+  25              		.thumb_func
+  27              	Uart_ITReadEnable:
+  28              	.LFB116:
+  29              		.file 1 "./user/source/uart.c"
+   1:./user/source/uart.c **** 
+   2:./user/source/uart.c **** #include <string.h>
+   3:./user/source/uart.c **** #include "uart.h"
+   4:./user/source/uart.c **** #include "stm32f37x.h"
+   5:./user/source/uart.c **** #include "stm32f37x_it.h"
+   6:./user/source/uart.c **** //#include "FreeRTOS.h"
+   7:./user/source/uart.c **** //#include "task.h"
+   8:./user/source/uart.c **** 
+   9:./user/source/uart.c **** static struct ucbuf Uart1_Rsvbuf, Uart1_Sndbuf, Uart3_Rsvbuf, Uart3_Sndbuf;
+  10:./user/source/uart.c **** /*应用层串口结构体*/
+  11:./user/source/uart.c **** static UartDef UartGPS = {USART1, &Uart1_Rsvbuf, &Uart1_Sndbuf};
+  12:./user/source/uart.c **** static UartDef UartGPRS = {USART3, &Uart3_Rsvbuf, &Uart3_Sndbuf};
+  13:./user/source/uart.c **** 
+  14:./user/source/uart.c **** UartDef *pUartGPS = &UartGPS;
+  15:./user/source/uart.c **** UartDef *pUartGPRS = &UartGPRS;
+  16:./user/source/uart.c **** 
+  17:./user/source/uart.c **** /************************************************************
+  18:./user/source/uart.c **** * 函数名称: Uart_Write
+  19:./user/source/uart.c **** * 功能描述: 写串口，中断发送，最大发送时长delay
+  20:./user/source/uart.c **** * 输入参数: uart：系统串口  buf:存储位置   count：发送数量
+  21:./user/source/uart.c **** * 输出参数: 无
+  22:./user/source/uart.c **** * 返 回 值: > 0：实际发送的数量   -1：发送失败
+  23:./user/source/uart.c **** ****************************************************************/
+  24:./user/source/uart.c **** int32_t Uart_OnceWrite(UartDef *puart, const uint8_t *pbuf, uint32_t count, uint32_t delay)
+  25:./user/source/uart.c **** {
+  26:./user/source/uart.c ****     uint32_t sendlen = 0;
+  27:./user/source/uart.c ****     uint16_t i;
+  28:./user/source/uart.c ****     //保证count不为0，可至少开启一次发送中断
+  29:./user/source/uart.c ****     if (!count || count > uwBuf_EmpLen(puart->pSndbuf))
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 2
+
+
+  30:./user/source/uart.c ****         return -1;
+  31:./user/source/uart.c ****     for (i = 0; i < count; i++)
+  32:./user/source/uart.c ****     {
+  33:./user/source/uart.c ****         puart->pSndbuf->data[puart->pSndbuf->wr] = *(pbuf + i);
+  34:./user/source/uart.c ****         puart->pSndbuf->wr = (++puart->pSndbuf->wr) % BUF_SIZE;
+  35:./user/source/uart.c ****     }
+  36:./user/source/uart.c ****     sendlen = puart->pSndbuf->rd;
+  37:./user/source/uart.c ****     //LL_USART_EnableIT_TXE(puart->handler);
+  38:./user/source/uart.c ****     USART_ITConfig(puart->handler, USART_IT_TXE, ENABLE);
+  39:./user/source/uart.c ****     while (delay)
+  40:./user/source/uart.c ****     {
+  41:./user/source/uart.c ****         /*发送完成*/
+  42:./user/source/uart.c ****         if (!uwBuf_UnReadLen(puart->pSndbuf))
+  43:./user/source/uart.c ****             break;
+  44:./user/source/uart.c ****         if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) != 0U)
+  45:./user/source/uart.c ****         {
+  46:./user/source/uart.c ****             delay--;
+  47:./user/source/uart.c ****         }
+  48:./user/source/uart.c ****     }
+  49:./user/source/uart.c ****     /*规定时间内未发送完成，也要关闭中断*/
+  50:./user/source/uart.c ****     //LL_USART_DisableIT_TXE(puart->handler);
+  51:./user/source/uart.c ****     USART_ITConfig(puart->handler, USART_IT_TXE, DISABLE);
+  52:./user/source/uart.c ****     return (puart->pSndbuf->rd - sendlen + BUF_SIZE) % BUF_SIZE;
+  53:./user/source/uart.c **** }
+  54:./user/source/uart.c **** 
+  55:./user/source/uart.c **** /**********************************************
+  56:./user/source/uart.c ****     * 函数名称: Uart_IdleRead
+  57:./user/source/uart.c ****     * 功能描述: 读串口,字节间隔大于idleMs，或者读取数量达到count时结束接�
+  58:./user/source/uart.c ****     * 输入参数: puart：串口结构体指针  buf:存储位置   count：读取数量  idle：
+  59:./user/source/uart.c ****     * 输出参数: 无
+  60:./user/source/uart.c ****     * 返 回 值: > 0：实际读取的数量   0：无数据或count==0或错误 
+  61:./user/source/uart.c ****     ****************************************************************/
+  62:./user/source/uart.c **** uint32_t Uart_IdleRead(UartDef *puart, uint8_t *buf, uint32_t count, uint32_t idleMs)
+  63:./user/source/uart.c **** {
+  64:./user/source/uart.c ****     volatile uint32_t readlen = 0;
+  65:./user/source/uart.c ****     volatile uint32_t readlenow = 0;
+  66:./user/source/uart.c ****     volatile uint32_t idleMsCount;
+  67:./user/source/uart.c ****     uint16_t i;
+  68:./user/source/uart.c ****     /*读取数量> 0，<缓存长度*/
+  69:./user/source/uart.c ****     if (!count || count > BUF_SIZE)
+  70:./user/source/uart.c ****     {
+  71:./user/source/uart.c ****         return 0;
+  72:./user/source/uart.c ****     }
+  73:./user/source/uart.c ****     /*保证最小延时*/
+  74:./user/source/uart.c ****     if (idleMs < 0xFFFFFFFF)
+  75:./user/source/uart.c ****     {
+  76:./user/source/uart.c ****         idleMsCount = ++idleMs;
+  77:./user/source/uart.c ****     }
+  78:./user/source/uart.c ****     USART_ITConfig(puart->handler, USART_IT_RXNE, ENABLE);
+  79:./user/source/uart.c ****     readlenow = uwBuf_UnReadLen(puart->pRsvbuf);
+  80:./user/source/uart.c ****     while (readlenow < count && idleMsCount > 0)
+  81:./user/source/uart.c ****     {
+  82:./user/source/uart.c ****         /*idleMsCount计时累减*/
+  83:./user/source/uart.c ****         if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) != 0U)
+  84:./user/source/uart.c ****         {
+  85:./user/source/uart.c ****             idleMsCount--;
+  86:./user/source/uart.c ****         }
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 3
+
+
+  87:./user/source/uart.c ****         readlenow = uwBuf_UnReadLen(puart->pRsvbuf);
+  88:./user/source/uart.c ****         /*readlennow 有变化，idleMsCount重载*/
+  89:./user/source/uart.c ****         if (readlenow > readlen)
+  90:./user/source/uart.c ****         {
+  91:./user/source/uart.c ****             idleMsCount = idleMs;
+  92:./user/source/uart.c ****             readlen = readlenow;
+  93:./user/source/uart.c ****         }
+  94:./user/source/uart.c ****     }
+  95:./user/source/uart.c ****     USART_ITConfig(puart->handler, USART_IT_RXNE, DISABLE);
+  96:./user/source/uart.c ****     if (readlen)
+  97:./user/source/uart.c ****     {
+  98:./user/source/uart.c ****         /*实际读到的长度*/
+  99:./user/source/uart.c ****         readlen = (readlen < count ? readlen : count);
+ 100:./user/source/uart.c ****         for (i = 0; i < readlen; i++)
+ 101:./user/source/uart.c ****         {
+ 102:./user/source/uart.c ****             *(buf + i) = puart->pRsvbuf->data[puart->pRsvbuf->rd];
+ 103:./user/source/uart.c ****             puart->pRsvbuf->rd = (++puart->pRsvbuf->rd) % BUF_SIZE;
+ 104:./user/source/uart.c ****         }
+ 105:./user/source/uart.c ****     }
+ 106:./user/source/uart.c ****     return readlen;
+ 107:./user/source/uart.c **** }
+ 108:./user/source/uart.c **** 
+ 109:./user/source/uart.c **** /**********************************************
+ 110:./user/source/uart.c ****     * 函数名称: Uart_OnceRead
+ 111:./user/source/uart.c ****     * 功能描述: 读串口,读到指定数量或读取时间超时后退出
+ 112:./user/source/uart.c ****     * 输入参数: puart：串口结构体指针  buf:存储位置   count：读取数量  delay�
+ 113:./user/source/uart.c ****     * 输出参数: 无
+ 114:./user/source/uart.c ****     * 返 回 值: > 0：实际读取的数量   0：无数据或count==0或错误 
+ 115:./user/source/uart.c ****     ****************************************************************/
+ 116:./user/source/uart.c **** uint32_t Uart_OnceRead(UartDef *puart, uint8_t *buf, uint32_t count, uint32_t delay)
+ 117:./user/source/uart.c **** {
+ 118:./user/source/uart.c ****     volatile uint32_t readlen = 0;
+ 119:./user/source/uart.c ****     uint16_t i;
+ 120:./user/source/uart.c ****     /*读取数量> 0，<缓存长度*/
+ 121:./user/source/uart.c ****     if (!count || count > BUF_SIZE)
+ 122:./user/source/uart.c ****     {
+ 123:./user/source/uart.c ****         return 0;
+ 124:./user/source/uart.c ****     }
+ 125:./user/source/uart.c ****     //USART_ITConfig(puart->handler, USART_IT_RXNE, ENABLE);
+ 126:./user/source/uart.c ****     readlen = uwBuf_UnReadLen(puart->pRsvbuf);
+ 127:./user/source/uart.c ****     while (delay)
+ 128:./user/source/uart.c ****     {
+ 129:./user/source/uart.c ****         readlen = uwBuf_UnReadLen(puart->pRsvbuf);
+ 130:./user/source/uart.c ****         /*多余的字节本次丢弃，并调用BufClear防止后面再读取*/
+ 131:./user/source/uart.c ****         if (readlen >= count)
+ 132:./user/source/uart.c ****             break;
+ 133:./user/source/uart.c ****         if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) != 0U)
+ 134:./user/source/uart.c ****         {
+ 135:./user/source/uart.c ****             delay--;
+ 136:./user/source/uart.c ****         }
+ 137:./user/source/uart.c ****     }
+ 138:./user/source/uart.c ****     //USART_ITConfig(puart->handler, USART_IT_RXNE, DISABLE);
+ 139:./user/source/uart.c ****     if (readlen)
+ 140:./user/source/uart.c ****     {
+ 141:./user/source/uart.c ****         /*实际读到的长度*/
+ 142:./user/source/uart.c ****         readlen = (readlen < count ? readlen : count);
+ 143:./user/source/uart.c ****         for (i = 0; i < readlen; i++)
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 4
+
+
+ 144:./user/source/uart.c ****         {
+ 145:./user/source/uart.c ****             *(buf + i) = puart->pRsvbuf->data[puart->pRsvbuf->rd];
+ 146:./user/source/uart.c ****             puart->pRsvbuf->rd = (++puart->pRsvbuf->rd) % BUF_SIZE;
+ 147:./user/source/uart.c ****         }
+ 148:./user/source/uart.c ****     }
+ 149:./user/source/uart.c ****     return readlen;
+ 150:./user/source/uart.c **** }
+ 151:./user/source/uart.c **** 
+ 152:./user/source/uart.c **** /***************************************************************
+ 153:./user/source/uart.c **** * 函数名称: Uart_Send
+ 154:./user/source/uart.c **** * 功能描述: 写串口
+ 155:./user/source/uart.c **** * 输入参数: uart：系统串口  buf:存储位置   count：发送数量
+ 156:./user/source/uart.c **** * 输出参数: 无
+ 157:./user/source/uart.c **** * 返 回 值: > 0：实际发送的数量   -1：发送失败
+ 158:./user/source/uart.c **** ****************************************************************/
+ 159:./user/source/uart.c **** 
+ 160:./user/source/uart.c **** void Uart_Write(UartDef *puart, const uint8_t *pbuf, uint32_t count)
+ 161:./user/source/uart.c **** {
+ 162:./user/source/uart.c ****     //uint32_t sendlen = 0;
+ 163:./user/source/uart.c ****     uint16_t i;
+ 164:./user/source/uart.c ****     //保证count不为0，可至少开启一次发送中断
+ 165:./user/source/uart.c ****     if (!count || count > uwBuf_EmpLen(puart->pSndbuf))
+ 166:./user/source/uart.c ****         return;
+ 167:./user/source/uart.c ****     for (i = 0; i < count; i++)
+ 168:./user/source/uart.c ****     {
+ 169:./user/source/uart.c ****         puart->pSndbuf->data[puart->pSndbuf->wr] = *(pbuf + i);
+ 170:./user/source/uart.c ****         puart->pSndbuf->wr = (++puart->pSndbuf->wr) % BUF_SIZE;
+ 171:./user/source/uart.c ****     }
+ 172:./user/source/uart.c ****     //sendlen = puart->pSndbuf->rd;
+ 173:./user/source/uart.c ****     USART_ITConfig(puart->handler, USART_IT_TXE, ENABLE);
+ 174:./user/source/uart.c **** }
+ 175:./user/source/uart.c **** 
+ 176:./user/source/uart.c **** /**********************************************
+ 177:./user/source/uart.c ****     * 函数名称: Uart_Read
+ 178:./user/source/uart.c ****     * 功能描述: 读串口，直接从缓存读取，缓存自动接收
+ 179:./user/source/uart.c ****     * 输入参数: puart：串口结构体指针  buf:存储位置   count：读取数量
+ 180:./user/source/uart.c ****     * 输出参数: 无
+ 181:./user/source/uart.c ****     * 返 回 值: > 0：实际读取的数量   0：无数据或count==0或错误 
+ 182:./user/source/uart.c ****     ****************************************************************/
+ 183:./user/source/uart.c **** uint32_t Uart_Read(UartDef *puart, uint8_t *buf, uint32_t count)
+ 184:./user/source/uart.c **** {
+ 185:./user/source/uart.c ****     volatile uint32_t readlen = 0;
+ 186:./user/source/uart.c ****     uint16_t i;
+ 187:./user/source/uart.c ****     if (!count || count > 0xFFFF)
+ 188:./user/source/uart.c ****         return 0;
+ 189:./user/source/uart.c ****     readlen = uwBuf_UnReadLen(puart->pRsvbuf);
+ 190:./user/source/uart.c ****     if (readlen)
+ 191:./user/source/uart.c ****     {
+ 192:./user/source/uart.c ****         /*实际读到的长度*/
+ 193:./user/source/uart.c ****         readlen = (readlen < count ? readlen : count);
+ 194:./user/source/uart.c **** 
+ 195:./user/source/uart.c ****         for (i = 0; i < readlen; i++)
+ 196:./user/source/uart.c ****         {
+ 197:./user/source/uart.c ****             *(buf + i) = puart->pRsvbuf->data[puart->pRsvbuf->rd];
+ 198:./user/source/uart.c ****             puart->pRsvbuf->rd = (++puart->pRsvbuf->rd) % BUF_SIZE;
+ 199:./user/source/uart.c ****         }
+ 200:./user/source/uart.c ****     }
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 5
+
+
+ 201:./user/source/uart.c ****     return readlen;
+ 202:./user/source/uart.c **** }
+ 203:./user/source/uart.c **** /**********************************************
+ 204:./user/source/uart.c **** * 函数名称: Uart_ReadITEnable
+ 205:./user/source/uart.c **** * 功能描述: 串口Idle中断方式连续接收是否使能
+ 206:./user/source/uart.c **** * 输入参数: puart：串口结构体指针 cmd:EN/DEN 
+ 207:./user/source/uart.c **** * 输出参数: 
+ 208:./user/source/uart.c **** * 返 回 值: 
+ 209:./user/source/uart.c **** ****************************************************************/
+ 210:./user/source/uart.c **** void Uart_ITReadEnable(UartDef *puart)
+ 211:./user/source/uart.c **** {
+  30              		.loc 1 211 0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              	.LVL0:
+  35 0000 38B5     		push	{r3, r4, r5, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 16
+  38              		.cfi_offset 3, -16
+  39              		.cfi_offset 4, -12
+  40              		.cfi_offset 5, -8
+  41              		.cfi_offset 14, -4
+  42 0002 0446     		mov	r4, r0
+ 212:./user/source/uart.c ****     USART_ITConfig(puart->handler, USART_IT_RXNE, ENABLE);
+  43              		.loc 1 212 0
+  44 0004 0122     		movs	r2, #1
+  45 0006 0849     		ldr	r1, .L3
+  46 0008 0068     		ldr	r0, [r0]
+  47              	.LVL1:
+  48 000a FFF7FEFF 		bl	USART_ITConfig
+  49              	.LVL2:
+ 213:./user/source/uart.c ****     USART_ClearITPendingBit(puart->handler, USART_IT_IDLE);
+  50              		.loc 1 213 0
+  51 000e 074D     		ldr	r5, .L3+4
+  52 0010 2946     		mov	r1, r5
+  53 0012 2068     		ldr	r0, [r4]
+  54 0014 FFF7FEFF 		bl	USART_ClearITPendingBit
+  55              	.LVL3:
+ 214:./user/source/uart.c ****     puart->handler->ISR;
+  56              		.loc 1 214 0
+  57 0018 2068     		ldr	r0, [r4]
+  58 001a C369     		ldr	r3, [r0, #28]
+ 215:./user/source/uart.c ****     USART_ITConfig(puart->handler, USART_IT_IDLE, ENABLE);
+  59              		.loc 1 215 0
+  60 001c 0122     		movs	r2, #1
+  61 001e 2946     		mov	r1, r5
+  62 0020 FFF7FEFF 		bl	USART_ITConfig
+  63              	.LVL4:
+  64 0024 38BD     		pop	{r3, r4, r5, pc}
+  65              	.LVL5:
+  66              	.L4:
+  67 0026 00BF     		.align	2
+  68              	.L3:
+  69 0028 05010500 		.word	327941
+  70 002c 04010400 		.word	262404
+  71              		.cfi_endproc
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 6
+
+
+  72              	.LFE116:
+  74              		.section	.text.Uart_ITReadDisable,"ax",%progbits
+  75              		.align	2
+  76              		.global	Uart_ITReadDisable
+  77              		.thumb
+  78              		.thumb_func
+  80              	Uart_ITReadDisable:
+  81              	.LFB117:
+ 216:./user/source/uart.c **** }
+ 217:./user/source/uart.c **** /**********************************************
+ 218:./user/source/uart.c **** * 函数名称: Uart_ReadITdisable
+ 219:./user/source/uart.c **** * 功能描述: 串口Idle中断方式连续接收是否使能
+ 220:./user/source/uart.c **** * 输入参数: puart：串口结构体指针 cmd:EN/DEN 
+ 221:./user/source/uart.c **** * 输出参数: 
+ 222:./user/source/uart.c **** * 返 回 值: 
+ 223:./user/source/uart.c **** ****************************************************************/
+ 224:./user/source/uart.c **** void Uart_ITReadDisable(UartDef *puart)
+ 225:./user/source/uart.c **** {
+  82              		.loc 1 225 0
+  83              		.cfi_startproc
+  84              		@ args = 0, pretend = 0, frame = 0
+  85              		@ frame_needed = 0, uses_anonymous_args = 0
+  86              	.LVL6:
+  87 0000 38B5     		push	{r3, r4, r5, lr}
+  88              	.LCFI1:
+  89              		.cfi_def_cfa_offset 16
+  90              		.cfi_offset 3, -16
+  91              		.cfi_offset 4, -12
+  92              		.cfi_offset 5, -8
+  93              		.cfi_offset 14, -4
+  94 0002 0446     		mov	r4, r0
+ 226:./user/source/uart.c ****     USART_ITConfig(puart->handler, USART_IT_RXNE, DISABLE);
+  95              		.loc 1 226 0
+  96 0004 0022     		movs	r2, #0
+  97 0006 0849     		ldr	r1, .L7
+  98 0008 0068     		ldr	r0, [r0]
+  99              	.LVL7:
+ 100 000a FFF7FEFF 		bl	USART_ITConfig
+ 101              	.LVL8:
+ 227:./user/source/uart.c ****     USART_ITConfig(puart->handler, USART_IT_IDLE, DISABLE);
+ 102              		.loc 1 227 0
+ 103 000e 074D     		ldr	r5, .L7+4
+ 104 0010 0022     		movs	r2, #0
+ 105 0012 2946     		mov	r1, r5
+ 106 0014 2068     		ldr	r0, [r4]
+ 107 0016 FFF7FEFF 		bl	USART_ITConfig
+ 108              	.LVL9:
+ 228:./user/source/uart.c ****     USART_ClearITPendingBit(puart->handler, USART_IT_IDLE);
+ 109              		.loc 1 228 0
+ 110 001a 2946     		mov	r1, r5
+ 111 001c 2068     		ldr	r0, [r4]
+ 112 001e FFF7FEFF 		bl	USART_ClearITPendingBit
+ 113              	.LVL10:
+ 229:./user/source/uart.c ****     puart->handler->ISR;
+ 114              		.loc 1 229 0
+ 115 0022 2368     		ldr	r3, [r4]
+ 116 0024 DB69     		ldr	r3, [r3, #28]
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 7
+
+
+ 117 0026 38BD     		pop	{r3, r4, r5, pc}
+ 118              	.LVL11:
+ 119              	.L8:
+ 120              		.align	2
+ 121              	.L7:
+ 122 0028 05010500 		.word	327941
+ 123 002c 04010400 		.word	262404
+ 124              		.cfi_endproc
+ 125              	.LFE117:
+ 127              		.section	.text.uwBuf_EmpLen,"ax",%progbits
+ 128              		.align	2
+ 129              		.global	uwBuf_EmpLen
+ 130              		.thumb
+ 131              		.thumb_func
+ 133              	uwBuf_EmpLen:
+ 134              	.LFB118:
+ 230:./user/source/uart.c **** }
+ 231:./user/source/uart.c **** 
+ 232:./user/source/uart.c **** /*******************************************************
+ 233:./user/source/uart.c **** * 功    能：查询驱动层缓存剩余空间
+ 234:./user/source/uart.c **** * 输    入：数据缓存结构体地址
+ 235:./user/source/uart.c **** * 输    出：uint32_t
+ 236:./user/source/uart.c **** *           
+ 237:./user/source/uart.c **** * 编 写 人：
+ 238:./user/source/uart.c **** * 编写日期：2018年9月7日11:04:55
+ 239:./user/source/uart.c **** **********************************************************************/
+ 240:./user/source/uart.c **** uint32_t uwBuf_EmpLen(const struct ucbuf *buf)
+ 241:./user/source/uart.c **** {
+ 135              		.loc 1 241 0
+ 136              		.cfi_startproc
+ 137              		@ args = 0, pretend = 0, frame = 0
+ 138              		@ frame_needed = 0, uses_anonymous_args = 0
+ 139              		@ link register save eliminated.
+ 140              	.LVL12:
+ 141 0000 30B4     		push	{r4, r5}
+ 142              	.LCFI2:
+ 143              		.cfi_def_cfa_offset 8
+ 144              		.cfi_offset 4, -8
+ 145              		.cfi_offset 5, -4
+ 242:./user/source/uart.c ****     /*return ((buf->rd + BUF_SIZE - buf->wr) % BUF_SIZE -1);*/
+ 243:./user/source/uart.c ****     return ((buf->rd + BUF_SIZE - buf->wr - 1) % BUF_SIZE);
+ 146              		.loc 1 243 0
+ 147 0002 D0F80034 		ldr	r3, [r0, #1024]
+ 148 0006 D0F80404 		ldr	r0, [r0, #1028]
+ 149              	.LVL13:
+ 150 000a 181A     		subs	r0, r3, r0
+ 151 000c 00F2FE30 		addw	r0, r0, #1022
+ 152 0010 054C     		ldr	r4, .L11
+ 153 0012 A0FB0445 		umull	r4, r5, r0, r4
+ 154 0016 431B     		subs	r3, r0, r5
+ 155 0018 05EB5303 		add	r3, r5, r3, lsr #1
+ 156 001c 5B0A     		lsrs	r3, r3, #9
+ 157 001e C3EB8323 		rsb	r3, r3, r3, lsl #10
+ 244:./user/source/uart.c **** }
+ 158              		.loc 1 244 0
+ 159 0022 C01A     		subs	r0, r0, r3
+ 160 0024 30BC     		pop	{r4, r5}
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 8
+
+
+ 161              	.LCFI3:
+ 162              		.cfi_restore 5
+ 163              		.cfi_restore 4
+ 164              		.cfi_def_cfa_offset 0
+ 165 0026 7047     		bx	lr
+ 166              	.L12:
+ 167              		.align	2
+ 168              	.L11:
+ 169 0028 05104000 		.word	4198405
+ 170              		.cfi_endproc
+ 171              	.LFE118:
+ 173              		.section	.text.Uart_Write,"ax",%progbits
+ 174              		.align	2
+ 175              		.global	Uart_Write
+ 176              		.thumb
+ 177              		.thumb_func
+ 179              	Uart_Write:
+ 180              	.LFB114:
+ 161:./user/source/uart.c ****     //uint32_t sendlen = 0;
+ 181              		.loc 1 161 0
+ 182              		.cfi_startproc
+ 183              		@ args = 0, pretend = 0, frame = 0
+ 184              		@ frame_needed = 0, uses_anonymous_args = 0
+ 185              	.LVL14:
+ 165:./user/source/uart.c ****         return;
+ 186              		.loc 1 165 0
+ 187 0000 52B3     		cbz	r2, .L18
+ 161:./user/source/uart.c ****     //uint32_t sendlen = 0;
+ 188              		.loc 1 161 0 discriminator 1
+ 189 0002 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 190              	.LCFI4:
+ 191              		.cfi_def_cfa_offset 24
+ 192              		.cfi_offset 3, -24
+ 193              		.cfi_offset 4, -20
+ 194              		.cfi_offset 5, -16
+ 195              		.cfi_offset 6, -12
+ 196              		.cfi_offset 7, -8
+ 197              		.cfi_offset 14, -4
+ 198 0004 1646     		mov	r6, r2
+ 199 0006 0F46     		mov	r7, r1
+ 200 0008 0546     		mov	r5, r0
+ 165:./user/source/uart.c ****         return;
+ 201              		.loc 1 165 0 discriminator 1
+ 202 000a 8068     		ldr	r0, [r0, #8]
+ 203              	.LVL15:
+ 204 000c FFF7FEFF 		bl	uwBuf_EmpLen
+ 205              	.LVL16:
+ 206 0010 8642     		cmp	r6, r0
+ 207 0012 20D8     		bhi	.L13
+ 208 0014 0024     		movs	r4, #0
+ 209 0016 17E0     		b	.L15
+ 210              	.LVL17:
+ 211              	.L16:
+ 169:./user/source/uart.c ****         puart->pSndbuf->wr = (++puart->pSndbuf->wr) % BUF_SIZE;
+ 212              		.loc 1 169 0 discriminator 3
+ 213 0018 AB68     		ldr	r3, [r5, #8]
+ 214 001a D3F80424 		ldr	r2, [r3, #1028]
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 9
+
+
+ 215 001e 395D     		ldrb	r1, [r7, r4]	@ zero_extendqisi2
+ 216 0020 9954     		strb	r1, [r3, r2]
+ 170:./user/source/uart.c ****     }
+ 217              		.loc 1 170 0 discriminator 3
+ 218 0022 D5F808E0 		ldr	lr, [r5, #8]
+ 219 0026 DEF80424 		ldr	r2, [lr, #1028]
+ 220 002a 0132     		adds	r2, r2, #1
+ 221 002c 0B48     		ldr	r0, .L19
+ 222 002e A2FB0001 		umull	r0, r1, r2, r0
+ 223 0032 531A     		subs	r3, r2, r1
+ 224 0034 01EB5303 		add	r3, r1, r3, lsr #1
+ 225 0038 5B0A     		lsrs	r3, r3, #9
+ 226 003a C3EB8323 		rsb	r3, r3, r3, lsl #10
+ 227 003e D31A     		subs	r3, r2, r3
+ 228 0040 CEF80434 		str	r3, [lr, #1028]
+ 167:./user/source/uart.c ****     {
+ 229              		.loc 1 167 0 discriminator 3
+ 230 0044 0134     		adds	r4, r4, #1
+ 231              	.LVL18:
+ 232 0046 A4B2     		uxth	r4, r4
+ 233              	.LVL19:
+ 234              	.L15:
+ 167:./user/source/uart.c ****     {
+ 235              		.loc 1 167 0 is_stmt 0 discriminator 1
+ 236 0048 A642     		cmp	r6, r4
+ 237 004a E5D8     		bhi	.L16
+ 173:./user/source/uart.c **** }
+ 238              		.loc 1 173 0 is_stmt 1
+ 239 004c 0122     		movs	r2, #1
+ 240 004e 0449     		ldr	r1, .L19+4
+ 241 0050 2868     		ldr	r0, [r5]
+ 242 0052 FFF7FEFF 		bl	USART_ITConfig
+ 243              	.LVL20:
+ 244              	.L13:
+ 245 0056 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 246              	.LVL21:
+ 247              	.L18:
+ 248              	.LCFI5:
+ 249              		.cfi_def_cfa_offset 0
+ 250              		.cfi_restore 3
+ 251              		.cfi_restore 4
+ 252              		.cfi_restore 5
+ 253              		.cfi_restore 6
+ 254              		.cfi_restore 7
+ 255              		.cfi_restore 14
+ 256 0058 7047     		bx	lr
+ 257              	.L20:
+ 258 005a 00BF     		.align	2
+ 259              	.L19:
+ 260 005c 05104000 		.word	4198405
+ 261 0060 07010700 		.word	459015
+ 262              		.cfi_endproc
+ 263              	.LFE114:
+ 265              		.section	.text.uwBuf_UnReadLen,"ax",%progbits
+ 266              		.align	2
+ 267              		.global	uwBuf_UnReadLen
+ 268              		.thumb
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 10
+
+
+ 269              		.thumb_func
+ 271              	uwBuf_UnReadLen:
+ 272              	.LFB119:
+ 245:./user/source/uart.c **** /********************************************************************
+ 246:./user/source/uart.c **** * 功    能：查询缓存中未读的字节数
+ 247:./user/source/uart.c **** * 输    入：数据缓存结构体地址
+ 248:./user/source/uart.c **** * 输    出：uint32_t
+ 249:./user/source/uart.c **** *          
+ 250:./user/source/uart.c **** * 编 写 人：
+ 251:./user/source/uart.c **** * 编写日期：2016.6.28
+ 252:./user/source/uart.c **** **********************************************************************/
+ 253:./user/source/uart.c **** uint32_t uwBuf_UnReadLen(const struct ucbuf *buf)
+ 254:./user/source/uart.c **** {
+ 273              		.loc 1 254 0
+ 274              		.cfi_startproc
+ 275              		@ args = 0, pretend = 0, frame = 0
+ 276              		@ frame_needed = 0, uses_anonymous_args = 0
+ 277              		@ link register save eliminated.
+ 278              	.LVL22:
+ 279 0000 30B4     		push	{r4, r5}
+ 280              	.LCFI6:
+ 281              		.cfi_def_cfa_offset 8
+ 282              		.cfi_offset 4, -8
+ 283              		.cfi_offset 5, -4
+ 255:./user/source/uart.c ****     return (buf->wr - buf->rd + BUF_SIZE) % BUF_SIZE;
+ 284              		.loc 1 255 0
+ 285 0002 D0F80434 		ldr	r3, [r0, #1028]
+ 286 0006 D0F80004 		ldr	r0, [r0, #1024]
+ 287              	.LVL23:
+ 288 000a 181A     		subs	r0, r3, r0
+ 289 000c 00F2FF30 		addw	r0, r0, #1023
+ 290 0010 054C     		ldr	r4, .L23
+ 291 0012 A0FB0445 		umull	r4, r5, r0, r4
+ 292 0016 431B     		subs	r3, r0, r5
+ 293 0018 05EB5303 		add	r3, r5, r3, lsr #1
+ 294 001c 5B0A     		lsrs	r3, r3, #9
+ 295 001e C3EB8323 		rsb	r3, r3, r3, lsl #10
+ 256:./user/source/uart.c **** }
+ 296              		.loc 1 256 0
+ 297 0022 C01A     		subs	r0, r0, r3
+ 298 0024 30BC     		pop	{r4, r5}
+ 299              	.LCFI7:
+ 300              		.cfi_restore 5
+ 301              		.cfi_restore 4
+ 302              		.cfi_def_cfa_offset 0
+ 303 0026 7047     		bx	lr
+ 304              	.L24:
+ 305              		.align	2
+ 306              	.L23:
+ 307 0028 05104000 		.word	4198405
+ 308              		.cfi_endproc
+ 309              	.LFE119:
+ 311              		.section	.text.Uart_OnceWrite,"ax",%progbits
+ 312              		.align	2
+ 313              		.global	Uart_OnceWrite
+ 314              		.thumb
+ 315              		.thumb_func
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 11
+
+
+ 317              	Uart_OnceWrite:
+ 318              	.LFB111:
+  25:./user/source/uart.c ****     uint32_t sendlen = 0;
+ 319              		.loc 1 25 0
+ 320              		.cfi_startproc
+ 321              		@ args = 0, pretend = 0, frame = 0
+ 322              		@ frame_needed = 0, uses_anonymous_args = 0
+ 323              	.LVL24:
+  29:./user/source/uart.c ****         return -1;
+ 324              		.loc 1 29 0
+ 325 0000 002A     		cmp	r2, #0
+ 326 0002 53D0     		beq	.L33
+  25:./user/source/uart.c ****     uint32_t sendlen = 0;
+ 327              		.loc 1 25 0 discriminator 1
+ 328 0004 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 329              	.LCFI8:
+ 330              		.cfi_def_cfa_offset 24
+ 331              		.cfi_offset 3, -24
+ 332              		.cfi_offset 4, -20
+ 333              		.cfi_offset 5, -16
+ 334              		.cfi_offset 6, -12
+ 335              		.cfi_offset 7, -8
+ 336              		.cfi_offset 14, -4
+ 337 0006 0446     		mov	r4, r0
+ 338 0008 0F46     		mov	r7, r1
+ 339 000a 1D46     		mov	r5, r3
+ 340 000c 1646     		mov	r6, r2
+  29:./user/source/uart.c ****         return -1;
+ 341              		.loc 1 29 0 discriminator 1
+ 342 000e 8068     		ldr	r0, [r0, #8]
+ 343              	.LVL25:
+ 344 0010 FFF7FEFF 		bl	uwBuf_EmpLen
+ 345              	.LVL26:
+ 346 0014 8642     		cmp	r6, r0
+ 347 0016 4CD8     		bhi	.L34
+ 348 0018 0022     		movs	r2, #0
+ 349 001a 1AE0     		b	.L27
+ 350              	.LVL27:
+ 351              	.L28:
+  33:./user/source/uart.c ****         puart->pSndbuf->wr = (++puart->pSndbuf->wr) % BUF_SIZE;
+ 352              		.loc 1 33 0 discriminator 3
+ 353 001c A368     		ldr	r3, [r4, #8]
+ 354 001e D3F80414 		ldr	r1, [r3, #1028]
+ 355 0022 B85C     		ldrb	r0, [r7, r2]	@ zero_extendqisi2
+ 356 0024 5854     		strb	r0, [r3, r1]
+  34:./user/source/uart.c ****     }
+ 357              		.loc 1 34 0 discriminator 3
+ 358 0026 D4F808C0 		ldr	ip, [r4, #8]
+ 359 002a DCF80434 		ldr	r3, [ip, #1028]
+ 360 002e 03F1010E 		add	lr, r3, #1
+ 361 0032 2148     		ldr	r0, .L36
+ 362 0034 AEFB0001 		umull	r0, r1, lr, r0
+ 363 0038 C1EB0E03 		rsb	r3, r1, lr
+ 364 003c 01EB5303 		add	r3, r1, r3, lsr #1
+ 365 0040 5B0A     		lsrs	r3, r3, #9
+ 366 0042 C3EB8323 		rsb	r3, r3, r3, lsl #10
+ 367 0046 C3EB0E03 		rsb	r3, r3, lr
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 12
+
+
+ 368 004a CCF80434 		str	r3, [ip, #1028]
+  31:./user/source/uart.c ****     {
+ 369              		.loc 1 31 0 discriminator 3
+ 370 004e 0132     		adds	r2, r2, #1
+ 371              	.LVL28:
+ 372 0050 92B2     		uxth	r2, r2
+ 373              	.LVL29:
+ 374              	.L27:
+  31:./user/source/uart.c ****     {
+ 375              		.loc 1 31 0 is_stmt 0 discriminator 1
+ 376 0052 9642     		cmp	r6, r2
+ 377 0054 E2D8     		bhi	.L28
+  36:./user/source/uart.c ****     //LL_USART_EnableIT_TXE(puart->handler);
+ 378              		.loc 1 36 0 is_stmt 1
+ 379 0056 A368     		ldr	r3, [r4, #8]
+ 380 0058 D3F80064 		ldr	r6, [r3, #1024]
+ 381              	.LVL30:
+  38:./user/source/uart.c ****     while (delay)
+ 382              		.loc 1 38 0
+ 383 005c 0122     		movs	r2, #1
+ 384              	.LVL31:
+ 385 005e 1749     		ldr	r1, .L36+4
+ 386 0060 2068     		ldr	r0, [r4]
+ 387 0062 FFF7FEFF 		bl	USART_ITConfig
+ 388              	.LVL32:
+  39:./user/source/uart.c ****     {
+ 389              		.loc 1 39 0
+ 390 0066 09E0     		b	.L31
+ 391              	.L32:
+  42:./user/source/uart.c ****             break;
+ 392              		.loc 1 42 0
+ 393 0068 A068     		ldr	r0, [r4, #8]
+ 394 006a FFF7FEFF 		bl	uwBuf_UnReadLen
+ 395              	.LVL33:
+ 396 006e 38B1     		cbz	r0, .L30
+  44:./user/source/uart.c ****         {
+ 397              		.loc 1 44 0
+ 398 0070 134B     		ldr	r3, .L36+8
+ 399 0072 1B68     		ldr	r3, [r3]
+ 400 0074 13F4803F 		tst	r3, #65536
+ 401 0078 00D0     		beq	.L31
+  46:./user/source/uart.c ****         }
+ 402              		.loc 1 46 0
+ 403 007a 013D     		subs	r5, r5, #1
+ 404              	.LVL34:
+ 405              	.L31:
+  39:./user/source/uart.c ****     {
+ 406              		.loc 1 39 0
+ 407 007c 002D     		cmp	r5, #0
+ 408 007e F3D1     		bne	.L32
+ 409              	.L30:
+  51:./user/source/uart.c ****     return (puart->pSndbuf->rd - sendlen + BUF_SIZE) % BUF_SIZE;
+ 410              		.loc 1 51 0
+ 411 0080 0022     		movs	r2, #0
+ 412 0082 0E49     		ldr	r1, .L36+4
+ 413 0084 2068     		ldr	r0, [r4]
+ 414 0086 FFF7FEFF 		bl	USART_ITConfig
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 13
+
+
+ 415              	.LVL35:
+  52:./user/source/uart.c **** }
+ 416              		.loc 1 52 0
+ 417 008a A368     		ldr	r3, [r4, #8]
+ 418 008c D3F80034 		ldr	r3, [r3, #1024]
+ 419 0090 9B1B     		subs	r3, r3, r6
+ 420 0092 03F2FF33 		addw	r3, r3, #1023
+ 421 0096 0848     		ldr	r0, .L36
+ 422 0098 A3FB0001 		umull	r0, r1, r3, r0
+ 423 009c 5A1A     		subs	r2, r3, r1
+ 424 009e 01EB5202 		add	r2, r1, r2, lsr #1
+ 425 00a2 520A     		lsrs	r2, r2, #9
+ 426 00a4 C2EB8222 		rsb	r2, r2, r2, lsl #10
+ 427 00a8 981A     		subs	r0, r3, r2
+ 428 00aa F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 429              	.LVL36:
+ 430              	.L33:
+ 431              	.LCFI9:
+ 432              		.cfi_def_cfa_offset 0
+ 433              		.cfi_restore 3
+ 434              		.cfi_restore 4
+ 435              		.cfi_restore 5
+ 436              		.cfi_restore 6
+ 437              		.cfi_restore 7
+ 438              		.cfi_restore 14
+  30:./user/source/uart.c ****     for (i = 0; i < count; i++)
+ 439              		.loc 1 30 0
+ 440 00ac 4FF0FF30 		mov	r0, #-1
+ 441              	.LVL37:
+  53:./user/source/uart.c **** 
+ 442              		.loc 1 53 0
+ 443 00b0 7047     		bx	lr
+ 444              	.LVL38:
+ 445              	.L34:
+ 446              	.LCFI10:
+ 447              		.cfi_def_cfa_offset 24
+ 448              		.cfi_offset 3, -24
+ 449              		.cfi_offset 4, -20
+ 450              		.cfi_offset 5, -16
+ 451              		.cfi_offset 6, -12
+ 452              		.cfi_offset 7, -8
+ 453              		.cfi_offset 14, -4
+  30:./user/source/uart.c ****     for (i = 0; i < count; i++)
+ 454              		.loc 1 30 0
+ 455 00b2 4FF0FF30 		mov	r0, #-1
+  53:./user/source/uart.c **** 
+ 456              		.loc 1 53 0
+ 457 00b6 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 458              	.LVL39:
+ 459              	.L37:
+ 460              		.align	2
+ 461              	.L36:
+ 462 00b8 05104000 		.word	4198405
+ 463 00bc 07010700 		.word	459015
+ 464 00c0 10E000E0 		.word	-536813552
+ 465              		.cfi_endproc
+ 466              	.LFE111:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 14
+
+
+ 468              		.section	.text.Uart_IdleRead,"ax",%progbits
+ 469              		.align	2
+ 470              		.global	Uart_IdleRead
+ 471              		.thumb
+ 472              		.thumb_func
+ 474              	Uart_IdleRead:
+ 475              	.LFB112:
+  63:./user/source/uart.c ****     volatile uint32_t readlen = 0;
+ 476              		.loc 1 63 0
+ 477              		.cfi_startproc
+ 478              		@ args = 0, pretend = 0, frame = 16
+ 479              		@ frame_needed = 0, uses_anonymous_args = 0
+ 480              	.LVL40:
+ 481 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 482              	.LCFI11:
+ 483              		.cfi_def_cfa_offset 24
+ 484              		.cfi_offset 4, -24
+ 485              		.cfi_offset 5, -20
+ 486              		.cfi_offset 6, -16
+ 487              		.cfi_offset 7, -12
+ 488              		.cfi_offset 8, -8
+ 489              		.cfi_offset 14, -4
+ 490 0004 84B0     		sub	sp, sp, #16
+ 491              	.LCFI12:
+ 492              		.cfi_def_cfa_offset 40
+ 493 0006 1646     		mov	r6, r2
+ 494 0008 9846     		mov	r8, r3
+  64:./user/source/uart.c ****     volatile uint32_t readlenow = 0;
+ 495              		.loc 1 64 0
+ 496 000a 0023     		movs	r3, #0
+ 497              	.LVL41:
+ 498 000c 0393     		str	r3, [sp, #12]
+  65:./user/source/uart.c ****     volatile uint32_t idleMsCount;
+ 499              		.loc 1 65 0
+ 500 000e 0293     		str	r3, [sp, #8]
+  69:./user/source/uart.c ****     {
+ 501              		.loc 1 69 0
+ 502 0010 013A     		subs	r2, r2, #1
+ 503              	.LVL42:
+ 504 0012 40F2FE33 		movw	r3, #1022
+ 505 0016 9A42     		cmp	r2, r3
+ 506 0018 57D8     		bhi	.L50
+ 507 001a 0446     		mov	r4, r0
+ 508 001c 0D46     		mov	r5, r1
+  74:./user/source/uart.c ****     {
+ 509              		.loc 1 74 0
+ 510 001e B8F1FF3F 		cmp	r8, #-1
+ 511 0022 03D0     		beq	.L40
+  76:./user/source/uart.c ****     }
+ 512              		.loc 1 76 0
+ 513 0024 08F10108 		add	r8, r8, #1
+ 514              	.LVL43:
+ 515 0028 CDF80480 		str	r8, [sp, #4]
+ 516              	.L40:
+  78:./user/source/uart.c ****     readlenow = uwBuf_UnReadLen(puart->pRsvbuf);
+ 517              		.loc 1 78 0
+ 518 002c 0122     		movs	r2, #1
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 15
+
+
+ 519 002e 2949     		ldr	r1, .L53
+ 520              	.LVL44:
+ 521 0030 2068     		ldr	r0, [r4]
+ 522              	.LVL45:
+ 523 0032 FFF7FEFF 		bl	USART_ITConfig
+ 524              	.LVL46:
+  79:./user/source/uart.c ****     while (readlenow < count && idleMsCount > 0)
+ 525              		.loc 1 79 0
+ 526 0036 6768     		ldr	r7, [r4, #4]
+ 527 0038 3846     		mov	r0, r7
+ 528 003a FFF7FEFF 		bl	uwBuf_UnReadLen
+ 529              	.LVL47:
+ 530 003e 0290     		str	r0, [sp, #8]
+  80:./user/source/uart.c ****     {
+ 531              		.loc 1 80 0
+ 532 0040 13E0     		b	.L43
+ 533              	.L45:
+  83:./user/source/uart.c ****         {
+ 534              		.loc 1 83 0
+ 535 0042 254B     		ldr	r3, .L53+4
+ 536 0044 1B68     		ldr	r3, [r3]
+ 537 0046 13F4803F 		tst	r3, #65536
+ 538 004a 02D0     		beq	.L42
+  85:./user/source/uart.c ****         }
+ 539              		.loc 1 85 0
+ 540 004c 019B     		ldr	r3, [sp, #4]
+ 541 004e 013B     		subs	r3, r3, #1
+ 542 0050 0193     		str	r3, [sp, #4]
+ 543              	.L42:
+  87:./user/source/uart.c ****         /*readlennow 有变化，idleMsCount重载*/
+ 544              		.loc 1 87 0
+ 545 0052 3846     		mov	r0, r7
+ 546 0054 FFF7FEFF 		bl	uwBuf_UnReadLen
+ 547              	.LVL48:
+ 548 0058 0290     		str	r0, [sp, #8]
+  89:./user/source/uart.c ****         {
+ 549              		.loc 1 89 0
+ 550 005a 029A     		ldr	r2, [sp, #8]
+ 551 005c 039B     		ldr	r3, [sp, #12]
+ 552 005e 9A42     		cmp	r2, r3
+ 553 0060 03D9     		bls	.L43
+  91:./user/source/uart.c ****             readlen = readlenow;
+ 554              		.loc 1 91 0
+ 555 0062 CDF80480 		str	r8, [sp, #4]
+  92:./user/source/uart.c ****         }
+ 556              		.loc 1 92 0
+ 557 0066 029B     		ldr	r3, [sp, #8]
+ 558 0068 0393     		str	r3, [sp, #12]
+ 559              	.L43:
+  80:./user/source/uart.c ****     {
+ 560              		.loc 1 80 0
+ 561 006a 029B     		ldr	r3, [sp, #8]
+ 562 006c 9E42     		cmp	r6, r3
+ 563 006e 02D9     		bls	.L44
+  80:./user/source/uart.c ****     {
+ 564              		.loc 1 80 0 is_stmt 0 discriminator 1
+ 565 0070 019B     		ldr	r3, [sp, #4]
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 16
+
+
+ 566 0072 002B     		cmp	r3, #0
+ 567 0074 E5D1     		bne	.L45
+ 568              	.L44:
+  95:./user/source/uart.c ****     if (readlen)
+ 569              		.loc 1 95 0 is_stmt 1
+ 570 0076 0022     		movs	r2, #0
+ 571 0078 1649     		ldr	r1, .L53
+ 572 007a 2068     		ldr	r0, [r4]
+ 573 007c FFF7FEFF 		bl	USART_ITConfig
+ 574              	.LVL49:
+  96:./user/source/uart.c ****     {
+ 575              		.loc 1 96 0
+ 576 0080 039B     		ldr	r3, [sp, #12]
+ 577 0082 03B3     		cbz	r3, .L46
+  99:./user/source/uart.c ****         for (i = 0; i < readlen; i++)
+ 578              		.loc 1 99 0
+ 579 0084 039B     		ldr	r3, [sp, #12]
+ 580 0086 9E42     		cmp	r6, r3
+ 581 0088 00D9     		bls	.L47
+  99:./user/source/uart.c ****         for (i = 0; i < readlen; i++)
+ 582              		.loc 1 99 0 is_stmt 0 discriminator 1
+ 583 008a 039E     		ldr	r6, [sp, #12]
+ 584              	.LVL50:
+ 585              	.L47:
+  99:./user/source/uart.c ****         for (i = 0; i < readlen; i++)
+ 586              		.loc 1 99 0 discriminator 4
+ 587 008c 0396     		str	r6, [sp, #12]
+ 588              	.LVL51:
+ 100:./user/source/uart.c ****         {
+ 589              		.loc 1 100 0 is_stmt 1 discriminator 4
+ 590 008e 0022     		movs	r2, #0
+ 591 0090 16E0     		b	.L48
+ 592              	.LVL52:
+ 593              	.L49:
+ 102:./user/source/uart.c ****             puart->pRsvbuf->rd = (++puart->pRsvbuf->rd) % BUF_SIZE;
+ 594              		.loc 1 102 0 discriminator 3
+ 595 0092 6368     		ldr	r3, [r4, #4]
+ 596 0094 D3F80014 		ldr	r1, [r3, #1024]
+ 597 0098 5B5C     		ldrb	r3, [r3, r1]	@ zero_extendqisi2
+ 598 009a AB54     		strb	r3, [r5, r2]
+ 103:./user/source/uart.c ****         }
+ 599              		.loc 1 103 0 discriminator 3
+ 600 009c 6068     		ldr	r0, [r4, #4]
+ 601 009e D0F80014 		ldr	r1, [r0, #1024]
+ 602 00a2 0131     		adds	r1, r1, #1
+ 603 00a4 0D4E     		ldr	r6, .L53+8
+ 604 00a6 A1FB0667 		umull	r6, r7, r1, r6
+ 605 00aa CB1B     		subs	r3, r1, r7
+ 606 00ac 07EB5303 		add	r3, r7, r3, lsr #1
+ 607 00b0 5B0A     		lsrs	r3, r3, #9
+ 608 00b2 C3EB8323 		rsb	r3, r3, r3, lsl #10
+ 609 00b6 CB1A     		subs	r3, r1, r3
+ 610 00b8 C0F80034 		str	r3, [r0, #1024]
+ 100:./user/source/uart.c ****         {
+ 611              		.loc 1 100 0 discriminator 3
+ 612 00bc 0132     		adds	r2, r2, #1
+ 613              	.LVL53:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 17
+
+
+ 614 00be 92B2     		uxth	r2, r2
+ 615              	.LVL54:
+ 616              	.L48:
+ 100:./user/source/uart.c ****         {
+ 617              		.loc 1 100 0 is_stmt 0 discriminator 1
+ 618 00c0 039B     		ldr	r3, [sp, #12]
+ 619 00c2 9A42     		cmp	r2, r3
+ 620 00c4 E5D3     		bcc	.L49
+ 621              	.LVL55:
+ 622              	.L46:
+ 106:./user/source/uart.c **** }
+ 623              		.loc 1 106 0 is_stmt 1
+ 624 00c6 0398     		ldr	r0, [sp, #12]
+ 625 00c8 00E0     		b	.L39
+ 626              	.LVL56:
+ 627              	.L50:
+  71:./user/source/uart.c ****     }
+ 628              		.loc 1 71 0
+ 629 00ca 0020     		movs	r0, #0
+ 630              	.LVL57:
+ 631              	.L39:
+ 107:./user/source/uart.c **** 
+ 632              		.loc 1 107 0
+ 633 00cc 04B0     		add	sp, sp, #16
+ 634              	.LCFI13:
+ 635              		.cfi_def_cfa_offset 24
+ 636              		@ sp needed
+ 637 00ce BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 638              	.LVL58:
+ 639              	.L54:
+ 640 00d2 00BF     		.align	2
+ 641              	.L53:
+ 642 00d4 05010500 		.word	327941
+ 643 00d8 10E000E0 		.word	-536813552
+ 644 00dc 05104000 		.word	4198405
+ 645              		.cfi_endproc
+ 646              	.LFE112:
+ 648              		.section	.text.Uart_OnceRead,"ax",%progbits
+ 649              		.align	2
+ 650              		.global	Uart_OnceRead
+ 651              		.thumb
+ 652              		.thumb_func
+ 654              	Uart_OnceRead:
+ 655              	.LFB113:
+ 117:./user/source/uart.c ****     volatile uint32_t readlen = 0;
+ 656              		.loc 1 117 0
+ 657              		.cfi_startproc
+ 658              		@ args = 0, pretend = 0, frame = 8
+ 659              		@ frame_needed = 0, uses_anonymous_args = 0
+ 660              	.LVL59:
+ 661 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 662              	.LCFI14:
+ 663              		.cfi_def_cfa_offset 24
+ 664              		.cfi_offset 4, -24
+ 665              		.cfi_offset 5, -20
+ 666              		.cfi_offset 6, -16
+ 667              		.cfi_offset 7, -12
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 18
+
+
+ 668              		.cfi_offset 8, -8
+ 669              		.cfi_offset 14, -4
+ 670 0004 82B0     		sub	sp, sp, #8
+ 671              	.LCFI15:
+ 672              		.cfi_def_cfa_offset 32
+ 673 0006 1746     		mov	r7, r2
+ 674 0008 1E46     		mov	r6, r3
+ 118:./user/source/uart.c ****     uint16_t i;
+ 675              		.loc 1 118 0
+ 676 000a 0023     		movs	r3, #0
+ 677              	.LVL60:
+ 678 000c 0193     		str	r3, [sp, #4]
+ 121:./user/source/uart.c ****     {
+ 679              		.loc 1 121 0
+ 680 000e 013A     		subs	r2, r2, #1
+ 681              	.LVL61:
+ 682 0010 40F2FE33 		movw	r3, #1022
+ 683 0014 9A42     		cmp	r2, r3
+ 684 0016 3CD8     		bhi	.L65
+ 685 0018 0446     		mov	r4, r0
+ 686 001a 0D46     		mov	r5, r1
+ 126:./user/source/uart.c ****     while (delay)
+ 687              		.loc 1 126 0
+ 688 001c D0F80480 		ldr	r8, [r0, #4]
+ 689 0020 4046     		mov	r0, r8
+ 690              	.LVL62:
+ 691 0022 FFF7FEFF 		bl	uwBuf_UnReadLen
+ 692              	.LVL63:
+ 693 0026 0190     		str	r0, [sp, #4]
+ 127:./user/source/uart.c ****     {
+ 694              		.loc 1 127 0
+ 695 0028 0CE0     		b	.L57
+ 696              	.L60:
+ 129:./user/source/uart.c ****         /*多余的字节本次丢弃，并调用BufClear防止后面再读取*/
+ 697              		.loc 1 129 0
+ 698 002a 4046     		mov	r0, r8
+ 699 002c FFF7FEFF 		bl	uwBuf_UnReadLen
+ 700              	.LVL64:
+ 701 0030 0190     		str	r0, [sp, #4]
+ 131:./user/source/uart.c ****             break;
+ 702              		.loc 1 131 0
+ 703 0032 019B     		ldr	r3, [sp, #4]
+ 704 0034 9F42     		cmp	r7, r3
+ 705 0036 07D9     		bls	.L58
+ 133:./user/source/uart.c ****         {
+ 706              		.loc 1 133 0
+ 707 0038 184B     		ldr	r3, .L68
+ 708 003a 1B68     		ldr	r3, [r3]
+ 709 003c 13F4803F 		tst	r3, #65536
+ 710 0040 00D0     		beq	.L57
+ 135:./user/source/uart.c ****         }
+ 711              		.loc 1 135 0
+ 712 0042 013E     		subs	r6, r6, #1
+ 713              	.LVL65:
+ 714              	.L57:
+ 127:./user/source/uart.c ****     {
+ 715              		.loc 1 127 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 19
+
+
+ 716 0044 002E     		cmp	r6, #0
+ 717 0046 F0D1     		bne	.L60
+ 718              	.L58:
+ 139:./user/source/uart.c ****     {
+ 719              		.loc 1 139 0
+ 720 0048 019B     		ldr	r3, [sp, #4]
+ 721 004a 03B3     		cbz	r3, .L61
+ 142:./user/source/uart.c ****         for (i = 0; i < readlen; i++)
+ 722              		.loc 1 142 0
+ 723 004c 019B     		ldr	r3, [sp, #4]
+ 724 004e 9F42     		cmp	r7, r3
+ 725 0050 00D9     		bls	.L62
+ 142:./user/source/uart.c ****         for (i = 0; i < readlen; i++)
+ 726              		.loc 1 142 0 is_stmt 0 discriminator 1
+ 727 0052 019F     		ldr	r7, [sp, #4]
+ 728              	.LVL66:
+ 729              	.L62:
+ 142:./user/source/uart.c ****         for (i = 0; i < readlen; i++)
+ 730              		.loc 1 142 0 discriminator 4
+ 731 0054 0197     		str	r7, [sp, #4]
+ 732              	.LVL67:
+ 143:./user/source/uart.c ****         {
+ 733              		.loc 1 143 0 is_stmt 1 discriminator 4
+ 734 0056 0022     		movs	r2, #0
+ 735 0058 16E0     		b	.L63
+ 736              	.LVL68:
+ 737              	.L64:
+ 145:./user/source/uart.c ****             puart->pRsvbuf->rd = (++puart->pRsvbuf->rd) % BUF_SIZE;
+ 738              		.loc 1 145 0 discriminator 3
+ 739 005a 6368     		ldr	r3, [r4, #4]
+ 740 005c D3F80014 		ldr	r1, [r3, #1024]
+ 741 0060 5B5C     		ldrb	r3, [r3, r1]	@ zero_extendqisi2
+ 742 0062 AB54     		strb	r3, [r5, r2]
+ 146:./user/source/uart.c ****         }
+ 743              		.loc 1 146 0 discriminator 3
+ 744 0064 6068     		ldr	r0, [r4, #4]
+ 745 0066 D0F80014 		ldr	r1, [r0, #1024]
+ 746 006a 0131     		adds	r1, r1, #1
+ 747 006c 0C4E     		ldr	r6, .L68+4
+ 748 006e A1FB0667 		umull	r6, r7, r1, r6
+ 749 0072 CB1B     		subs	r3, r1, r7
+ 750 0074 07EB5303 		add	r3, r7, r3, lsr #1
+ 751 0078 5B0A     		lsrs	r3, r3, #9
+ 752 007a C3EB8323 		rsb	r3, r3, r3, lsl #10
+ 753 007e CB1A     		subs	r3, r1, r3
+ 754 0080 C0F80034 		str	r3, [r0, #1024]
+ 143:./user/source/uart.c ****         {
+ 755              		.loc 1 143 0 discriminator 3
+ 756 0084 0132     		adds	r2, r2, #1
+ 757              	.LVL69:
+ 758 0086 92B2     		uxth	r2, r2
+ 759              	.LVL70:
+ 760              	.L63:
+ 143:./user/source/uart.c ****         {
+ 761              		.loc 1 143 0 is_stmt 0 discriminator 1
+ 762 0088 019B     		ldr	r3, [sp, #4]
+ 763 008a 9A42     		cmp	r2, r3
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 20
+
+
+ 764 008c E5D3     		bcc	.L64
+ 765              	.LVL71:
+ 766              	.L61:
+ 149:./user/source/uart.c **** }
+ 767              		.loc 1 149 0 is_stmt 1
+ 768 008e 0198     		ldr	r0, [sp, #4]
+ 769 0090 00E0     		b	.L56
+ 770              	.LVL72:
+ 771              	.L65:
+ 123:./user/source/uart.c ****     }
+ 772              		.loc 1 123 0
+ 773 0092 0020     		movs	r0, #0
+ 774              	.LVL73:
+ 775              	.L56:
+ 150:./user/source/uart.c **** 
+ 776              		.loc 1 150 0
+ 777 0094 02B0     		add	sp, sp, #8
+ 778              	.LCFI16:
+ 779              		.cfi_def_cfa_offset 24
+ 780              		@ sp needed
+ 781 0096 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 782              	.L69:
+ 783 009a 00BF     		.align	2
+ 784              	.L68:
+ 785 009c 10E000E0 		.word	-536813552
+ 786 00a0 05104000 		.word	4198405
+ 787              		.cfi_endproc
+ 788              	.LFE113:
+ 790              		.section	.text.Uart_Read,"ax",%progbits
+ 791              		.align	2
+ 792              		.global	Uart_Read
+ 793              		.thumb
+ 794              		.thumb_func
+ 796              	Uart_Read:
+ 797              	.LFB115:
+ 184:./user/source/uart.c ****     volatile uint32_t readlen = 0;
+ 798              		.loc 1 184 0
+ 799              		.cfi_startproc
+ 800              		@ args = 0, pretend = 0, frame = 8
+ 801              		@ frame_needed = 0, uses_anonymous_args = 0
+ 802              	.LVL74:
+ 803 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 804              	.LCFI17:
+ 805              		.cfi_def_cfa_offset 20
+ 806              		.cfi_offset 4, -20
+ 807              		.cfi_offset 5, -16
+ 808              		.cfi_offset 6, -12
+ 809              		.cfi_offset 7, -8
+ 810              		.cfi_offset 14, -4
+ 811 0002 83B0     		sub	sp, sp, #12
+ 812              	.LCFI18:
+ 813              		.cfi_def_cfa_offset 32
+ 185:./user/source/uart.c ****     uint16_t i;
+ 814              		.loc 1 185 0
+ 815 0004 0023     		movs	r3, #0
+ 816 0006 0193     		str	r3, [sp, #4]
+ 187:./user/source/uart.c ****         return 0;
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 21
+
+
+ 817              		.loc 1 187 0
+ 818 0008 541E     		subs	r4, r2, #1
+ 819 000a 4FF6FE73 		movw	r3, #65534
+ 820 000e 9C42     		cmp	r4, r3
+ 821 0010 2DD8     		bhi	.L76
+ 822 0012 1446     		mov	r4, r2
+ 823 0014 0E46     		mov	r6, r1
+ 824 0016 0546     		mov	r5, r0
+ 189:./user/source/uart.c ****     if (readlen)
+ 825              		.loc 1 189 0
+ 826 0018 4068     		ldr	r0, [r0, #4]
+ 827              	.LVL75:
+ 828 001a FFF7FEFF 		bl	uwBuf_UnReadLen
+ 829              	.LVL76:
+ 830 001e 0190     		str	r0, [sp, #4]
+ 190:./user/source/uart.c ****     {
+ 831              		.loc 1 190 0
+ 832 0020 019B     		ldr	r3, [sp, #4]
+ 833 0022 13B3     		cbz	r3, .L72
+ 193:./user/source/uart.c **** 
+ 834              		.loc 1 193 0
+ 835 0024 019B     		ldr	r3, [sp, #4]
+ 836 0026 9C42     		cmp	r4, r3
+ 837 0028 01D9     		bls	.L77
+ 193:./user/source/uart.c **** 
+ 838              		.loc 1 193 0 is_stmt 0 discriminator 1
+ 839 002a 019A     		ldr	r2, [sp, #4]
+ 840 002c 00E0     		b	.L73
+ 841              	.L77:
+ 193:./user/source/uart.c **** 
+ 842              		.loc 1 193 0
+ 843 002e 2246     		mov	r2, r4
+ 844              	.L73:
+ 193:./user/source/uart.c **** 
+ 845              		.loc 1 193 0 discriminator 4
+ 846 0030 0192     		str	r2, [sp, #4]
+ 847              	.LVL77:
+ 195:./user/source/uart.c ****         {
+ 848              		.loc 1 195 0 is_stmt 1 discriminator 4
+ 849 0032 0022     		movs	r2, #0
+ 850 0034 16E0     		b	.L74
+ 851              	.LVL78:
+ 852              	.L75:
+ 197:./user/source/uart.c ****             puart->pRsvbuf->rd = (++puart->pRsvbuf->rd) % BUF_SIZE;
+ 853              		.loc 1 197 0 discriminator 3
+ 854 0036 6B68     		ldr	r3, [r5, #4]
+ 855 0038 D3F80014 		ldr	r1, [r3, #1024]
+ 856 003c 5B5C     		ldrb	r3, [r3, r1]	@ zero_extendqisi2
+ 857 003e B354     		strb	r3, [r6, r2]
+ 198:./user/source/uart.c ****         }
+ 858              		.loc 1 198 0 discriminator 3
+ 859 0040 6F68     		ldr	r7, [r5, #4]
+ 860 0042 D7F80044 		ldr	r4, [r7, #1024]
+ 861 0046 0134     		adds	r4, r4, #1
+ 862 0048 0A48     		ldr	r0, .L79
+ 863 004a A4FB0001 		umull	r0, r1, r4, r0
+ 864 004e 631A     		subs	r3, r4, r1
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 22
+
+
+ 865 0050 01EB5303 		add	r3, r1, r3, lsr #1
+ 866 0054 5B0A     		lsrs	r3, r3, #9
+ 867 0056 C3EB8323 		rsb	r3, r3, r3, lsl #10
+ 868 005a E31A     		subs	r3, r4, r3
+ 869 005c C7F80034 		str	r3, [r7, #1024]
+ 195:./user/source/uart.c ****         {
+ 870              		.loc 1 195 0 discriminator 3
+ 871 0060 0132     		adds	r2, r2, #1
+ 872              	.LVL79:
+ 873 0062 92B2     		uxth	r2, r2
+ 874              	.LVL80:
+ 875              	.L74:
+ 195:./user/source/uart.c ****         {
+ 876              		.loc 1 195 0 is_stmt 0 discriminator 1
+ 877 0064 019B     		ldr	r3, [sp, #4]
+ 878 0066 9A42     		cmp	r2, r3
+ 879 0068 E5D3     		bcc	.L75
+ 880              	.LVL81:
+ 881              	.L72:
+ 201:./user/source/uart.c **** }
+ 882              		.loc 1 201 0 is_stmt 1
+ 883 006a 0198     		ldr	r0, [sp, #4]
+ 884 006c 00E0     		b	.L71
+ 885              	.LVL82:
+ 886              	.L76:
+ 188:./user/source/uart.c ****     readlen = uwBuf_UnReadLen(puart->pRsvbuf);
+ 887              		.loc 1 188 0
+ 888 006e 0020     		movs	r0, #0
+ 889              	.LVL83:
+ 890              	.L71:
+ 202:./user/source/uart.c **** /**********************************************
+ 891              		.loc 1 202 0
+ 892 0070 03B0     		add	sp, sp, #12
+ 893              	.LCFI19:
+ 894              		.cfi_def_cfa_offset 20
+ 895              		@ sp needed
+ 896 0072 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 897              	.L80:
+ 898              		.align	2
+ 899              	.L79:
+ 900 0074 05104000 		.word	4198405
+ 901              		.cfi_endproc
+ 902              	.LFE115:
+ 904              		.section	.text.vBuf_Clear,"ax",%progbits
+ 905              		.align	2
+ 906              		.global	vBuf_Clear
+ 907              		.thumb
+ 908              		.thumb_func
+ 910              	vBuf_Clear:
+ 911              	.LFB120:
+ 257:./user/source/uart.c **** /********************************************************************
+ 258:./user/source/uart.c **** * 功    能：清空缓存
+ 259:./user/source/uart.c **** * 输    入：数据缓存结构体地址
+ 260:./user/source/uart.c **** * 输    出：
+ 261:./user/source/uart.c **** *          
+ 262:./user/source/uart.c **** * 编 写 人：
+ 263:./user/source/uart.c **** * 编写日期：2016.6.28
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 23
+
+
+ 264:./user/source/uart.c **** **********************************************************************/
+ 265:./user/source/uart.c **** void vBuf_Clear(struct ucbuf *buf)
+ 266:./user/source/uart.c **** {
+ 912              		.loc 1 266 0
+ 913              		.cfi_startproc
+ 914              		@ args = 0, pretend = 0, frame = 0
+ 915              		@ frame_needed = 0, uses_anonymous_args = 0
+ 916              		@ link register save eliminated.
+ 917              	.LVL84:
+ 267:./user/source/uart.c ****     buf->rd = buf->wr;
+ 918              		.loc 1 267 0
+ 919 0000 D0F80434 		ldr	r3, [r0, #1028]
+ 920 0004 C0F80034 		str	r3, [r0, #1024]
+ 921 0008 7047     		bx	lr
+ 922              		.cfi_endproc
+ 923              	.LFE120:
+ 925 000a 00BF     		.section	.text.blBufchr,"ax",%progbits
+ 926              		.align	2
+ 927              		.global	blBufchr
+ 928              		.thumb
+ 929              		.thumb_func
+ 931              	blBufchr:
+ 932              	.LFB121:
+ 268:./user/source/uart.c **** }
+ 269:./user/source/uart.c **** 
+ 270:./user/source/uart.c **** /********************************************************************
+ 271:./user/source/uart.c **** * 功    能：查找缓存中特定字符
+ 272:./user/source/uart.c **** * 输    入：缓存结构体指针uc_buf，特定字符chr,缓存内字节数ln
+ 273:./user/source/uart.c **** * 输    出：true/false
+ 274:./user/source/uart.c **** * 说    明：读指针指向该字符           
+ 275:./user/source/uart.c **** * 编 写 人：stragen
+ 276:./user/source/uart.c **** * 编写日期：2016.8.25
+ 277:./user/source/uart.c **** **********************************************************************/
+ 278:./user/source/uart.c **** bool blBufchr(struct ucbuf *uc_buf, uint8_t chr, uint16_t ln)
+ 279:./user/source/uart.c **** {
+ 933              		.loc 1 279 0
+ 934              		.cfi_startproc
+ 935              		@ args = 0, pretend = 0, frame = 0
+ 936              		@ frame_needed = 0, uses_anonymous_args = 0
+ 937              		@ link register save eliminated.
+ 938              	.LVL85:
+ 939 0000 70B4     		push	{r4, r5, r6}
+ 940              	.LCFI20:
+ 941              		.cfi_def_cfa_offset 12
+ 942              		.cfi_offset 4, -12
+ 943              		.cfi_offset 5, -8
+ 944              		.cfi_offset 6, -4
+ 280:./user/source/uart.c ****     while (ln-- && (uc_buf->data[uc_buf->rd] != chr)) // &&(uc_buf->RD_Index != uc_buf->WR_Index))
+ 945              		.loc 1 280 0
+ 946 0002 0DE0     		b	.L83
+ 947              	.LVL86:
+ 948              	.L85:
+ 281:./user/source/uart.c ****     {
+ 282:./user/source/uart.c ****         uc_buf->rd = (uc_buf->rd + 1) % BUF_SIZE;
+ 949              		.loc 1 282 0
+ 950 0004 0132     		adds	r2, r2, #1
+ 951 0006 0D4C     		ldr	r4, .L89
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 24
+
+
+ 952 0008 A2FB0445 		umull	r4, r5, r2, r4
+ 953 000c 531B     		subs	r3, r2, r5
+ 954 000e 05EB5303 		add	r3, r5, r3, lsr #1
+ 955 0012 5B0A     		lsrs	r3, r3, #9
+ 956 0014 C3EB8323 		rsb	r3, r3, r3, lsl #10
+ 957 0018 D31A     		subs	r3, r2, r3
+ 958 001a C0F80034 		str	r3, [r0, #1024]
+ 280:./user/source/uart.c ****     while (ln-- && (uc_buf->data[uc_buf->rd] != chr)) // &&(uc_buf->RD_Index != uc_buf->WR_Index))
+ 959              		.loc 1 280 0
+ 960 001e 3246     		mov	r2, r6
+ 961              	.LVL87:
+ 962              	.L83:
+ 963 0020 561E     		subs	r6, r2, #1
+ 964 0022 B6B2     		uxth	r6, r6
+ 965              	.LVL88:
+ 966 0024 22B1     		cbz	r2, .L84
+ 280:./user/source/uart.c ****     while (ln-- && (uc_buf->data[uc_buf->rd] != chr)) // &&(uc_buf->RD_Index != uc_buf->WR_Index))
+ 967              		.loc 1 280 0 is_stmt 0 discriminator 1
+ 968 0026 D0F80024 		ldr	r2, [r0, #1024]
+ 969 002a 835C     		ldrb	r3, [r0, r2]	@ zero_extendqisi2
+ 970 002c 8B42     		cmp	r3, r1
+ 971 002e E9D1     		bne	.L85
+ 972              	.L84:
+ 283:./user/source/uart.c ****     }
+ 284:./user/source/uart.c ****     //return(ln ? true : false);						//读指针可能是0
+ 285:./user/source/uart.c ****     if (ln)
+ 973              		.loc 1 285 0 is_stmt 1
+ 974 0030 0EB1     		cbz	r6, .L87
+ 286:./user/source/uart.c ****         return false;
+ 975              		.loc 1 286 0
+ 976 0032 0020     		movs	r0, #0
+ 977              	.LVL89:
+ 978 0034 00E0     		b	.L86
+ 979              	.LVL90:
+ 980              	.L87:
+ 287:./user/source/uart.c ****     else
+ 288:./user/source/uart.c ****         return true;
+ 981              		.loc 1 288 0
+ 982 0036 0120     		movs	r0, #1
+ 983              	.LVL91:
+ 984              	.L86:
+ 289:./user/source/uart.c **** }
+ 985              		.loc 1 289 0
+ 986 0038 70BC     		pop	{r4, r5, r6}
+ 987              	.LCFI21:
+ 988              		.cfi_restore 6
+ 989              		.cfi_restore 5
+ 990              		.cfi_restore 4
+ 991              		.cfi_def_cfa_offset 0
+ 992              	.LVL92:
+ 993 003a 7047     		bx	lr
+ 994              	.L90:
+ 995              		.align	2
+ 996              	.L89:
+ 997 003c 05104000 		.word	4198405
+ 998              		.cfi_endproc
+ 999              	.LFE121:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 25
+
+
+ 1001              		.section	.text.blBufcmp,"ax",%progbits
+ 1002              		.align	2
+ 1003              		.global	blBufcmp
+ 1004              		.thumb
+ 1005              		.thumb_func
+ 1007              	blBufcmp:
+ 1008              	.LFB122:
+ 290:./user/source/uart.c **** 
+ 291:./user/source/uart.c **** /********************************************************************
+ 292:./user/source/uart.c **** * 功    能：判断缓存中字符串是否是特定字符串
+ 293:./user/source/uart.c **** * 输    入：缓存结构体地址uc_buf，字符串指针ptchr，字符串长度ln
+ 294:./user/source/uart.c **** * 输    出：true/false
+ 295:./user/source/uart.c **** * 说    明：读指针不改变
+ 296:./user/source/uart.c **** * 编 写 人：stragen
+ 297:./user/source/uart.c **** * 编写日期：2016.8.25
+ 298:./user/source/uart.c **** **********************************************************************/
+ 299:./user/source/uart.c **** bool blBufcmp(struct ucbuf *uc_buf, char *ptchr, uint8_t ln)
+ 300:./user/source/uart.c **** {
+ 1009              		.loc 1 300 0
+ 1010              		.cfi_startproc
+ 1011              		@ args = 0, pretend = 0, frame = 0
+ 1012              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1013              		@ link register save eliminated.
+ 1014              	.LVL93:
+ 1015 0000 F0B4     		push	{r4, r5, r6, r7}
+ 1016              	.LCFI22:
+ 1017              		.cfi_def_cfa_offset 16
+ 1018              		.cfi_offset 4, -16
+ 1019              		.cfi_offset 5, -12
+ 1020              		.cfi_offset 6, -8
+ 1021              		.cfi_offset 7, -4
+ 301:./user/source/uart.c ****     while (ln-- && (uc_buf->data[uc_buf->rd] == *(ptchr++)) && (uc_buf->rd != uc_buf->wr)) //防止
+ 1022              		.loc 1 301 0
+ 1023 0002 0EE0     		b	.L92
+ 1024              	.LVL94:
+ 1025              	.L94:
+ 302:./user/source/uart.c ****     {
+ 303:./user/source/uart.c ****         uc_buf->rd = (uc_buf->rd + 1) % BUF_SIZE;
+ 1026              		.loc 1 303 0
+ 1027 0004 5A1C     		adds	r2, r3, #1
+ 1028 0006 104C     		ldr	r4, .L96
+ 1029 0008 A2FB0445 		umull	r4, r5, r2, r4
+ 1030 000c 531B     		subs	r3, r2, r5
+ 1031 000e 05EB5303 		add	r3, r5, r3, lsr #1
+ 1032 0012 5B0A     		lsrs	r3, r3, #9
+ 1033 0014 C3EB8323 		rsb	r3, r3, r3, lsl #10
+ 1034 0018 D31A     		subs	r3, r2, r3
+ 1035 001a C0F80034 		str	r3, [r0, #1024]
+ 301:./user/source/uart.c ****     while (ln-- && (uc_buf->data[uc_buf->rd] == *(ptchr++)) && (uc_buf->rd != uc_buf->wr)) //防止
+ 1036              		.loc 1 301 0
+ 1037 001e 3246     		mov	r2, r6
+ 1038 0020 3946     		mov	r1, r7
+ 1039              	.LVL95:
+ 1040              	.L92:
+ 1041 0022 531E     		subs	r3, r2, #1
+ 1042 0024 DEB2     		uxtb	r6, r3
+ 1043              	.LVL96:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 26
+
+
+ 1044 0026 52B1     		cbz	r2, .L93
+ 301:./user/source/uart.c ****     while (ln-- && (uc_buf->data[uc_buf->rd] == *(ptchr++)) && (uc_buf->rd != uc_buf->wr)) //防止
+ 1045              		.loc 1 301 0 is_stmt 0 discriminator 1
+ 1046 0028 D0F80034 		ldr	r3, [r0, #1024]
+ 1047 002c C45C     		ldrb	r4, [r0, r3]	@ zero_extendqisi2
+ 1048 002e 4F1C     		adds	r7, r1, #1
+ 1049              	.LVL97:
+ 1050 0030 0A78     		ldrb	r2, [r1]	@ zero_extendqisi2
+ 1051 0032 9442     		cmp	r4, r2
+ 1052 0034 03D1     		bne	.L93
+ 301:./user/source/uart.c ****     while (ln-- && (uc_buf->data[uc_buf->rd] == *(ptchr++)) && (uc_buf->rd != uc_buf->wr)) //防止
+ 1053              		.loc 1 301 0 discriminator 2
+ 1054 0036 D0F80424 		ldr	r2, [r0, #1028]
+ 1055 003a 9342     		cmp	r3, r2
+ 1056 003c E2D1     		bne	.L94
+ 1057              	.LVL98:
+ 1058              	.L93:
+ 304:./user/source/uart.c ****     }
+ 305:./user/source/uart.c ****     return (ln ? false : true);
+ 306:./user/source/uart.c **** }...
+ 1059              		.loc 1 306 0 is_stmt 1
+ 1060 003e B6FA86F0 		clz	r0, r6
+ 1061              	.LVL99:
+ 1062 0042 4009     		lsrs	r0, r0, #5
+ 1063 0044 F0BC     		pop	{r4, r5, r6, r7}
+ 1064              	.LCFI23:
+ 1065              		.cfi_restore 7
+ 1066              		.cfi_restore 6
+ 1067              		.cfi_restore 5
+ 1068              		.cfi_restore 4
+ 1069              		.cfi_def_cfa_offset 0
+ 1070              	.LVL100:
+ 1071 0046 7047     		bx	lr
+ 1072              	.L97:
+ 1073              		.align	2
+ 1074              	.L96:
+ 1075 0048 05104000 		.word	4198405
+ 1076              		.cfi_endproc
+ 1077              	.LFE122:
+ 1079              		.global	pUartGPRS
+ 1080              		.global	pUartGPS
+ 1081              		.section	.data.UartGPS,"aw",%progbits
+ 1082              		.align	2
+ 1085              	UartGPS:
+ 1086 0000 00380140 		.word	1073821696
+ 1087 0004 00000000 		.word	Uart1_Rsvbuf
+ 1088 0008 00000000 		.word	Uart1_Sndbuf
+ 1089              		.section	.bss.Uart3_Sndbuf,"aw",%nobits
+ 1090              		.align	2
+ 1093              	Uart3_Sndbuf:
+ 1094 0000 00000000 		.space	1032
+ 1094      00000000 
+ 1094      00000000 
+ 1094      00000000 
+ 1094      00000000 
+ 1095              		.section	.data.pUartGPRS,"aw",%progbits
+ 1096              		.align	2
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 27
+
+
+ 1099              	pUartGPRS:
+ 1100 0000 00000000 		.word	UartGPRS
+ 1101              		.section	.bss.Uart1_Rsvbuf,"aw",%nobits
+ 1102              		.align	2
+ 1105              	Uart1_Rsvbuf:
+ 1106 0000 00000000 		.space	1032
+ 1106      00000000 
+ 1106      00000000 
+ 1106      00000000 
+ 1106      00000000 
+ 1107              		.section	.data.pUartGPS,"aw",%progbits
+ 1108              		.align	2
+ 1111              	pUartGPS:
+ 1112 0000 00000000 		.word	UartGPS
+ 1113              		.section	.data.UartGPRS,"aw",%progbits
+ 1114              		.align	2
+ 1117              	UartGPRS:
+ 1118 0000 00480040 		.word	1073760256
+ 1119 0004 00000000 		.word	Uart3_Rsvbuf
+ 1120 0008 00000000 		.word	Uart3_Sndbuf
+ 1121              		.section	.bss.Uart3_Rsvbuf,"aw",%nobits
+ 1122              		.align	2
+ 1125              	Uart3_Rsvbuf:
+ 1126 0000 00000000 		.space	1032
+ 1126      00000000 
+ 1126      00000000 
+ 1126      00000000 
+ 1126      00000000 
+ 1127              		.section	.bss.Uart1_Sndbuf,"aw",%nobits
+ 1128              		.align	2
+ 1131              	Uart1_Sndbuf:
+ 1132 0000 00000000 		.space	1032
+ 1132      00000000 
+ 1132      00000000 
+ 1132      00000000 
+ 1132      00000000 
+ 1133              		.text
+ 1134              	.Letext0:
+ 1135              		.file 2 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\machine\\_defaul
+ 1136              		.file 3 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 1137              		.file 4 "cmsis/include/core_cm4.h"
+ 1138              		.file 5 "cmsis/include/stm32f37x.h"
+ 1139              		.file 6 "user/include/uart.h"
+ 1140              		.file 7 "stdperiph/include/stm32f37x_usart.h"
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 28
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 uart.c
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:22     .text.Uart_ITReadEnable:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:27     .text.Uart_ITReadEnable:00000000 Uart_ITReadEnable
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:69     .text.Uart_ITReadEnable:00000028 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:75     .text.Uart_ITReadDisable:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:80     .text.Uart_ITReadDisable:00000000 Uart_ITReadDisable
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:122    .text.Uart_ITReadDisable:00000028 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:128    .text.uwBuf_EmpLen:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:133    .text.uwBuf_EmpLen:00000000 uwBuf_EmpLen
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:169    .text.uwBuf_EmpLen:00000028 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:174    .text.Uart_Write:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:179    .text.Uart_Write:00000000 Uart_Write
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:260    .text.Uart_Write:0000005c $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:266    .text.uwBuf_UnReadLen:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:271    .text.uwBuf_UnReadLen:00000000 uwBuf_UnReadLen
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:307    .text.uwBuf_UnReadLen:00000028 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:312    .text.Uart_OnceWrite:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:317    .text.Uart_OnceWrite:00000000 Uart_OnceWrite
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:462    .text.Uart_OnceWrite:000000b8 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:469    .text.Uart_IdleRead:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:474    .text.Uart_IdleRead:00000000 Uart_IdleRead
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:642    .text.Uart_IdleRead:000000d4 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:649    .text.Uart_OnceRead:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:654    .text.Uart_OnceRead:00000000 Uart_OnceRead
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:785    .text.Uart_OnceRead:0000009c $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:791    .text.Uart_Read:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:796    .text.Uart_Read:00000000 Uart_Read
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:900    .text.Uart_Read:00000074 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:905    .text.vBuf_Clear:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:910    .text.vBuf_Clear:00000000 vBuf_Clear
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:926    .text.blBufchr:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:931    .text.blBufchr:00000000 blBufchr
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:997    .text.blBufchr:0000003c $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1002   .text.blBufcmp:00000000 $t
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1007   .text.blBufcmp:00000000 blBufcmp
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1075   .text.blBufcmp:00000048 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1099   .data.pUartGPRS:00000000 pUartGPRS
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1111   .data.pUartGPS:00000000 pUartGPS
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1082   .data.UartGPS:00000000 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1085   .data.UartGPS:00000000 UartGPS
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1105   .bss.Uart1_Rsvbuf:00000000 Uart1_Rsvbuf
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1131   .bss.Uart1_Sndbuf:00000000 Uart1_Sndbuf
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1090   .bss.Uart3_Sndbuf:00000000 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1093   .bss.Uart3_Sndbuf:00000000 Uart3_Sndbuf
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1096   .data.pUartGPRS:00000000 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1117   .data.UartGPRS:00000000 UartGPRS
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1102   .bss.Uart1_Rsvbuf:00000000 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1108   .data.pUartGPS:00000000 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1114   .data.UartGPRS:00000000 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1125   .bss.Uart3_Rsvbuf:00000000 Uart3_Rsvbuf
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1122   .bss.Uart3_Rsvbuf:00000000 $d
+C:\Users\strag\AppData\Local\Temp\ccedSQw0.s:1128   .bss.Uart1_Sndbuf:00000000 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+USART_ITConfig
+ARM GAS  C:\Users\strag\AppData\Local\Temp\ccedSQw0.s 			page 29
+
+
+USART_ClearITPendingBit

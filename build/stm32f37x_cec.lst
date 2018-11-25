@@ -1,0 +1,1239 @@
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 1
+   4              		.eabi_attribute 28, 1
+   5              		.fpu fpv4-sp-d16
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.thumb
+  16              		.syntax unified
+  17              		.file	"stm32f37x_cec.c"
+  18              		.text
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.section	.text.CEC_DeInit,"ax",%progbits
+  22              		.align	2
+  23              		.global	CEC_DeInit
+  24              		.thumb
+  25              		.thumb_func
+  27              	CEC_DeInit:
+  28              	.LFB111:
+  29              		.file 1 "./stdperiph/source/stm32f37x_cec.c"
+   1:./stdperiph/source/stm32f37x_cec.c **** /**
+   2:./stdperiph/source/stm32f37x_cec.c ****   ******************************************************************************
+   3:./stdperiph/source/stm32f37x_cec.c ****   * @file    stm32f37x_cec.c
+   4:./stdperiph/source/stm32f37x_cec.c ****   * @author  MCD Application Team
+   5:./stdperiph/source/stm32f37x_cec.c ****   * @version V1.0.0
+   6:./stdperiph/source/stm32f37x_cec.c ****   * @date    20-September-2012
+   7:./stdperiph/source/stm32f37x_cec.c ****   * @brief   This file provides firmware functions to manage the following 
+   8:./stdperiph/source/stm32f37x_cec.c ****   *          functionalities of the Consumer Electronics Control (CEC) peripheral:
+   9:./stdperiph/source/stm32f37x_cec.c ****   *           + Initialization and Configuration
+  10:./stdperiph/source/stm32f37x_cec.c ****   *           + Data transfers functions
+  11:./stdperiph/source/stm32f37x_cec.c ****   *           + Interrupts and flags management
+  12:./stdperiph/source/stm32f37x_cec.c ****   *               
+  13:./stdperiph/source/stm32f37x_cec.c ****   *  @verbatim
+  14:./stdperiph/source/stm32f37x_cec.c ****   ==============================================================================
+  15:./stdperiph/source/stm32f37x_cec.c ****                             ##### CEC features #####
+  16:./stdperiph/source/stm32f37x_cec.c ****   ==============================================================================
+  17:./stdperiph/source/stm32f37x_cec.c ****       [..] This device provides some features:
+  18:./stdperiph/source/stm32f37x_cec.c ****            (#) Supports HDMI-CEC specification 1.4.
+  19:./stdperiph/source/stm32f37x_cec.c ****            (#) Supports two source clocks(HSI/244 or LSE).
+  20:./stdperiph/source/stm32f37x_cec.c ****            (#) Works in stop mode(without APB clock, but with CEC clock 32KHz).
+  21:./stdperiph/source/stm32f37x_cec.c ****                It can genarate an interrupt in the CEC clock domain that the CPU 
+  22:./stdperiph/source/stm32f37x_cec.c ****                wakes up from the low power mode.
+  23:./stdperiph/source/stm32f37x_cec.c ****            (#) Configurable Signal Free Time before of transmission start. The 
+  24:./stdperiph/source/stm32f37x_cec.c ****                number of nominal data bit periods waited before transmission can be
+  25:./stdperiph/source/stm32f37x_cec.c ****                ruled by Hardware or Software.
+  26:./stdperiph/source/stm32f37x_cec.c ****            (#) Configurable Peripheral Address (multi-addressing configuration).
+  27:./stdperiph/source/stm32f37x_cec.c ****            (#) Supports listen mode.The CEC Messages addressed to different destination
+  28:./stdperiph/source/stm32f37x_cec.c ****                can be received without interfering with CEC bus when Listen mode option is enabled.
+  29:./stdperiph/source/stm32f37x_cec.c ****            (#) Configurable Rx-Tolerance(Standard and Extended tolerance margin).
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 2
+
+
+  30:./stdperiph/source/stm32f37x_cec.c ****            (#) Error detection with configurable error bit generation.
+  31:./stdperiph/source/stm32f37x_cec.c ****            (#) Arbitration lost error in the case of two CEC devices starting at the same time.
+  32:./stdperiph/source/stm32f37x_cec.c **** 
+  33:./stdperiph/source/stm32f37x_cec.c ****                             ##### How to use this driver ##### 
+  34:./stdperiph/source/stm32f37x_cec.c ****   ==============================================================================
+  35:./stdperiph/source/stm32f37x_cec.c ****       [..] This driver provides functions to configure and program the CEC device,
+  36:./stdperiph/source/stm32f37x_cec.c ****        follow steps below:
+  37:./stdperiph/source/stm32f37x_cec.c ****            (#) The source clock can be configured using:
+  38:./stdperiph/source/stm32f37x_cec.c ****                (++) RCC_CECCLKConfig(RCC_CECCLK_HSI_Div244) for HSI(Default) 
+  39:./stdperiph/source/stm32f37x_cec.c ****                (++) RCC_CECCLKConfig(RCC_CECCLK_LSE) for LSE.
+  40:./stdperiph/source/stm32f37x_cec.c ****            (#) Enable CEC peripheral clock using RCC_APBPeriphClockCmd(RCC_APBPeriph_CEC, ENABLE).
+  41:./stdperiph/source/stm32f37x_cec.c ****            (#) Peripherals alternate function.
+  42:./stdperiph/source/stm32f37x_cec.c ****                (++) Connect the pin to the desired peripherals' Alternate Function (AF) using 
+  43:./stdperiph/source/stm32f37x_cec.c ****                GPIO_PinAFConfig() function.
+  44:./stdperiph/source/stm32f37x_cec.c ****                (++) Configure the desired pin in alternate function by:
+  45:./stdperiph/source/stm32f37x_cec.c ****                GPIO_InitStruct->GPIO_Mode = GPIO_Mode_AF.
+  46:./stdperiph/source/stm32f37x_cec.c ****                (++) Select the type open-drain and output speed via GPIO_OType 
+  47:./stdperiph/source/stm32f37x_cec.c ****                and GPIO_Speed members.
+  48:./stdperiph/source/stm32f37x_cec.c ****                (++) Call GPIO_Init() function.
+  49:./stdperiph/source/stm32f37x_cec.c ****            (#) Configure the Signal Free Time, Rx Tolerance, Stop reception generation 
+  50:./stdperiph/source/stm32f37x_cec.c ****                and Bit error generation using the CEC_Init() function.
+  51:./stdperiph/source/stm32f37x_cec.c ****                The function CEC_Init() must be called when the CEC peripheral is disabled.
+  52:./stdperiph/source/stm32f37x_cec.c ****            (#) Configure the CEC own address by calling the fuction CEC_OwnAddressConfig().
+  53:./stdperiph/source/stm32f37x_cec.c ****            (#) Optionally, you can configure the Listen mode using the function CEC_ListenModeCmd()
+  54:./stdperiph/source/stm32f37x_cec.c ****            (#) Enable the NVIC and the corresponding interrupt using the function 
+  55:./stdperiph/source/stm32f37x_cec.c ****                CEC_ITConfig() if you need to use interrupt mode.
+  56:./stdperiph/source/stm32f37x_cec.c ****                CEC_ITConfig() must be called before enabling the CEC peripheral.
+  57:./stdperiph/source/stm32f37x_cec.c ****            (#) Enable the CEC using the CEC_Cmd() function.
+  58:./stdperiph/source/stm32f37x_cec.c ****            (#) Charge the first data byte in the TXDR register using CEC_SendDataByte().
+  59:./stdperiph/source/stm32f37x_cec.c ****            (#) Enable the transmission of the Byte of a CEC message using CEC_StartOfMessage() 
+  60:./stdperiph/source/stm32f37x_cec.c ****            (#) Transmit single data through the CEC peripheral using CEC_SendDataByte() 
+  61:./stdperiph/source/stm32f37x_cec.c ****                and Receive the last transmitted byte using CEC_ReceiveDataByte().
+  62:./stdperiph/source/stm32f37x_cec.c ****            (#) Enable the CEC_EndOfMessage() in order to indicate the last byte of the message.
+  63:./stdperiph/source/stm32f37x_cec.c ****       [..]
+  64:./stdperiph/source/stm32f37x_cec.c ****            (@) If the listen mode is enabled, Stop reception generation and Bit error generation 
+  65:./stdperiph/source/stm32f37x_cec.c ****                must be in reset state.
+  66:./stdperiph/source/stm32f37x_cec.c ****            (@) If the CEC message consists of only 1 byte, the function CEC_EndOfMessage()
+  67:./stdperiph/source/stm32f37x_cec.c ****                must be called before CEC_StartOfMessage().
+  68:./stdperiph/source/stm32f37x_cec.c ****   
+  69:./stdperiph/source/stm32f37x_cec.c ****    @endverbatim
+  70:./stdperiph/source/stm32f37x_cec.c ****   *
+  71:./stdperiph/source/stm32f37x_cec.c ****   ******************************************************************************
+  72:./stdperiph/source/stm32f37x_cec.c ****   * @attention
+  73:./stdperiph/source/stm32f37x_cec.c ****   *
+  74:./stdperiph/source/stm32f37x_cec.c ****   * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
+  75:./stdperiph/source/stm32f37x_cec.c ****   *
+  76:./stdperiph/source/stm32f37x_cec.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  77:./stdperiph/source/stm32f37x_cec.c ****   * You may not use this file except in compliance with the License.
+  78:./stdperiph/source/stm32f37x_cec.c ****   * You may obtain a copy of the License at:
+  79:./stdperiph/source/stm32f37x_cec.c ****   *
+  80:./stdperiph/source/stm32f37x_cec.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  81:./stdperiph/source/stm32f37x_cec.c ****   *
+  82:./stdperiph/source/stm32f37x_cec.c ****   * Unless required by applicable law or agreed to in writing, software 
+  83:./stdperiph/source/stm32f37x_cec.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  84:./stdperiph/source/stm32f37x_cec.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  85:./stdperiph/source/stm32f37x_cec.c ****   * See the License for the specific language governing permissions and
+  86:./stdperiph/source/stm32f37x_cec.c ****   * limitations under the License.
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 3
+
+
+  87:./stdperiph/source/stm32f37x_cec.c ****   *
+  88:./stdperiph/source/stm32f37x_cec.c ****   ******************************************************************************
+  89:./stdperiph/source/stm32f37x_cec.c ****   */
+  90:./stdperiph/source/stm32f37x_cec.c **** 
+  91:./stdperiph/source/stm32f37x_cec.c **** 
+  92:./stdperiph/source/stm32f37x_cec.c **** /* Includes ------------------------------------------------------------------*/
+  93:./stdperiph/source/stm32f37x_cec.c **** #include "stm32f37x_cec.h"
+  94:./stdperiph/source/stm32f37x_cec.c **** #include "stm32f37x_rcc.h"
+  95:./stdperiph/source/stm32f37x_cec.c **** 
+  96:./stdperiph/source/stm32f37x_cec.c **** /** @addtogroup STM32F37x_StdPeriph_Driver
+  97:./stdperiph/source/stm32f37x_cec.c ****   * @{
+  98:./stdperiph/source/stm32f37x_cec.c ****   */
+  99:./stdperiph/source/stm32f37x_cec.c **** 
+ 100:./stdperiph/source/stm32f37x_cec.c **** /** @defgroup CEC 
+ 101:./stdperiph/source/stm32f37x_cec.c ****   * @brief CEC driver modules
+ 102:./stdperiph/source/stm32f37x_cec.c ****   * @{
+ 103:./stdperiph/source/stm32f37x_cec.c ****   */
+ 104:./stdperiph/source/stm32f37x_cec.c **** 
+ 105:./stdperiph/source/stm32f37x_cec.c **** /* Private typedef -----------------------------------------------------------*/
+ 106:./stdperiph/source/stm32f37x_cec.c **** /* Private define ------------------------------------------------------------*/
+ 107:./stdperiph/source/stm32f37x_cec.c **** #define BROADCAST_ADDRESS      ((uint32_t)0x0000F)      /* Broadcast address  */
+ 108:./stdperiph/source/stm32f37x_cec.c **** #define CFGR_CLEAR_MASK        ((uint32_t)0x7000FE00)   /* CFGR register Mask */
+ 109:./stdperiph/source/stm32f37x_cec.c **** 
+ 110:./stdperiph/source/stm32f37x_cec.c **** /* ------------- CEC registers bit address in the alias region -------------- */
+ 111:./stdperiph/source/stm32f37x_cec.c **** #define CEC_OFFSET                (CEC_BASE - PERIPH_BASE)
+ 112:./stdperiph/source/stm32f37x_cec.c **** 
+ 113:./stdperiph/source/stm32f37x_cec.c **** /* --- CR Register ---*/
+ 114:./stdperiph/source/stm32f37x_cec.c **** /* Alias word address of CECEN bit */
+ 115:./stdperiph/source/stm32f37x_cec.c **** #define CR_OFFSET                 (CEC_OFFSET + 0x00)
+ 116:./stdperiph/source/stm32f37x_cec.c **** #define CECEN_BitNumber           0x00
+ 117:./stdperiph/source/stm32f37x_cec.c **** #define CR_CECEN_BB               (PERIPH_BB_BASE + (CR_OFFSET * 32) + (CECEN_BitNumber * 4))
+ 118:./stdperiph/source/stm32f37x_cec.c **** 
+ 119:./stdperiph/source/stm32f37x_cec.c **** /* Alias word address of TXSOM bit */
+ 120:./stdperiph/source/stm32f37x_cec.c **** #define TXSOM_BitNumber           0x01
+ 121:./stdperiph/source/stm32f37x_cec.c **** #define CR_TXSOM_BB               (PERIPH_BB_BASE + (CR_OFFSET * 32) + (TXSOM_BitNumber * 4))
+ 122:./stdperiph/source/stm32f37x_cec.c **** 
+ 123:./stdperiph/source/stm32f37x_cec.c **** /* Alias word address of TXEOM bit */
+ 124:./stdperiph/source/stm32f37x_cec.c **** #define TXEOM_BitNumber           0x02
+ 125:./stdperiph/source/stm32f37x_cec.c **** #define CR_TXEOM_BB               (PERIPH_BB_BASE + (CR_OFFSET * 32) + (TXEOM_BitNumber * 4))
+ 126:./stdperiph/source/stm32f37x_cec.c **** 
+ 127:./stdperiph/source/stm32f37x_cec.c **** /* --- CFGR Register ---*/
+ 128:./stdperiph/source/stm32f37x_cec.c **** /* Alias word address of LSTN bit */
+ 129:./stdperiph/source/stm32f37x_cec.c **** #define CFGR_OFFSET               (CEC_OFFSET + 0x04)
+ 130:./stdperiph/source/stm32f37x_cec.c **** #define LSTN_BitNumber            0x1F
+ 131:./stdperiph/source/stm32f37x_cec.c **** #define CFGR_LSTN_BB              (PERIPH_BB_BASE + (CFGR_OFFSET * 32) + (LSTN_BitNumber * 4))
+ 132:./stdperiph/source/stm32f37x_cec.c **** 
+ 133:./stdperiph/source/stm32f37x_cec.c **** 
+ 134:./stdperiph/source/stm32f37x_cec.c **** /* Private macro -------------------------------------------------------------*/
+ 135:./stdperiph/source/stm32f37x_cec.c **** /* Private variables ---------------------------------------------------------*/
+ 136:./stdperiph/source/stm32f37x_cec.c **** /* Private function prototypes -----------------------------------------------*/
+ 137:./stdperiph/source/stm32f37x_cec.c **** /* Private functions ---------------------------------------------------------*/
+ 138:./stdperiph/source/stm32f37x_cec.c **** 
+ 139:./stdperiph/source/stm32f37x_cec.c **** /** @defgroup CEC_Private_Functions
+ 140:./stdperiph/source/stm32f37x_cec.c ****   * @{
+ 141:./stdperiph/source/stm32f37x_cec.c ****   */
+ 142:./stdperiph/source/stm32f37x_cec.c **** 
+ 143:./stdperiph/source/stm32f37x_cec.c **** /** @defgroup CEC_Group1 Initialization and Configuration functions
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 4
+
+
+ 144:./stdperiph/source/stm32f37x_cec.c ****  *  @brief   Initialization and Configuration functions
+ 145:./stdperiph/source/stm32f37x_cec.c ****  *
+ 146:./stdperiph/source/stm32f37x_cec.c **** @verbatim  
+ 147:./stdperiph/source/stm32f37x_cec.c ****  ===============================================================================
+ 148:./stdperiph/source/stm32f37x_cec.c ****                             ##### Initialization and Configuration functions #####
+ 149:./stdperiph/source/stm32f37x_cec.c ****  ===============================================================================
+ 150:./stdperiph/source/stm32f37x_cec.c ****       [..] This section provides functions allowing to initialize:
+ 151:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC own addresses
+ 152:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC Signal Free Time
+ 153:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC Rx Tolerance
+ 154:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC Stop Reception
+ 155:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC Bit Rising Error
+ 156:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC Long Bit Period Error
+ 157:./stdperiph/source/stm32f37x_cec.c ****       [..] This section provides also a function to configure the CEC peripheral in Listen Mode.
+ 158:./stdperiph/source/stm32f37x_cec.c ****            Messages addressed to different destination can be received when Listen mode is 
+ 159:./stdperiph/source/stm32f37x_cec.c ****            enabled without interfering with CEC bus.
+ 160:./stdperiph/source/stm32f37x_cec.c **** @endverbatim
+ 161:./stdperiph/source/stm32f37x_cec.c ****   * @{
+ 162:./stdperiph/source/stm32f37x_cec.c ****   */
+ 163:./stdperiph/source/stm32f37x_cec.c **** 
+ 164:./stdperiph/source/stm32f37x_cec.c **** /**
+ 165:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Deinitializes all CEC peripheral registers to their default reset values.
+ 166:./stdperiph/source/stm32f37x_cec.c ****   * @param  None
+ 167:./stdperiph/source/stm32f37x_cec.c ****   * @retval None
+ 168:./stdperiph/source/stm32f37x_cec.c ****   */
+ 169:./stdperiph/source/stm32f37x_cec.c **** void CEC_DeInit(void)
+ 170:./stdperiph/source/stm32f37x_cec.c **** {
+  30              		.loc 1 170 0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34 0000 08B5     		push	{r3, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 8
+  37              		.cfi_offset 3, -8
+  38              		.cfi_offset 14, -4
+ 171:./stdperiph/source/stm32f37x_cec.c ****   /* Enable all CEC reset state */
+ 172:./stdperiph/source/stm32f37x_cec.c ****   RCC_APB1PeriphResetCmd(RCC_APB1Periph_CEC, ENABLE);
+  39              		.loc 1 172 0
+  40 0002 0121     		movs	r1, #1
+  41 0004 4FF08040 		mov	r0, #1073741824
+  42 0008 FFF7FEFF 		bl	RCC_APB1PeriphResetCmd
+  43              	.LVL0:
+ 173:./stdperiph/source/stm32f37x_cec.c **** 
+ 174:./stdperiph/source/stm32f37x_cec.c ****   /* Release all CEC from reset state */
+ 175:./stdperiph/source/stm32f37x_cec.c ****   RCC_APB1PeriphResetCmd(RCC_APB1Periph_CEC, DISABLE);
+  44              		.loc 1 175 0
+  45 000c 0021     		movs	r1, #0
+  46 000e 4FF08040 		mov	r0, #1073741824
+  47 0012 FFF7FEFF 		bl	RCC_APB1PeriphResetCmd
+  48              	.LVL1:
+  49 0016 08BD     		pop	{r3, pc}
+  50              		.cfi_endproc
+  51              	.LFE111:
+  53              		.section	.text.CEC_Init,"ax",%progbits
+  54              		.align	2
+  55              		.global	CEC_Init
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 5
+
+
+  56              		.thumb
+  57              		.thumb_func
+  59              	CEC_Init:
+  60              	.LFB112:
+ 176:./stdperiph/source/stm32f37x_cec.c **** }
+ 177:./stdperiph/source/stm32f37x_cec.c **** 
+ 178:./stdperiph/source/stm32f37x_cec.c **** /**
+ 179:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Initializes the CEC peripheral according to the specified 
+ 180:./stdperiph/source/stm32f37x_cec.c ****   *         parameters in the CEC_InitStruct. 
+ 181:./stdperiph/source/stm32f37x_cec.c ****   * @note   The CEC parameters must be configured before enabling the CEC peripheral.
+ 182:./stdperiph/source/stm32f37x_cec.c ****   * @param  CEC_InitStruct: pointer to an CEC_InitTypeDef structure that
+ 183:./stdperiph/source/stm32f37x_cec.c ****   *         contains the configuration information for the specified
+ 184:./stdperiph/source/stm32f37x_cec.c ****   *         CEC peripheral.
+ 185:./stdperiph/source/stm32f37x_cec.c ****   * @retval None
+ 186:./stdperiph/source/stm32f37x_cec.c ****   */
+ 187:./stdperiph/source/stm32f37x_cec.c **** void CEC_Init(CEC_InitTypeDef* CEC_InitStruct)
+ 188:./stdperiph/source/stm32f37x_cec.c **** {
+  61              		.loc 1 188 0
+  62              		.cfi_startproc
+  63              		@ args = 0, pretend = 0, frame = 0
+  64              		@ frame_needed = 0, uses_anonymous_args = 0
+  65              		@ link register save eliminated.
+  66              	.LVL2:
+  67 0000 10B4     		push	{r4}
+  68              	.LCFI1:
+  69              		.cfi_def_cfa_offset 4
+  70              		.cfi_offset 4, -4
+  71              	.LVL3:
+ 189:./stdperiph/source/stm32f37x_cec.c ****   uint32_t tmpreg = 0;
+ 190:./stdperiph/source/stm32f37x_cec.c **** 
+ 191:./stdperiph/source/stm32f37x_cec.c ****   /* Check the parameters */
+ 192:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_CEC_SIGNAL_FREE_TIME(CEC_InitStruct->CEC_SignalFreeTime));
+ 193:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_CEC_RX_TOLERANCE(CEC_InitStruct->CEC_RxTolerance));
+ 194:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_CEC_STOP_RECEPTION(CEC_InitStruct->CEC_StopReception));
+ 195:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_CEC_BIT_RISING_ERROR(CEC_InitStruct->CEC_BitRisingError));
+ 196:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_CEC_LONG_BIT_PERIOD_ERROR(CEC_InitStruct->CEC_LongBitPeriodError));
+ 197:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_CEC_BDR_NO_GEN_ERROR(CEC_InitStruct->CEC_BRDNoGen));
+ 198:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_CEC_SFT_OPTION(CEC_InitStruct->CEC_SFTOption));
+ 199:./stdperiph/source/stm32f37x_cec.c **** 
+ 200:./stdperiph/source/stm32f37x_cec.c ****   /*---------------------------- CEC CFGR Configuration ----------------------*/
+ 201:./stdperiph/source/stm32f37x_cec.c ****   /* Get the CEC CFGR value */
+ 202:./stdperiph/source/stm32f37x_cec.c ****   tmpreg = CEC->CFGR;
+  72              		.loc 1 202 0
+  73 0002 0B4C     		ldr	r4, .L5
+  74 0004 6368     		ldr	r3, [r4, #4]
+  75              	.LVL4:
+ 203:./stdperiph/source/stm32f37x_cec.c **** 
+ 204:./stdperiph/source/stm32f37x_cec.c ****   /* Clear CFGR bits */
+ 205:./stdperiph/source/stm32f37x_cec.c ****   tmpreg &= CFGR_CLEAR_MASK;
+  76              		.loc 1 205 0
+  77 0006 0B49     		ldr	r1, .L5+4
+  78 0008 1940     		ands	r1, r1, r3
+  79              	.LVL5:
+ 206:./stdperiph/source/stm32f37x_cec.c **** 
+ 207:./stdperiph/source/stm32f37x_cec.c ****   /* Configure the CEC peripheral */
+ 208:./stdperiph/source/stm32f37x_cec.c ****   tmpreg |= (CEC_InitStruct->CEC_SignalFreeTime | CEC_InitStruct->CEC_RxTolerance |
+  80              		.loc 1 208 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 6
+
+
+  81 000a 0268     		ldr	r2, [r0]
+  82 000c 4368     		ldr	r3, [r0, #4]
+  83 000e 1A43     		orrs	r2, r2, r3
+ 209:./stdperiph/source/stm32f37x_cec.c ****              CEC_InitStruct->CEC_StopReception  | CEC_InitStruct->CEC_BitRisingError |
+  84              		.loc 1 209 0
+  85 0010 8368     		ldr	r3, [r0, #8]
+ 208:./stdperiph/source/stm32f37x_cec.c ****              CEC_InitStruct->CEC_StopReception  | CEC_InitStruct->CEC_BitRisingError |
+  86              		.loc 1 208 0
+  87 0012 1A43     		orrs	r2, r2, r3
+  88              		.loc 1 209 0
+  89 0014 C368     		ldr	r3, [r0, #12]
+  90 0016 1A43     		orrs	r2, r2, r3
+ 210:./stdperiph/source/stm32f37x_cec.c ****              CEC_InitStruct->CEC_LongBitPeriodError|CEC_InitStruct->CEC_BRDNoGen |
+  91              		.loc 1 210 0
+  92 0018 0369     		ldr	r3, [r0, #16]
+ 209:./stdperiph/source/stm32f37x_cec.c ****              CEC_InitStruct->CEC_StopReception  | CEC_InitStruct->CEC_BitRisingError |
+  93              		.loc 1 209 0
+  94 001a 1A43     		orrs	r2, r2, r3
+  95              		.loc 1 210 0
+  96 001c 4369     		ldr	r3, [r0, #20]
+  97 001e 1343     		orrs	r3, r3, r2
+ 211:./stdperiph/source/stm32f37x_cec.c ****              CEC_InitStruct->CEC_SFTOption);
+  98              		.loc 1 211 0
+  99 0020 8269     		ldr	r2, [r0, #24]
+ 210:./stdperiph/source/stm32f37x_cec.c ****              CEC_InitStruct->CEC_LongBitPeriodError|CEC_InitStruct->CEC_BRDNoGen |
+ 100              		.loc 1 210 0
+ 101 0022 1343     		orrs	r3, r3, r2
+ 208:./stdperiph/source/stm32f37x_cec.c ****              CEC_InitStruct->CEC_StopReception  | CEC_InitStruct->CEC_BitRisingError |
+ 102              		.loc 1 208 0
+ 103 0024 0B43     		orrs	r3, r3, r1
+ 104              	.LVL6:
+ 212:./stdperiph/source/stm32f37x_cec.c **** 
+ 213:./stdperiph/source/stm32f37x_cec.c ****   /* Write to CEC CFGR  register */
+ 214:./stdperiph/source/stm32f37x_cec.c ****   CEC->CFGR = tmpreg;
+ 105              		.loc 1 214 0
+ 106 0026 6360     		str	r3, [r4, #4]
+ 215:./stdperiph/source/stm32f37x_cec.c **** }
+ 107              		.loc 1 215 0
+ 108 0028 5DF8044B 		ldr	r4, [sp], #4
+ 109              	.LCFI2:
+ 110              		.cfi_restore 4
+ 111              		.cfi_def_cfa_offset 0
+ 112 002c 7047     		bx	lr
+ 113              	.L6:
+ 114 002e 00BF     		.align	2
+ 115              	.L5:
+ 116 0030 00780040 		.word	1073772544
+ 117 0034 00FE0070 		.word	1879113216
+ 118              		.cfi_endproc
+ 119              	.LFE112:
+ 121              		.section	.text.CEC_StructInit,"ax",%progbits
+ 122              		.align	2
+ 123              		.global	CEC_StructInit
+ 124              		.thumb
+ 125              		.thumb_func
+ 127              	CEC_StructInit:
+ 128              	.LFB113:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 7
+
+
+ 216:./stdperiph/source/stm32f37x_cec.c **** 
+ 217:./stdperiph/source/stm32f37x_cec.c **** /**
+ 218:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Fills each CEC_InitStruct member with its default value.
+ 219:./stdperiph/source/stm32f37x_cec.c ****   * @param  CEC_InitStruct: pointer to a CEC_InitTypeDef structure which will 
+ 220:./stdperiph/source/stm32f37x_cec.c ****   *         be initialized.
+ 221:./stdperiph/source/stm32f37x_cec.c ****   * @retval None
+ 222:./stdperiph/source/stm32f37x_cec.c ****   */
+ 223:./stdperiph/source/stm32f37x_cec.c **** void CEC_StructInit(CEC_InitTypeDef* CEC_InitStruct)
+ 224:./stdperiph/source/stm32f37x_cec.c **** {
+ 129              		.loc 1 224 0
+ 130              		.cfi_startproc
+ 131              		@ args = 0, pretend = 0, frame = 0
+ 132              		@ frame_needed = 0, uses_anonymous_args = 0
+ 133              		@ link register save eliminated.
+ 134              	.LVL7:
+ 225:./stdperiph/source/stm32f37x_cec.c ****   CEC_InitStruct->CEC_SignalFreeTime = CEC_SignalFreeTime_Standard;
+ 135              		.loc 1 225 0
+ 136 0000 0023     		movs	r3, #0
+ 137 0002 0360     		str	r3, [r0]
+ 226:./stdperiph/source/stm32f37x_cec.c ****   CEC_InitStruct->CEC_RxTolerance = CEC_RxTolerance_Standard;
+ 138              		.loc 1 226 0
+ 139 0004 4360     		str	r3, [r0, #4]
+ 227:./stdperiph/source/stm32f37x_cec.c ****   CEC_InitStruct->CEC_StopReception = CEC_StopReception_Off;
+ 140              		.loc 1 227 0
+ 141 0006 8360     		str	r3, [r0, #8]
+ 228:./stdperiph/source/stm32f37x_cec.c ****   CEC_InitStruct->CEC_BitRisingError = CEC_BitRisingError_Off;
+ 142              		.loc 1 228 0
+ 143 0008 C360     		str	r3, [r0, #12]
+ 229:./stdperiph/source/stm32f37x_cec.c ****   CEC_InitStruct->CEC_LongBitPeriodError = CEC_LongBitPeriodError_Off;
+ 144              		.loc 1 229 0
+ 145 000a 0361     		str	r3, [r0, #16]
+ 230:./stdperiph/source/stm32f37x_cec.c ****   CEC_InitStruct->CEC_BRDNoGen = CEC_BRDNoGen_Off;
+ 146              		.loc 1 230 0
+ 147 000c 4361     		str	r3, [r0, #20]
+ 231:./stdperiph/source/stm32f37x_cec.c ****   CEC_InitStruct->CEC_SFTOption = CEC_SFTOption_Off;
+ 148              		.loc 1 231 0
+ 149 000e 8361     		str	r3, [r0, #24]
+ 150 0010 7047     		bx	lr
+ 151              		.cfi_endproc
+ 152              	.LFE113:
+ 154 0012 00BF     		.section	.text.CEC_Cmd,"ax",%progbits
+ 155              		.align	2
+ 156              		.global	CEC_Cmd
+ 157              		.thumb
+ 158              		.thumb_func
+ 160              	CEC_Cmd:
+ 161              	.LFB114:
+ 232:./stdperiph/source/stm32f37x_cec.c **** }
+ 233:./stdperiph/source/stm32f37x_cec.c **** 
+ 234:./stdperiph/source/stm32f37x_cec.c **** /**
+ 235:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Enables or disables the CEC peripheral.
+ 236:./stdperiph/source/stm32f37x_cec.c ****   * @param  NewState: new state of the CEC peripheral. 
+ 237:./stdperiph/source/stm32f37x_cec.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 238:./stdperiph/source/stm32f37x_cec.c ****   * @retval None
+ 239:./stdperiph/source/stm32f37x_cec.c ****   */
+ 240:./stdperiph/source/stm32f37x_cec.c **** void CEC_Cmd(FunctionalState NewState)
+ 241:./stdperiph/source/stm32f37x_cec.c **** {
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 8
+
+
+ 162              		.loc 1 241 0
+ 163              		.cfi_startproc
+ 164              		@ args = 0, pretend = 0, frame = 0
+ 165              		@ frame_needed = 0, uses_anonymous_args = 0
+ 166              		@ link register save eliminated.
+ 167              	.LVL8:
+ 242:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 243:./stdperiph/source/stm32f37x_cec.c **** 
+ 244:./stdperiph/source/stm32f37x_cec.c ****   *(__IO uint32_t *) CR_CECEN_BB = (uint32_t)NewState;
+ 168              		.loc 1 244 0
+ 169 0000 014B     		ldr	r3, .L9
+ 170 0002 1860     		str	r0, [r3]
+ 171 0004 7047     		bx	lr
+ 172              	.L10:
+ 173 0006 00BF     		.align	2
+ 174              	.L9:
+ 175 0008 00000F42 		.word	1108279296
+ 176              		.cfi_endproc
+ 177              	.LFE114:
+ 179              		.section	.text.CEC_ListenModeCmd,"ax",%progbits
+ 180              		.align	2
+ 181              		.global	CEC_ListenModeCmd
+ 182              		.thumb
+ 183              		.thumb_func
+ 185              	CEC_ListenModeCmd:
+ 186              	.LFB115:
+ 245:./stdperiph/source/stm32f37x_cec.c **** }
+ 246:./stdperiph/source/stm32f37x_cec.c **** 
+ 247:./stdperiph/source/stm32f37x_cec.c **** /**
+ 248:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Enables or disables the CEC Listen Mode.
+ 249:./stdperiph/source/stm32f37x_cec.c ****   * @param  NewState: new state of the Listen Mode.
+ 250:./stdperiph/source/stm32f37x_cec.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 251:./stdperiph/source/stm32f37x_cec.c ****   * @retval None
+ 252:./stdperiph/source/stm32f37x_cec.c ****   */
+ 253:./stdperiph/source/stm32f37x_cec.c **** void CEC_ListenModeCmd(FunctionalState NewState)
+ 254:./stdperiph/source/stm32f37x_cec.c **** { 
+ 187              		.loc 1 254 0
+ 188              		.cfi_startproc
+ 189              		@ args = 0, pretend = 0, frame = 0
+ 190              		@ frame_needed = 0, uses_anonymous_args = 0
+ 191              		@ link register save eliminated.
+ 192              	.LVL9:
+ 255:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 256:./stdperiph/source/stm32f37x_cec.c **** 
+ 257:./stdperiph/source/stm32f37x_cec.c ****   *(__IO uint32_t *) CFGR_LSTN_BB = (uint32_t)NewState;
+ 193              		.loc 1 257 0
+ 194 0000 014B     		ldr	r3, .L12
+ 195 0002 1860     		str	r0, [r3]
+ 196 0004 7047     		bx	lr
+ 197              	.L13:
+ 198 0006 00BF     		.align	2
+ 199              	.L12:
+ 200 0008 FC000F42 		.word	1108279548
+ 201              		.cfi_endproc
+ 202              	.LFE115:
+ 204              		.section	.text.CEC_OwnAddressConfig,"ax",%progbits
+ 205              		.align	2
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 9
+
+
+ 206              		.global	CEC_OwnAddressConfig
+ 207              		.thumb
+ 208              		.thumb_func
+ 210              	CEC_OwnAddressConfig:
+ 211              	.LFB116:
+ 258:./stdperiph/source/stm32f37x_cec.c **** }
+ 259:./stdperiph/source/stm32f37x_cec.c **** 
+ 260:./stdperiph/source/stm32f37x_cec.c **** /**
+ 261:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Defines the Own Address of the CEC device.
+ 262:./stdperiph/source/stm32f37x_cec.c ****   * @param  CEC_OwnAddress: The CEC own address.
+ 263:./stdperiph/source/stm32f37x_cec.c ****   * @retval None
+ 264:./stdperiph/source/stm32f37x_cec.c ****   */
+ 265:./stdperiph/source/stm32f37x_cec.c **** void CEC_OwnAddressConfig(uint8_t CEC_OwnAddress)
+ 266:./stdperiph/source/stm32f37x_cec.c **** {
+ 212              		.loc 1 266 0
+ 213              		.cfi_startproc
+ 214              		@ args = 0, pretend = 0, frame = 0
+ 215              		@ frame_needed = 0, uses_anonymous_args = 0
+ 216              		@ link register save eliminated.
+ 217              	.LVL10:
+ 267:./stdperiph/source/stm32f37x_cec.c ****   uint32_t tmp =0x00;
+ 268:./stdperiph/source/stm32f37x_cec.c ****   
+ 269:./stdperiph/source/stm32f37x_cec.c ****   /* Check the parameters */
+ 270:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_CEC_ADDRESS(CEC_OwnAddress));
+ 271:./stdperiph/source/stm32f37x_cec.c ****   tmp = 1 <<(CEC_OwnAddress + 16);
+ 218              		.loc 1 271 0
+ 219 0000 1030     		adds	r0, r0, #16
+ 220              	.LVL11:
+ 221 0002 0123     		movs	r3, #1
+ 222 0004 03FA00F0 		lsl	r0, r3, r0
+ 223              	.LVL12:
+ 272:./stdperiph/source/stm32f37x_cec.c ****   /* Set the CEC own address */
+ 273:./stdperiph/source/stm32f37x_cec.c ****   CEC->CFGR |= tmp;
+ 224              		.loc 1 273 0
+ 225 0008 024A     		ldr	r2, .L15
+ 226 000a 5368     		ldr	r3, [r2, #4]
+ 227 000c 1843     		orrs	r0, r0, r3
+ 228              	.LVL13:
+ 229 000e 5060     		str	r0, [r2, #4]
+ 230 0010 7047     		bx	lr
+ 231              	.L16:
+ 232 0012 00BF     		.align	2
+ 233              	.L15:
+ 234 0014 00780040 		.word	1073772544
+ 235              		.cfi_endproc
+ 236              	.LFE116:
+ 238              		.section	.text.CEC_OwnAddressClear,"ax",%progbits
+ 239              		.align	2
+ 240              		.global	CEC_OwnAddressClear
+ 241              		.thumb
+ 242              		.thumb_func
+ 244              	CEC_OwnAddressClear:
+ 245              	.LFB117:
+ 274:./stdperiph/source/stm32f37x_cec.c **** }
+ 275:./stdperiph/source/stm32f37x_cec.c **** 
+ 276:./stdperiph/source/stm32f37x_cec.c **** /**
+ 277:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Clears the Own Address of the CEC device.
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 10
+
+
+ 278:./stdperiph/source/stm32f37x_cec.c ****   * @param  CEC_OwnAddress: The CEC own address.
+ 279:./stdperiph/source/stm32f37x_cec.c ****   * @retval None
+ 280:./stdperiph/source/stm32f37x_cec.c ****   */
+ 281:./stdperiph/source/stm32f37x_cec.c **** void CEC_OwnAddressClear(void)
+ 282:./stdperiph/source/stm32f37x_cec.c **** {
+ 246              		.loc 1 282 0
+ 247              		.cfi_startproc
+ 248              		@ args = 0, pretend = 0, frame = 0
+ 249              		@ frame_needed = 0, uses_anonymous_args = 0
+ 250              		@ link register save eliminated.
+ 283:./stdperiph/source/stm32f37x_cec.c ****   /* Set the CEC own address */
+ 284:./stdperiph/source/stm32f37x_cec.c ****   CEC->CFGR = 0x0;
+ 251              		.loc 1 284 0
+ 252 0000 0022     		movs	r2, #0
+ 253 0002 014B     		ldr	r3, .L18
+ 254 0004 5A60     		str	r2, [r3, #4]
+ 255 0006 7047     		bx	lr
+ 256              	.L19:
+ 257              		.align	2
+ 258              	.L18:
+ 259 0008 00780040 		.word	1073772544
+ 260              		.cfi_endproc
+ 261              	.LFE117:
+ 263              		.section	.text.CEC_SendData,"ax",%progbits
+ 264              		.align	2
+ 265              		.global	CEC_SendData
+ 266              		.thumb
+ 267              		.thumb_func
+ 269              	CEC_SendData:
+ 270              	.LFB118:
+ 285:./stdperiph/source/stm32f37x_cec.c **** }
+ 286:./stdperiph/source/stm32f37x_cec.c **** 
+ 287:./stdperiph/source/stm32f37x_cec.c **** /**
+ 288:./stdperiph/source/stm32f37x_cec.c ****   * @}
+ 289:./stdperiph/source/stm32f37x_cec.c ****   */
+ 290:./stdperiph/source/stm32f37x_cec.c **** 
+ 291:./stdperiph/source/stm32f37x_cec.c **** /** @defgroup CEC_Group2 Data transfers functions
+ 292:./stdperiph/source/stm32f37x_cec.c ****  *  @brief    Data transfers functions
+ 293:./stdperiph/source/stm32f37x_cec.c ****  *
+ 294:./stdperiph/source/stm32f37x_cec.c **** @verbatim
+ 295:./stdperiph/source/stm32f37x_cec.c ****  ===============================================================================
+ 296:./stdperiph/source/stm32f37x_cec.c ****                             ##### Data transfers functions #####
+ 297:./stdperiph/source/stm32f37x_cec.c ****  ===============================================================================
+ 298:./stdperiph/source/stm32f37x_cec.c ****     [..] This section provides functions allowing the CEC data transfers.The read 
+ 299:./stdperiph/source/stm32f37x_cec.c ****          access of the CEC_RXDR register can be done using the CEC_ReceiveData()function 
+ 300:./stdperiph/source/stm32f37x_cec.c ****          and returns the Rx buffered value. Whereas a write access to the CEC_TXDR can be 
+ 301:./stdperiph/source/stm32f37x_cec.c ****          done using CEC_SendData() function.
+ 302:./stdperiph/source/stm32f37x_cec.c **** @endverbatim
+ 303:./stdperiph/source/stm32f37x_cec.c ****   * @{
+ 304:./stdperiph/source/stm32f37x_cec.c ****   */
+ 305:./stdperiph/source/stm32f37x_cec.c **** 
+ 306:./stdperiph/source/stm32f37x_cec.c **** /**
+ 307:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Transmits single data through the CEC peripheral.
+ 308:./stdperiph/source/stm32f37x_cec.c ****   * @param  Data: the data to transmit.
+ 309:./stdperiph/source/stm32f37x_cec.c ****   * @retval None
+ 310:./stdperiph/source/stm32f37x_cec.c ****   */
+ 311:./stdperiph/source/stm32f37x_cec.c **** void CEC_SendData(uint8_t Data)
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 11
+
+
+ 312:./stdperiph/source/stm32f37x_cec.c **** {
+ 271              		.loc 1 312 0
+ 272              		.cfi_startproc
+ 273              		@ args = 0, pretend = 0, frame = 0
+ 274              		@ frame_needed = 0, uses_anonymous_args = 0
+ 275              		@ link register save eliminated.
+ 276              	.LVL14:
+ 313:./stdperiph/source/stm32f37x_cec.c ****   /* Transmit Data */
+ 314:./stdperiph/source/stm32f37x_cec.c ****   CEC->TXDR = Data;
+ 277              		.loc 1 314 0
+ 278 0000 014B     		ldr	r3, .L21
+ 279 0002 9860     		str	r0, [r3, #8]
+ 280 0004 7047     		bx	lr
+ 281              	.L22:
+ 282 0006 00BF     		.align	2
+ 283              	.L21:
+ 284 0008 00780040 		.word	1073772544
+ 285              		.cfi_endproc
+ 286              	.LFE118:
+ 288              		.section	.text.CEC_ReceiveData,"ax",%progbits
+ 289              		.align	2
+ 290              		.global	CEC_ReceiveData
+ 291              		.thumb
+ 292              		.thumb_func
+ 294              	CEC_ReceiveData:
+ 295              	.LFB119:
+ 315:./stdperiph/source/stm32f37x_cec.c **** }
+ 316:./stdperiph/source/stm32f37x_cec.c **** 
+ 317:./stdperiph/source/stm32f37x_cec.c **** /**
+ 318:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Returns the most recent received data by the CEC peripheral.
+ 319:./stdperiph/source/stm32f37x_cec.c ****   * @param  None
+ 320:./stdperiph/source/stm32f37x_cec.c ****   * @retval The received data.
+ 321:./stdperiph/source/stm32f37x_cec.c ****   */
+ 322:./stdperiph/source/stm32f37x_cec.c **** uint8_t CEC_ReceiveData(void)
+ 323:./stdperiph/source/stm32f37x_cec.c **** {
+ 296              		.loc 1 323 0
+ 297              		.cfi_startproc
+ 298              		@ args = 0, pretend = 0, frame = 0
+ 299              		@ frame_needed = 0, uses_anonymous_args = 0
+ 300              		@ link register save eliminated.
+ 324:./stdperiph/source/stm32f37x_cec.c ****   /* Receive Data */
+ 325:./stdperiph/source/stm32f37x_cec.c ****   return (uint8_t)(CEC->RXDR);
+ 301              		.loc 1 325 0
+ 302 0000 014B     		ldr	r3, .L24
+ 303 0002 D868     		ldr	r0, [r3, #12]
+ 326:./stdperiph/source/stm32f37x_cec.c **** }
+ 304              		.loc 1 326 0
+ 305 0004 C0B2     		uxtb	r0, r0
+ 306 0006 7047     		bx	lr
+ 307              	.L25:
+ 308              		.align	2
+ 309              	.L24:
+ 310 0008 00780040 		.word	1073772544
+ 311              		.cfi_endproc
+ 312              	.LFE119:
+ 314              		.section	.text.CEC_StartOfMessage,"ax",%progbits
+ 315              		.align	2
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 12
+
+
+ 316              		.global	CEC_StartOfMessage
+ 317              		.thumb
+ 318              		.thumb_func
+ 320              	CEC_StartOfMessage:
+ 321              	.LFB120:
+ 327:./stdperiph/source/stm32f37x_cec.c **** 
+ 328:./stdperiph/source/stm32f37x_cec.c **** /**
+ 329:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Starts a new message.
+ 330:./stdperiph/source/stm32f37x_cec.c ****   * @param  None
+ 331:./stdperiph/source/stm32f37x_cec.c ****   * @retval None
+ 332:./stdperiph/source/stm32f37x_cec.c ****   */
+ 333:./stdperiph/source/stm32f37x_cec.c **** void CEC_StartOfMessage(void)
+ 334:./stdperiph/source/stm32f37x_cec.c **** {
+ 322              		.loc 1 334 0
+ 323              		.cfi_startproc
+ 324              		@ args = 0, pretend = 0, frame = 0
+ 325              		@ frame_needed = 0, uses_anonymous_args = 0
+ 326              		@ link register save eliminated.
+ 335:./stdperiph/source/stm32f37x_cec.c ****   /* Starts of new message */
+ 336:./stdperiph/source/stm32f37x_cec.c ****   *(__IO uint32_t *) CR_TXSOM_BB = (uint32_t)0x1;
+ 327              		.loc 1 336 0
+ 328 0000 0122     		movs	r2, #1
+ 329 0002 014B     		ldr	r3, .L27
+ 330 0004 1A60     		str	r2, [r3]
+ 331 0006 7047     		bx	lr
+ 332              	.L28:
+ 333              		.align	2
+ 334              	.L27:
+ 335 0008 04000F42 		.word	1108279300
+ 336              		.cfi_endproc
+ 337              	.LFE120:
+ 339              		.section	.text.CEC_EndOfMessage,"ax",%progbits
+ 340              		.align	2
+ 341              		.global	CEC_EndOfMessage
+ 342              		.thumb
+ 343              		.thumb_func
+ 345              	CEC_EndOfMessage:
+ 346              	.LFB121:
+ 337:./stdperiph/source/stm32f37x_cec.c **** }
+ 338:./stdperiph/source/stm32f37x_cec.c **** 
+ 339:./stdperiph/source/stm32f37x_cec.c **** /**
+ 340:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Transmits message with an EOM bit.
+ 341:./stdperiph/source/stm32f37x_cec.c ****   * @param  None
+ 342:./stdperiph/source/stm32f37x_cec.c ****   * @retval None
+ 343:./stdperiph/source/stm32f37x_cec.c ****   */
+ 344:./stdperiph/source/stm32f37x_cec.c **** void CEC_EndOfMessage(void)
+ 345:./stdperiph/source/stm32f37x_cec.c **** {
+ 347              		.loc 1 345 0
+ 348              		.cfi_startproc
+ 349              		@ args = 0, pretend = 0, frame = 0
+ 350              		@ frame_needed = 0, uses_anonymous_args = 0
+ 351              		@ link register save eliminated.
+ 346:./stdperiph/source/stm32f37x_cec.c ****   /* The data byte will be transmitted with an EOM bit */
+ 347:./stdperiph/source/stm32f37x_cec.c ****   *(__IO uint32_t *) CR_TXEOM_BB = (uint32_t)0x1;
+ 352              		.loc 1 347 0
+ 353 0000 0122     		movs	r2, #1
+ 354 0002 014B     		ldr	r3, .L30
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 13
+
+
+ 355 0004 1A60     		str	r2, [r3]
+ 356 0006 7047     		bx	lr
+ 357              	.L31:
+ 358              		.align	2
+ 359              	.L30:
+ 360 0008 08000F42 		.word	1108279304
+ 361              		.cfi_endproc
+ 362              	.LFE121:
+ 364              		.section	.text.CEC_ITConfig,"ax",%progbits
+ 365              		.align	2
+ 366              		.global	CEC_ITConfig
+ 367              		.thumb
+ 368              		.thumb_func
+ 370              	CEC_ITConfig:
+ 371              	.LFB122:
+ 348:./stdperiph/source/stm32f37x_cec.c **** }
+ 349:./stdperiph/source/stm32f37x_cec.c **** 
+ 350:./stdperiph/source/stm32f37x_cec.c **** /**
+ 351:./stdperiph/source/stm32f37x_cec.c ****   * @}
+ 352:./stdperiph/source/stm32f37x_cec.c ****   */
+ 353:./stdperiph/source/stm32f37x_cec.c **** 
+ 354:./stdperiph/source/stm32f37x_cec.c **** /** @defgroup CEC_Group3 Interrupts and flags management functions
+ 355:./stdperiph/source/stm32f37x_cec.c ****  *  @brief    Interrupts and flags management functions
+ 356:./stdperiph/source/stm32f37x_cec.c **** *
+ 357:./stdperiph/source/stm32f37x_cec.c **** @verbatim
+ 358:./stdperiph/source/stm32f37x_cec.c ****  ===============================================================================
+ 359:./stdperiph/source/stm32f37x_cec.c ****                             ##### Interrupts and flags management functions ##### 
+ 360:./stdperiph/source/stm32f37x_cec.c ****  ===============================================================================
+ 361:./stdperiph/source/stm32f37x_cec.c ****     [..] This section provides functions allowing to configure the CEC Interrupts
+ 362:./stdperiph/source/stm32f37x_cec.c ****          sources and check or clear the flags or pending bits status.
+ 363:./stdperiph/source/stm32f37x_cec.c ****     [..] The user should identify which mode will be used in his application to manage
+ 364:./stdperiph/source/stm32f37x_cec.c ****          the communication: Polling mode or Interrupt mode.
+ 365:./stdperiph/source/stm32f37x_cec.c ****   
+ 366:./stdperiph/source/stm32f37x_cec.c ****     [..] In polling mode, the CEC can be managed by the following flags:
+ 367:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC_FLAG_TXACKE : to indicate a missing acknowledge in transmission mode.
+ 368:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC_FLAG_TXERR  : to indicate an error occurs during transmission mode.
+ 369:./stdperiph/source/stm32f37x_cec.c ****                                   The initiator detects low impedance in the CEC line.
+ 370:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC_FLAG_TXUDR  : to indicate if an underrun error occurs in transmission mode.
+ 371:./stdperiph/source/stm32f37x_cec.c ****                                   The transmission is enabled while the software has not yet 
+ 372:./stdperiph/source/stm32f37x_cec.c ****                                   loaded any value into the TXDR register.
+ 373:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC_FLAG_TXEND  : to indicate the end of successful transmission.
+ 374:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC_FLAG_TXBR   : to indicate the next transmission data has to be written to TXDR.
+ 375:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC_FLAG_ARBLST : to indicate arbitration lost in the case of two CEC devices
+ 376:./stdperiph/source/stm32f37x_cec.c ****                                   starting at the same time.
+ 377:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC_FLAG_RXACKE : to indicate a missing acknowledge in receive mode.
+ 378:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC_FLAG_LBPE   : to indicate a long bit period error generated during receive mode
+ 379:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC_FLAG_SBPE   : to indicate a short bit period error generated during receive mod
+ 380:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC_FLAG_BRE    : to indicate a bit rising error generated during receive mode.
+ 381:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC_FLAG_RXOVR  : to indicate if an overrun error occur while receiving a CEC messa
+ 382:./stdperiph/source/stm32f37x_cec.c ****                                   A byte is not yet received while a new byte is stored in the RXDR
+ 383:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC_FLAG_RXEND  : to indicate the end Of reception
+ 384:./stdperiph/source/stm32f37x_cec.c ****             (+) CEC_FLAG_RXBR   : to indicate a new byte has been received from the CEC line and 
+ 385:./stdperiph/source/stm32f37x_cec.c ****                                   stored into the RXDR buffer.
+ 386:./stdperiph/source/stm32f37x_cec.c ****     [..]
+ 387:./stdperiph/source/stm32f37x_cec.c ****            (@)In this Mode, it is advised to use the following functions:
+ 388:./stdperiph/source/stm32f37x_cec.c ****               FlagStatus CEC_GetFlagStatus(uint16_t CEC_FLAG);
+ 389:./stdperiph/source/stm32f37x_cec.c ****               void CEC_ClearFlag(uint16_t CEC_FLAG);
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 14
+
+
+ 390:./stdperiph/source/stm32f37x_cec.c **** 
+ 391:./stdperiph/source/stm32f37x_cec.c ****     [..] In Interrupt mode, the CEC can be managed by the following interrupt sources:
+ 392:./stdperiph/source/stm32f37x_cec.c ****            (+) CEC_IT_TXACKE : to indicate a TX Missing acknowledge 
+ 393:./stdperiph/source/stm32f37x_cec.c ****            (+) CEC_IT_TXACKE : to indicate a missing acknowledge in transmission mode.
+ 394:./stdperiph/source/stm32f37x_cec.c ****            (+) CEC_IT_TXERR  : to indicate an error occurs during transmission mode.
+ 395:./stdperiph/source/stm32f37x_cec.c ****                                The initiator detects low impedance in the CEC line.
+ 396:./stdperiph/source/stm32f37x_cec.c ****            (+) CEC_IT_TXUDR  : to indicate if an underrun error occurs in transmission mode.
+ 397:./stdperiph/source/stm32f37x_cec.c ****                                The transmission is enabled while the software has not yet 
+ 398:./stdperiph/source/stm32f37x_cec.c ****                                loaded any value into the TXDR register.
+ 399:./stdperiph/source/stm32f37x_cec.c ****            (+) CEC_IT_TXEND  : to indicate the end of successful transmission.
+ 400:./stdperiph/source/stm32f37x_cec.c ****            (+) CEC_IT_TXBR   : to indicate the next transmission data has to be written to TXDR reg
+ 401:./stdperiph/source/stm32f37x_cec.c ****            (+) CEC_IT_ARBLST : to indicate arbitration lost in the case of two CEC devices
+ 402:./stdperiph/source/stm32f37x_cec.c ****                                 starting at the same time.
+ 403:./stdperiph/source/stm32f37x_cec.c ****            (+) CEC_IT_RXACKE : to indicate a missing acknowledge in receive mode.
+ 404:./stdperiph/source/stm32f37x_cec.c ****            (+) CEC_IT_LBPE   : to indicate a long bit period error generated during receive mode.
+ 405:./stdperiph/source/stm32f37x_cec.c ****            (+) CEC_IT_SBPE   : to indicate a short bit period error generated during receive mode.
+ 406:./stdperiph/source/stm32f37x_cec.c ****            (+) CEC_IT_BRE    : to indicate a bit rising error generated during receive mode.
+ 407:./stdperiph/source/stm32f37x_cec.c ****            (+) CEC_IT_RXOVR  : to indicate if an overrun error occur while receiving a CEC message.
+ 408:./stdperiph/source/stm32f37x_cec.c ****                                A byte is not yet received while a new byte is stored in the RXDR re
+ 409:./stdperiph/source/stm32f37x_cec.c ****            (+) CEC_IT_RXEND  : to indicate the end Of reception
+ 410:./stdperiph/source/stm32f37x_cec.c ****            (+) CEC_IT_RXBR   : to indicate a new byte has been received from the CEC line and 
+ 411:./stdperiph/source/stm32f37x_cec.c ****                                 stored into the RXDR buffer.
+ 412:./stdperiph/source/stm32f37x_cec.c ****     [..]
+ 413:./stdperiph/source/stm32f37x_cec.c ****            (@)In this Mode it is advised to use the following functions:
+ 414:./stdperiph/source/stm32f37x_cec.c ****               void CEC_ITConfig( uint16_t CEC_IT, FunctionalState NewState);
+ 415:./stdperiph/source/stm32f37x_cec.c ****               ITStatus CEC_GetITStatus(uint16_t CEC_IT);
+ 416:./stdperiph/source/stm32f37x_cec.c ****               void CEC_ClearITPendingBit(uint16_t CEC_IT);
+ 417:./stdperiph/source/stm32f37x_cec.c ****               
+ 418:./stdperiph/source/stm32f37x_cec.c **** 
+ 419:./stdperiph/source/stm32f37x_cec.c **** @endverbatim
+ 420:./stdperiph/source/stm32f37x_cec.c ****   * @{
+ 421:./stdperiph/source/stm32f37x_cec.c ****   */
+ 422:./stdperiph/source/stm32f37x_cec.c **** 
+ 423:./stdperiph/source/stm32f37x_cec.c **** /**
+ 424:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Enables or disables the selected CEC interrupts.
+ 425:./stdperiph/source/stm32f37x_cec.c ****   * @param  CEC_IT: specifies the CEC interrupt source to be enabled.
+ 426:./stdperiph/source/stm32f37x_cec.c ****   *          This parameter can be any combination of the following values:
+ 427:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXACKE: Tx Missing acknowledge Error
+ 428:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXERR: Tx Error.
+ 429:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXUDR: Tx-Buffer Underrun.
+ 430:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXEND: End of Transmission (successful transmission of the last byte).
+ 431:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXBR: Tx-Byte Request.
+ 432:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_ARBLST: Arbitration Lost
+ 433:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_RXACKE: Rx-Missing Acknowledge
+ 434:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_LBPE: Rx Long period Error
+ 435:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_SBPE: Rx Short period Error
+ 436:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_BRE: Rx Bit Rising Error
+ 437:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_RXOVR: Rx Overrun.
+ 438:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_RXEND: End Of Reception
+ 439:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_RXBR: Rx-Byte Received
+ 440:./stdperiph/source/stm32f37x_cec.c ****   * @param  NewState: new state of the selected CEC interrupts.
+ 441:./stdperiph/source/stm32f37x_cec.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 442:./stdperiph/source/stm32f37x_cec.c ****   * @retval None
+ 443:./stdperiph/source/stm32f37x_cec.c ****   */
+ 444:./stdperiph/source/stm32f37x_cec.c **** void CEC_ITConfig(uint16_t CEC_IT, FunctionalState NewState)
+ 445:./stdperiph/source/stm32f37x_cec.c **** {
+ 372              		.loc 1 445 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 15
+
+
+ 373              		.cfi_startproc
+ 374              		@ args = 0, pretend = 0, frame = 0
+ 375              		@ frame_needed = 0, uses_anonymous_args = 0
+ 376              		@ link register save eliminated.
+ 377              	.LVL15:
+ 446:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 447:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_CEC_IT(CEC_IT));
+ 448:./stdperiph/source/stm32f37x_cec.c **** 
+ 449:./stdperiph/source/stm32f37x_cec.c ****   if (NewState != DISABLE)
+ 378              		.loc 1 449 0
+ 379 0000 21B1     		cbz	r1, .L33
+ 450:./stdperiph/source/stm32f37x_cec.c ****   {
+ 451:./stdperiph/source/stm32f37x_cec.c ****     /* Enable the selected CEC interrupt */
+ 452:./stdperiph/source/stm32f37x_cec.c ****     CEC->IER |= CEC_IT;
+ 380              		.loc 1 452 0
+ 381 0002 064A     		ldr	r2, .L35
+ 382 0004 5369     		ldr	r3, [r2, #20]
+ 383 0006 1843     		orrs	r0, r0, r3
+ 384              	.LVL16:
+ 385 0008 5061     		str	r0, [r2, #20]
+ 386 000a 7047     		bx	lr
+ 387              	.LVL17:
+ 388              	.L33:
+ 453:./stdperiph/source/stm32f37x_cec.c ****   }
+ 454:./stdperiph/source/stm32f37x_cec.c ****   else
+ 455:./stdperiph/source/stm32f37x_cec.c ****   {
+ 456:./stdperiph/source/stm32f37x_cec.c ****     CEC_IT =~CEC_IT;
+ 389              		.loc 1 456 0
+ 390 000c C043     		mvns	r0, r0
+ 391              	.LVL18:
+ 392 000e 80B2     		uxth	r0, r0
+ 393              	.LVL19:
+ 457:./stdperiph/source/stm32f37x_cec.c ****     /* Disable the selected CEC interrupt */
+ 458:./stdperiph/source/stm32f37x_cec.c ****     CEC->IER &= CEC_IT;
+ 394              		.loc 1 458 0
+ 395 0010 024A     		ldr	r2, .L35
+ 396 0012 5369     		ldr	r3, [r2, #20]
+ 397 0014 1840     		ands	r0, r0, r3
+ 398              	.LVL20:
+ 399 0016 5061     		str	r0, [r2, #20]
+ 400 0018 7047     		bx	lr
+ 401              	.L36:
+ 402 001a 00BF     		.align	2
+ 403              	.L35:
+ 404 001c 00780040 		.word	1073772544
+ 405              		.cfi_endproc
+ 406              	.LFE122:
+ 408              		.section	.text.CEC_GetFlagStatus,"ax",%progbits
+ 409              		.align	2
+ 410              		.global	CEC_GetFlagStatus
+ 411              		.thumb
+ 412              		.thumb_func
+ 414              	CEC_GetFlagStatus:
+ 415              	.LFB123:
+ 459:./stdperiph/source/stm32f37x_cec.c ****   }
+ 460:./stdperiph/source/stm32f37x_cec.c **** }
+ 461:./stdperiph/source/stm32f37x_cec.c **** 
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 16
+
+
+ 462:./stdperiph/source/stm32f37x_cec.c **** /**
+ 463:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Gets the CEC flag status.
+ 464:./stdperiph/source/stm32f37x_cec.c ****   * @param  CEC_FLAG: specifies the CEC flag to check.
+ 465:./stdperiph/source/stm32f37x_cec.c ****   *          This parameter can be one of the following values:
+ 466:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_TXACKE: Tx Missing acknowledge Error
+ 467:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_TXERR: Tx Error.
+ 468:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_TXUDR: Tx-Buffer Underrun.
+ 469:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_TXEND: End of transmission (successful transmission of the last byte).
+ 470:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_TXBR: Tx-Byte Request.
+ 471:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_ARBLST: Arbitration Lost
+ 472:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_RXACKE: Rx-Missing Acknowledge 
+ 473:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_LBPE: Rx Long period Error
+ 474:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_SBPE: Rx Short period Error
+ 475:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_BRE: Rx Bit Rissing Error
+ 476:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_RXOVR: Rx Overrun.
+ 477:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_RXEND: End Of Reception.
+ 478:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_RXBR: Rx-Byte Received.
+ 479:./stdperiph/source/stm32f37x_cec.c ****   * @retval The new state of CEC_FLAG (SET or RESET)
+ 480:./stdperiph/source/stm32f37x_cec.c ****   */
+ 481:./stdperiph/source/stm32f37x_cec.c **** FlagStatus CEC_GetFlagStatus(uint16_t CEC_FLAG) 
+ 482:./stdperiph/source/stm32f37x_cec.c **** {
+ 416              		.loc 1 482 0
+ 417              		.cfi_startproc
+ 418              		@ args = 0, pretend = 0, frame = 0
+ 419              		@ frame_needed = 0, uses_anonymous_args = 0
+ 420              		@ link register save eliminated.
+ 421              	.LVL21:
+ 483:./stdperiph/source/stm32f37x_cec.c ****   FlagStatus bitstatus = RESET;
+ 484:./stdperiph/source/stm32f37x_cec.c **** 
+ 485:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_CEC_GET_FLAG(CEC_FLAG));
+ 486:./stdperiph/source/stm32f37x_cec.c **** 
+ 487:./stdperiph/source/stm32f37x_cec.c ****   /* Check the status of the specified CEC flag */
+ 488:./stdperiph/source/stm32f37x_cec.c ****   if ((CEC->ISR & CEC_FLAG) != (uint16_t)RESET)
+ 422              		.loc 1 488 0
+ 423 0000 034B     		ldr	r3, .L40
+ 424 0002 1B69     		ldr	r3, [r3, #16]
+ 425 0004 1842     		tst	r0, r3
+ 426 0006 01D0     		beq	.L39
+ 489:./stdperiph/source/stm32f37x_cec.c ****   {
+ 490:./stdperiph/source/stm32f37x_cec.c ****     /* CEC flag is set */
+ 491:./stdperiph/source/stm32f37x_cec.c ****     bitstatus = SET;
+ 427              		.loc 1 491 0
+ 428 0008 0120     		movs	r0, #1
+ 429              	.LVL22:
+ 430 000a 7047     		bx	lr
+ 431              	.LVL23:
+ 432              	.L39:
+ 492:./stdperiph/source/stm32f37x_cec.c ****   }
+ 493:./stdperiph/source/stm32f37x_cec.c ****   else
+ 494:./stdperiph/source/stm32f37x_cec.c ****   {
+ 495:./stdperiph/source/stm32f37x_cec.c ****     /* CEC flag is reset */
+ 496:./stdperiph/source/stm32f37x_cec.c ****     bitstatus = RESET;
+ 433              		.loc 1 496 0
+ 434 000c 0020     		movs	r0, #0
+ 435              	.LVL24:
+ 497:./stdperiph/source/stm32f37x_cec.c ****   }
+ 498:./stdperiph/source/stm32f37x_cec.c **** 
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 17
+
+
+ 499:./stdperiph/source/stm32f37x_cec.c ****   /* Return the CEC flag status */
+ 500:./stdperiph/source/stm32f37x_cec.c ****   return  bitstatus;
+ 501:./stdperiph/source/stm32f37x_cec.c **** }
+ 436              		.loc 1 501 0
+ 437 000e 7047     		bx	lr
+ 438              	.L41:
+ 439              		.align	2
+ 440              	.L40:
+ 441 0010 00780040 		.word	1073772544
+ 442              		.cfi_endproc
+ 443              	.LFE123:
+ 445              		.section	.text.CEC_ClearFlag,"ax",%progbits
+ 446              		.align	2
+ 447              		.global	CEC_ClearFlag
+ 448              		.thumb
+ 449              		.thumb_func
+ 451              	CEC_ClearFlag:
+ 452              	.LFB124:
+ 502:./stdperiph/source/stm32f37x_cec.c **** 
+ 503:./stdperiph/source/stm32f37x_cec.c **** /**
+ 504:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Clears the CEC's pending flags.
+ 505:./stdperiph/source/stm32f37x_cec.c ****   * @param  CEC_FLAG: specifies the flag to clear. 
+ 506:./stdperiph/source/stm32f37x_cec.c ****   *          This parameter can be any combination of the following values:
+ 507:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_TXACKE: Tx Missing acknowledge Error
+ 508:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_TXERR: Tx Error
+ 509:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_TXUDR: Tx-Buffer Underrun
+ 510:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_TXEND: End of transmission (successful transmission of the last byte).
+ 511:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_TXBR: Tx-Byte Request
+ 512:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_ARBLST: Arbitration Lost
+ 513:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_RXACKE: Rx Missing Acknowledge 
+ 514:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_LBPE: Rx Long period Error
+ 515:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_SBPE: Rx Short period Error
+ 516:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_BRE: Rx Bit Rising Error
+ 517:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_RXOVR: Rx Overrun
+ 518:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_RXEND: End Of Reception
+ 519:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_FLAG_RXBR: Rx-Byte Received
+ 520:./stdperiph/source/stm32f37x_cec.c ****   * @retval None
+ 521:./stdperiph/source/stm32f37x_cec.c ****   */
+ 522:./stdperiph/source/stm32f37x_cec.c **** void CEC_ClearFlag(uint16_t CEC_FLAG)
+ 523:./stdperiph/source/stm32f37x_cec.c **** {
+ 453              		.loc 1 523 0
+ 454              		.cfi_startproc
+ 455              		@ args = 0, pretend = 0, frame = 0
+ 456              		@ frame_needed = 0, uses_anonymous_args = 0
+ 457              		@ link register save eliminated.
+ 458              	.LVL25:
+ 524:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_CEC_CLEAR_FLAG(CEC_FLAG));
+ 525:./stdperiph/source/stm32f37x_cec.c **** 
+ 526:./stdperiph/source/stm32f37x_cec.c ****   /* Clear the selected CEC flag */
+ 527:./stdperiph/source/stm32f37x_cec.c ****   CEC->ISR = CEC_FLAG;
+ 459              		.loc 1 527 0
+ 460 0000 014B     		ldr	r3, .L43
+ 461 0002 1861     		str	r0, [r3, #16]
+ 462 0004 7047     		bx	lr
+ 463              	.L44:
+ 464 0006 00BF     		.align	2
+ 465              	.L43:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 18
+
+
+ 466 0008 00780040 		.word	1073772544
+ 467              		.cfi_endproc
+ 468              	.LFE124:
+ 470              		.section	.text.CEC_GetITStatus,"ax",%progbits
+ 471              		.align	2
+ 472              		.global	CEC_GetITStatus
+ 473              		.thumb
+ 474              		.thumb_func
+ 476              	CEC_GetITStatus:
+ 477              	.LFB125:
+ 528:./stdperiph/source/stm32f37x_cec.c **** }
+ 529:./stdperiph/source/stm32f37x_cec.c **** 
+ 530:./stdperiph/source/stm32f37x_cec.c **** /**
+ 531:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Checks whether the specified CEC interrupt has occurred or not.
+ 532:./stdperiph/source/stm32f37x_cec.c ****   * @param  CEC_IT: specifies the CEC interrupt source to check. 
+ 533:./stdperiph/source/stm32f37x_cec.c ****   *          This parameter can be one of the following values:
+ 534:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXACKE: Tx Missing acknowledge Error
+ 535:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXERR: Tx Error.
+ 536:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXUDR: Tx-Buffer Underrun.
+ 537:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXEND: End of transmission (successful transmission of the last byte).
+ 538:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXBR: Tx-Byte Request.
+ 539:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_ARBLST: Arbitration Lost.
+ 540:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_RXACKE: Rx-Missing Acknowledge.
+ 541:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_LBPE: Rx Long period Error.
+ 542:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_SBPE: Rx Short period Error.
+ 543:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_BRE: Rx Bit Rising Error.
+ 544:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_RXOVR: Rx Overrun.
+ 545:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_RXEND: End Of Reception.
+ 546:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_RXBR: Rx-Byte Received 
+ 547:./stdperiph/source/stm32f37x_cec.c ****   * @retval The new state of CEC_IT (SET or RESET).
+ 548:./stdperiph/source/stm32f37x_cec.c ****   */
+ 549:./stdperiph/source/stm32f37x_cec.c **** ITStatus CEC_GetITStatus(uint16_t CEC_IT)
+ 550:./stdperiph/source/stm32f37x_cec.c **** {
+ 478              		.loc 1 550 0
+ 479              		.cfi_startproc
+ 480              		@ args = 0, pretend = 0, frame = 0
+ 481              		@ frame_needed = 0, uses_anonymous_args = 0
+ 482              		@ link register save eliminated.
+ 483              	.LVL26:
+ 551:./stdperiph/source/stm32f37x_cec.c ****   ITStatus bitstatus = RESET;
+ 552:./stdperiph/source/stm32f37x_cec.c ****   uint32_t enablestatus = 0;
+ 553:./stdperiph/source/stm32f37x_cec.c **** 
+ 554:./stdperiph/source/stm32f37x_cec.c ****   /* Check the parameters */
+ 555:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_CEC_GET_IT(CEC_IT));
+ 556:./stdperiph/source/stm32f37x_cec.c **** 
+ 557:./stdperiph/source/stm32f37x_cec.c ****   /* Get the CEC IT enable bit status */
+ 558:./stdperiph/source/stm32f37x_cec.c ****   enablestatus = (CEC->IER & CEC_IT);
+ 484              		.loc 1 558 0
+ 485 0000 064A     		ldr	r2, .L49
+ 486 0002 5369     		ldr	r3, [r2, #20]
+ 487 0004 0340     		ands	r3, r3, r0
+ 488              	.LVL27:
+ 559:./stdperiph/source/stm32f37x_cec.c **** 
+ 560:./stdperiph/source/stm32f37x_cec.c ****   /* Check the status of the specified CEC interrupt */
+ 561:./stdperiph/source/stm32f37x_cec.c ****   if (((CEC->ISR & CEC_IT) != (uint32_t)RESET) && enablestatus)
+ 489              		.loc 1 561 0
+ 490 0006 1269     		ldr	r2, [r2, #16]
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 19
+
+
+ 491 0008 1042     		tst	r0, r2
+ 492 000a 02D0     		beq	.L47
+ 493              		.loc 1 561 0 is_stmt 0 discriminator 1
+ 494 000c 1BB9     		cbnz	r3, .L48
+ 562:./stdperiph/source/stm32f37x_cec.c ****   {
+ 563:./stdperiph/source/stm32f37x_cec.c ****     /* CEC interrupt is set */
+ 564:./stdperiph/source/stm32f37x_cec.c ****     bitstatus = SET;
+ 565:./stdperiph/source/stm32f37x_cec.c ****   }
+ 566:./stdperiph/source/stm32f37x_cec.c ****   else
+ 567:./stdperiph/source/stm32f37x_cec.c ****   {
+ 568:./stdperiph/source/stm32f37x_cec.c ****     /* CEC interrupt is reset */
+ 569:./stdperiph/source/stm32f37x_cec.c ****     bitstatus = RESET;
+ 495              		.loc 1 569 0 is_stmt 1
+ 496 000e 0020     		movs	r0, #0
+ 497              	.LVL28:
+ 498 0010 7047     		bx	lr
+ 499              	.LVL29:
+ 500              	.L47:
+ 501 0012 0020     		movs	r0, #0
+ 502              	.LVL30:
+ 503 0014 7047     		bx	lr
+ 504              	.LVL31:
+ 505              	.L48:
+ 564:./stdperiph/source/stm32f37x_cec.c ****   }
+ 506              		.loc 1 564 0
+ 507 0016 0120     		movs	r0, #1
+ 508              	.LVL32:
+ 570:./stdperiph/source/stm32f37x_cec.c ****   }
+ 571:./stdperiph/source/stm32f37x_cec.c **** 
+ 572:./stdperiph/source/stm32f37x_cec.c ****   /* Return the CEC interrupt status */
+ 573:./stdperiph/source/stm32f37x_cec.c ****   return  bitstatus;
+ 574:./stdperiph/source/stm32f37x_cec.c **** 
+ 575:./stdperiph/source/stm32f37x_cec.c **** }
+ 509              		.loc 1 575 0
+ 510 0018 7047     		bx	lr
+ 511              	.L50:
+ 512 001a 00BF     		.align	2
+ 513              	.L49:
+ 514 001c 00780040 		.word	1073772544
+ 515              		.cfi_endproc
+ 516              	.LFE125:
+ 518              		.section	.text.CEC_ClearITPendingBit,"ax",%progbits
+ 519              		.align	2
+ 520              		.global	CEC_ClearITPendingBit
+ 521              		.thumb
+ 522              		.thumb_func
+ 524              	CEC_ClearITPendingBit:
+ 525              	.LFB126:
+ 576:./stdperiph/source/stm32f37x_cec.c **** 
+ 577:./stdperiph/source/stm32f37x_cec.c **** /**
+ 578:./stdperiph/source/stm32f37x_cec.c ****   * @brief  Clears the CEC's interrupt pending bits.
+ 579:./stdperiph/source/stm32f37x_cec.c ****   * @param  CEC_IT: specifies the CEC interrupt pending bit to clear.
+ 580:./stdperiph/source/stm32f37x_cec.c ****   *          This parameter can be any combination of the following values:
+ 581:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXACKE: Tx Missing acknowledge Error
+ 582:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXERR: Tx Error
+ 583:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXUDR: Tx-Buffer Underrun
+ 584:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXEND: End of Transmission
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 20
+
+
+ 585:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_TXBR: Tx-Byte Request
+ 586:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_ARBLST: Arbitration Lost
+ 587:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_RXACKE: Rx-Missing Acknowledge
+ 588:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_LBPE: Rx Long period Error
+ 589:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_SBPE: Rx Short period Error
+ 590:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_BRE: Rx Bit Rising Error
+ 591:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_RXOVR: Rx Overrun
+ 592:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_RXEND: End Of Reception
+ 593:./stdperiph/source/stm32f37x_cec.c ****   *            @arg CEC_IT_RXBR: Rx-Byte Received
+ 594:./stdperiph/source/stm32f37x_cec.c ****   * @retval None
+ 595:./stdperiph/source/stm32f37x_cec.c ****   */
+ 596:./stdperiph/source/stm32f37x_cec.c **** void CEC_ClearITPendingBit(uint16_t CEC_IT)
+ 597:./stdperiph/source/stm32f37x_cec.c **** {
+ 526              		.loc 1 597 0
+ 527              		.cfi_startproc
+ 528              		@ args = 0, pretend = 0, frame = 0
+ 529              		@ frame_needed = 0, uses_anonymous_args = 0
+ 530              		@ link register save eliminated.
+ 531              	.LVL33:
+ 598:./stdperiph/source/stm32f37x_cec.c ****   assert_param(IS_CEC_IT(CEC_IT));
+ 599:./stdperiph/source/stm32f37x_cec.c **** 
+ 600:./stdperiph/source/stm32f37x_cec.c ****   /* Clear the selected CEC interrupt pending bits */
+ 601:./stdperiph/source/stm32f37x_cec.c ****   CEC->ISR = CEC_IT;
+ 532              		.loc 1 601 0
+ 533 0000 014B     		ldr	r3, .L52
+ 534 0002 1861     		str	r0, [r3, #16]
+ 535 0004 7047     		bx	lr
+ 536              	.L53:
+ 537 0006 00BF     		.align	2
+ 538              	.L52:
+ 539 0008 00780040 		.word	1073772544
+ 540              		.cfi_endproc
+ 541              	.LFE126:
+ 543              		.text
+ 544              	.Letext0:
+ 545              		.file 2 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\machine\\_defaul
+ 546              		.file 3 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 547              		.file 4 "cmsis/include/stm32f37x.h"
+ 548              		.file 5 "stdperiph/include/stm32f37x_cec.h"
+ 549              		.file 6 "cmsis/include/core_cm4.h"
+ 550              		.file 7 "stdperiph/include/stm32f37x_rcc.h"
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cc4feGNn.s 			page 21
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f37x_cec.c
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:22     .text.CEC_DeInit:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:27     .text.CEC_DeInit:00000000 CEC_DeInit
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:54     .text.CEC_Init:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:59     .text.CEC_Init:00000000 CEC_Init
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:116    .text.CEC_Init:00000030 $d
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:122    .text.CEC_StructInit:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:127    .text.CEC_StructInit:00000000 CEC_StructInit
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:155    .text.CEC_Cmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:160    .text.CEC_Cmd:00000000 CEC_Cmd
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:175    .text.CEC_Cmd:00000008 $d
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:180    .text.CEC_ListenModeCmd:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:185    .text.CEC_ListenModeCmd:00000000 CEC_ListenModeCmd
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:200    .text.CEC_ListenModeCmd:00000008 $d
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:205    .text.CEC_OwnAddressConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:210    .text.CEC_OwnAddressConfig:00000000 CEC_OwnAddressConfig
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:234    .text.CEC_OwnAddressConfig:00000014 $d
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:239    .text.CEC_OwnAddressClear:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:244    .text.CEC_OwnAddressClear:00000000 CEC_OwnAddressClear
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:259    .text.CEC_OwnAddressClear:00000008 $d
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:264    .text.CEC_SendData:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:269    .text.CEC_SendData:00000000 CEC_SendData
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:284    .text.CEC_SendData:00000008 $d
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:289    .text.CEC_ReceiveData:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:294    .text.CEC_ReceiveData:00000000 CEC_ReceiveData
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:310    .text.CEC_ReceiveData:00000008 $d
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:315    .text.CEC_StartOfMessage:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:320    .text.CEC_StartOfMessage:00000000 CEC_StartOfMessage
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:335    .text.CEC_StartOfMessage:00000008 $d
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:340    .text.CEC_EndOfMessage:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:345    .text.CEC_EndOfMessage:00000000 CEC_EndOfMessage
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:360    .text.CEC_EndOfMessage:00000008 $d
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:365    .text.CEC_ITConfig:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:370    .text.CEC_ITConfig:00000000 CEC_ITConfig
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:404    .text.CEC_ITConfig:0000001c $d
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:409    .text.CEC_GetFlagStatus:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:414    .text.CEC_GetFlagStatus:00000000 CEC_GetFlagStatus
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:441    .text.CEC_GetFlagStatus:00000010 $d
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:446    .text.CEC_ClearFlag:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:451    .text.CEC_ClearFlag:00000000 CEC_ClearFlag
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:466    .text.CEC_ClearFlag:00000008 $d
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:471    .text.CEC_GetITStatus:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:476    .text.CEC_GetITStatus:00000000 CEC_GetITStatus
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:514    .text.CEC_GetITStatus:0000001c $d
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:519    .text.CEC_ClearITPendingBit:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:524    .text.CEC_ClearITPendingBit:00000000 CEC_ClearITPendingBit
+C:\Users\strag\AppData\Local\Temp\cc4feGNn.s:539    .text.CEC_ClearITPendingBit:00000008 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+RCC_APB1PeriphResetCmd

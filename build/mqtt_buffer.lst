@@ -1,0 +1,603 @@
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cck37rXh.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 1
+   4              		.eabi_attribute 28, 1
+   5              		.fpu fpv4-sp-d16
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.thumb
+  16              		.syntax unified
+  17              		.file	"mqtt_buffer.c"
+  18              		.text
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.section	.text.MqttBuffer_Init,"ax",%progbits
+  22              		.align	2
+  23              		.global	MqttBuffer_Init
+  24              		.thumb
+  25              		.thumb_func
+  27              	MqttBuffer_Init:
+  28              	.LFB0:
+  29              		.file 1 "./mqtt/source/mqtt_buffer.c"
+   1:./mqtt/source/mqtt_buffer.c **** #include "mqtt_buffer.h"
+   2:./mqtt/source/mqtt_buffer.c **** #include <stdlib.h>
+   3:./mqtt/source/mqtt_buffer.c **** #include <string.h>
+   4:./mqtt/source/mqtt_buffer.c **** #include <assert.h>
+   5:./mqtt/source/mqtt_buffer.c **** #include "mqtt.h"
+   6:./mqtt/source/mqtt_buffer.c **** 
+   7:./mqtt/source/mqtt_buffer.c **** static const uint32_t MQTT_MIN_EXTENT_SIZE = 1024;
+   8:./mqtt/source/mqtt_buffer.c **** 
+   9:./mqtt/source/mqtt_buffer.c **** void MqttBuffer_Init(struct MqttBuffer *buf)
+  10:./mqtt/source/mqtt_buffer.c **** {
+  30              		.loc 1 10 0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  35              	.LVL0:
+  11:./mqtt/source/mqtt_buffer.c ****     buf->first_ext = NULL;
+  36              		.loc 1 11 0
+  37 0000 0023     		movs	r3, #0
+  38 0002 0360     		str	r3, [r0]
+  12:./mqtt/source/mqtt_buffer.c ****     buf->last_ext = NULL;
+  39              		.loc 1 12 0
+  40 0004 4360     		str	r3, [r0, #4]
+  13:./mqtt/source/mqtt_buffer.c ****     buf->available_bytes = 0;
+  41              		.loc 1 13 0
+  42 0006 8360     		str	r3, [r0, #8]
+  14:./mqtt/source/mqtt_buffer.c ****     buf->allocations = NULL;
+  43              		.loc 1 14 0
+  44 0008 C360     		str	r3, [r0, #12]
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cck37rXh.s 			page 2
+
+
+  15:./mqtt/source/mqtt_buffer.c ****     buf->alloc_count = 0;
+  45              		.loc 1 15 0
+  46 000a 4361     		str	r3, [r0, #20]
+  16:./mqtt/source/mqtt_buffer.c ****     buf->alloc_max_count = 0;
+  47              		.loc 1 16 0
+  48 000c 8361     		str	r3, [r0, #24]
+  17:./mqtt/source/mqtt_buffer.c ****     buf->first_available = NULL;
+  49              		.loc 1 17 0
+  50 000e 0361     		str	r3, [r0, #16]
+  18:./mqtt/source/mqtt_buffer.c ****     buf->buffered_bytes = 0;
+  51              		.loc 1 18 0
+  52 0010 C361     		str	r3, [r0, #28]
+  53 0012 7047     		bx	lr
+  54              		.cfi_endproc
+  55              	.LFE0:
+  57              		.section	.text.MqttBuffer_Reset,"ax",%progbits
+  58              		.align	2
+  59              		.global	MqttBuffer_Reset
+  60              		.thumb
+  61              		.thumb_func
+  63              	MqttBuffer_Reset:
+  64              	.LFB2:
+  19:./mqtt/source/mqtt_buffer.c **** }
+  20:./mqtt/source/mqtt_buffer.c **** 
+  21:./mqtt/source/mqtt_buffer.c **** void MqttBuffer_Destroy(struct MqttBuffer *buf)
+  22:./mqtt/source/mqtt_buffer.c **** {
+  23:./mqtt/source/mqtt_buffer.c ****     MqttBuffer_Reset(buf);
+  24:./mqtt/source/mqtt_buffer.c **** }
+  25:./mqtt/source/mqtt_buffer.c **** 
+  26:./mqtt/source/mqtt_buffer.c **** void MqttBuffer_Reset(struct MqttBuffer *buf)
+  27:./mqtt/source/mqtt_buffer.c **** {
+  65              		.loc 1 27 0
+  66              		.cfi_startproc
+  67              		@ args = 0, pretend = 0, frame = 0
+  68              		@ frame_needed = 0, uses_anonymous_args = 0
+  69              	.LVL1:
+  70 0000 38B5     		push	{r3, r4, r5, lr}
+  71              	.LCFI0:
+  72              		.cfi_def_cfa_offset 16
+  73              		.cfi_offset 3, -16
+  74              		.cfi_offset 4, -12
+  75              		.cfi_offset 5, -8
+  76              		.cfi_offset 14, -4
+  77 0002 0546     		mov	r5, r0
+  78              	.LVL2:
+  28:./mqtt/source/mqtt_buffer.c ****     uint32_t i;
+  29:./mqtt/source/mqtt_buffer.c ****     for(i = 0; i < buf->alloc_count; ++i) {
+  79              		.loc 1 29 0
+  80 0004 0024     		movs	r4, #0
+  81 0006 05E0     		b	.L3
+  82              	.LVL3:
+  83              	.L4:
+  30:./mqtt/source/mqtt_buffer.c ****         free(buf->allocations[i]);
+  84              		.loc 1 30 0 discriminator 3
+  85 0008 EB68     		ldr	r3, [r5, #12]
+  86 000a 53F82400 		ldr	r0, [r3, r4, lsl #2]
+  87 000e FFF7FEFF 		bl	free
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cck37rXh.s 			page 3
+
+
+  88              	.LVL4:
+  29:./mqtt/source/mqtt_buffer.c ****         free(buf->allocations[i]);
+  89              		.loc 1 29 0 discriminator 3
+  90 0012 0134     		adds	r4, r4, #1
+  91              	.LVL5:
+  92              	.L3:
+  29:./mqtt/source/mqtt_buffer.c ****         free(buf->allocations[i]);
+  93              		.loc 1 29 0 is_stmt 0 discriminator 1
+  94 0014 6B69     		ldr	r3, [r5, #20]
+  95 0016 9C42     		cmp	r4, r3
+  96 0018 F6D3     		bcc	.L4
+  31:./mqtt/source/mqtt_buffer.c ****     }
+  32:./mqtt/source/mqtt_buffer.c ****     
+  33:./mqtt/source/mqtt_buffer.c ****     free(buf->allocations);
+  97              		.loc 1 33 0 is_stmt 1
+  98 001a E868     		ldr	r0, [r5, #12]
+  99 001c FFF7FEFF 		bl	free
+ 100              	.LVL6:
+  34:./mqtt/source/mqtt_buffer.c **** 
+  35:./mqtt/source/mqtt_buffer.c ****     MqttBuffer_Init(buf);
+ 101              		.loc 1 35 0
+ 102 0020 2846     		mov	r0, r5
+ 103 0022 FFF7FEFF 		bl	MqttBuffer_Init
+ 104              	.LVL7:
+ 105 0026 38BD     		pop	{r3, r4, r5, pc}
+ 106              		.cfi_endproc
+ 107              	.LFE2:
+ 109              		.section	.text.MqttBuffer_Destroy,"ax",%progbits
+ 110              		.align	2
+ 111              		.global	MqttBuffer_Destroy
+ 112              		.thumb
+ 113              		.thumb_func
+ 115              	MqttBuffer_Destroy:
+ 116              	.LFB1:
+  22:./mqtt/source/mqtt_buffer.c ****     MqttBuffer_Reset(buf);
+ 117              		.loc 1 22 0
+ 118              		.cfi_startproc
+ 119              		@ args = 0, pretend = 0, frame = 0
+ 120              		@ frame_needed = 0, uses_anonymous_args = 0
+ 121              	.LVL8:
+ 122 0000 08B5     		push	{r3, lr}
+ 123              	.LCFI1:
+ 124              		.cfi_def_cfa_offset 8
+ 125              		.cfi_offset 3, -8
+ 126              		.cfi_offset 14, -4
+  23:./mqtt/source/mqtt_buffer.c **** }
+ 127              		.loc 1 23 0
+ 128 0002 FFF7FEFF 		bl	MqttBuffer_Reset
+ 129              	.LVL9:
+ 130 0006 08BD     		pop	{r3, pc}
+ 131              		.cfi_endproc
+ 132              	.LFE1:
+ 134              		.section	.text.MqttBuffer_AllocExtent,"ax",%progbits
+ 135              		.align	2
+ 136              		.global	MqttBuffer_AllocExtent
+ 137              		.thumb
+ 138              		.thumb_func
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cck37rXh.s 			page 4
+
+
+ 140              	MqttBuffer_AllocExtent:
+ 141              	.LFB3:
+  36:./mqtt/source/mqtt_buffer.c **** }
+  37:./mqtt/source/mqtt_buffer.c **** 
+  38:./mqtt/source/mqtt_buffer.c **** struct MqttExtent *MqttBuffer_AllocExtent(struct MqttBuffer *buf, uint32_t bytes)
+  39:./mqtt/source/mqtt_buffer.c **** {
+ 142              		.loc 1 39 0
+ 143              		.cfi_startproc
+ 144              		@ args = 0, pretend = 0, frame = 0
+ 145              		@ frame_needed = 0, uses_anonymous_args = 0
+ 146              	.LVL10:
+ 147 0000 2DE9F843 		push	{r3, r4, r5, r6, r7, r8, r9, lr}
+ 148              	.LCFI2:
+ 149              		.cfi_def_cfa_offset 32
+ 150              		.cfi_offset 3, -32
+ 151              		.cfi_offset 4, -28
+ 152              		.cfi_offset 5, -24
+ 153              		.cfi_offset 6, -20
+ 154              		.cfi_offset 7, -16
+ 155              		.cfi_offset 8, -12
+ 156              		.cfi_offset 9, -8
+ 157              		.cfi_offset 14, -4
+ 158 0004 0446     		mov	r4, r0
+ 159 0006 0E46     		mov	r6, r1
+  40:./mqtt/source/mqtt_buffer.c ****     struct MqttExtent *ext;
+  41:./mqtt/source/mqtt_buffer.c ****     uint32_t aligned_bytes = bytes + sizeof(struct MqttExtent);
+ 160              		.loc 1 41 0
+ 161 0008 01F10C05 		add	r5, r1, #12
+ 162              	.LVL11:
+  42:./mqtt/source/mqtt_buffer.c ****     aligned_bytes = aligned_bytes + (MQTT_DEFAULT_ALIGNMENT -
+  43:./mqtt/source/mqtt_buffer.c ****         (aligned_bytes % MQTT_DEFAULT_ALIGNMENT)) % MQTT_DEFAULT_ALIGNMENT;
+ 163              		.loc 1 43 0
+ 164 000c 6B42     		negs	r3, r5
+ 165 000e 03F00303 		and	r3, r3, #3
+  42:./mqtt/source/mqtt_buffer.c ****     aligned_bytes = aligned_bytes + (MQTT_DEFAULT_ALIGNMENT -
+ 166              		.loc 1 42 0
+ 167 0012 1D44     		add	r5, r5, r3
+ 168              	.LVL12:
+  44:./mqtt/source/mqtt_buffer.c ****     
+  45:./mqtt/source/mqtt_buffer.c ****     if(buf->available_bytes < aligned_bytes) {
+ 169              		.loc 1 45 0
+ 170 0014 8368     		ldr	r3, [r0, #8]
+ 171 0016 9D42     		cmp	r5, r3
+ 172 0018 2ED9     		bls	.L9
+ 173              	.LBB2:
+  46:./mqtt/source/mqtt_buffer.c ****         uint32_t alloc_bytes;
+  47:./mqtt/source/mqtt_buffer.c ****         char *chunk;
+  48:./mqtt/source/mqtt_buffer.c **** 
+  49:./mqtt/source/mqtt_buffer.c ****         if(buf->alloc_count == buf->alloc_max_count) {
+ 174              		.loc 1 49 0
+ 175 001a 4269     		ldr	r2, [r0, #20]
+ 176 001c 8369     		ldr	r3, [r0, #24]
+ 177 001e 9A42     		cmp	r2, r3
+ 178 0020 18D1     		bne	.L10
+ 179              	.LBB3:
+  50:./mqtt/source/mqtt_buffer.c ****             uint32_t max_count = buf->alloc_max_count * 2 + 1;
+ 180              		.loc 1 50 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cck37rXh.s 			page 5
+
+
+ 181 0022 5B00     		lsls	r3, r3, #1
+ 182 0024 5F1C     		adds	r7, r3, #1
+ 183              	.LVL13:
+  51:./mqtt/source/mqtt_buffer.c ****             char **tmp = (char**)malloc(max_count * sizeof(char**));
+ 184              		.loc 1 51 0
+ 185 0026 4FEA8709 		lsl	r9, r7, #2
+ 186 002a 4846     		mov	r0, r9
+ 187              	.LVL14:
+ 188 002c FFF7FEFF 		bl	malloc
+ 189              	.LVL15:
+  52:./mqtt/source/mqtt_buffer.c ****             if(NULL == tmp) {
+ 190              		.loc 1 52 0
+ 191 0030 8046     		mov	r8, r0
+ 192 0032 0028     		cmp	r0, #0
+ 193 0034 2FD0     		beq	.L12
+  53:./mqtt/source/mqtt_buffer.c ****                 return NULL;
+  54:./mqtt/source/mqtt_buffer.c ****             }
+  55:./mqtt/source/mqtt_buffer.c **** 
+  56:./mqtt/source/mqtt_buffer.c ****             memset(tmp, 0, max_count * sizeof(char**));
+ 194              		.loc 1 56 0
+ 195 0036 4A46     		mov	r2, r9
+ 196 0038 0021     		movs	r1, #0
+ 197 003a FFF7FEFF 		bl	memset
+ 198              	.LVL16:
+  57:./mqtt/source/mqtt_buffer.c ****             memcpy(tmp, buf->allocations, buf->alloc_max_count);
+ 199              		.loc 1 57 0
+ 200 003e A269     		ldr	r2, [r4, #24]
+ 201 0040 E168     		ldr	r1, [r4, #12]
+ 202 0042 4046     		mov	r0, r8
+ 203 0044 FFF7FEFF 		bl	memcpy
+ 204              	.LVL17:
+  58:./mqtt/source/mqtt_buffer.c ****             free(buf->allocations);
+ 205              		.loc 1 58 0
+ 206 0048 E068     		ldr	r0, [r4, #12]
+ 207 004a FFF7FEFF 		bl	free
+ 208              	.LVL18:
+  59:./mqtt/source/mqtt_buffer.c **** 
+  60:./mqtt/source/mqtt_buffer.c ****             buf->alloc_max_count = max_count;
+ 209              		.loc 1 60 0
+ 210 004e A761     		str	r7, [r4, #24]
+  61:./mqtt/source/mqtt_buffer.c ****             buf->allocations = tmp;
+ 211              		.loc 1 61 0
+ 212 0050 C4F80C80 		str	r8, [r4, #12]
+ 213              	.LVL19:
+ 214              	.L10:
+ 215              	.LBE3:
+  62:./mqtt/source/mqtt_buffer.c ****         }
+  63:./mqtt/source/mqtt_buffer.c **** 
+  64:./mqtt/source/mqtt_buffer.c ****         alloc_bytes = aligned_bytes < MQTT_MIN_EXTENT_SIZE ? MQTT_MIN_EXTENT_SIZE : aligned_bytes;
+ 216              		.loc 1 64 0
+ 217 0054 2F46     		mov	r7, r5
+ 218 0056 B5F5806F 		cmp	r5, #1024
+ 219 005a 38BF     		it	cc
+ 220 005c 4FF48067 		movcc	r7, #1024
+ 221              	.LVL20:
+  65:./mqtt/source/mqtt_buffer.c ****         chunk = (char*)malloc(alloc_bytes);
+ 222              		.loc 1 65 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cck37rXh.s 			page 6
+
+
+ 223 0060 3846     		mov	r0, r7
+ 224 0062 FFF7FEFF 		bl	malloc
+ 225              	.LVL21:
+  66:./mqtt/source/mqtt_buffer.c ****         if(NULL == chunk) {
+ 226              		.loc 1 66 0
+ 227 0066 C8B1     		cbz	r0, .L13
+  67:./mqtt/source/mqtt_buffer.c ****             return NULL;
+  68:./mqtt/source/mqtt_buffer.c ****         }
+  69:./mqtt/source/mqtt_buffer.c **** 
+  70:./mqtt/source/mqtt_buffer.c ****         buf->alloc_count += 1;
+ 228              		.loc 1 70 0
+ 229 0068 6269     		ldr	r2, [r4, #20]
+ 230 006a 511C     		adds	r1, r2, #1
+ 231 006c 6161     		str	r1, [r4, #20]
+  71:./mqtt/source/mqtt_buffer.c ****         buf->allocations[buf->alloc_count - 1] = chunk;
+ 232              		.loc 1 71 0
+ 233 006e E168     		ldr	r1, [r4, #12]
+ 234 0070 41F82200 		str	r0, [r1, r2, lsl #2]
+  72:./mqtt/source/mqtt_buffer.c ****         buf->available_bytes = alloc_bytes;
+ 235              		.loc 1 72 0
+ 236 0074 A760     		str	r7, [r4, #8]
+  73:./mqtt/source/mqtt_buffer.c ****         buf->first_available = chunk;
+ 237              		.loc 1 73 0
+ 238 0076 2061     		str	r0, [r4, #16]
+ 239              	.LVL22:
+ 240              	.L9:
+ 241              	.LBE2:
+  74:./mqtt/source/mqtt_buffer.c ****     }
+  75:./mqtt/source/mqtt_buffer.c **** 
+  76:./mqtt/source/mqtt_buffer.c ****     //assert(buf->available_bytes >= bytes);
+  77:./mqtt/source/mqtt_buffer.c ****     //assert(buf->alloc_count > 0);
+  78:./mqtt/source/mqtt_buffer.c **** 
+  79:./mqtt/source/mqtt_buffer.c ****     ext = (struct MqttExtent*)(buf->first_available);
+ 242              		.loc 1 79 0
+ 243 0078 2069     		ldr	r0, [r4, #16]
+ 244              	.LVL23:
+  80:./mqtt/source/mqtt_buffer.c ****     ext->len = bytes;
+ 245              		.loc 1 80 0
+ 246 007a 0660     		str	r6, [r0]
+  81:./mqtt/source/mqtt_buffer.c ****     ext->payload = buf->first_available + sizeof(struct MqttExtent);
+ 247              		.loc 1 81 0
+ 248 007c 2369     		ldr	r3, [r4, #16]
+ 249 007e 0C33     		adds	r3, r3, #12
+ 250 0080 4360     		str	r3, [r0, #4]
+  82:./mqtt/source/mqtt_buffer.c ****     ext->next = NULL;
+ 251              		.loc 1 82 0
+ 252 0082 0023     		movs	r3, #0
+ 253 0084 8360     		str	r3, [r0, #8]
+  83:./mqtt/source/mqtt_buffer.c **** 
+  84:./mqtt/source/mqtt_buffer.c ****     buf->first_available += aligned_bytes;
+ 254              		.loc 1 84 0
+ 255 0086 2369     		ldr	r3, [r4, #16]
+ 256 0088 2B44     		add	r3, r3, r5
+ 257 008a 2361     		str	r3, [r4, #16]
+  85:./mqtt/source/mqtt_buffer.c ****     buf->available_bytes -= aligned_bytes;
+ 258              		.loc 1 85 0
+ 259 008c A368     		ldr	r3, [r4, #8]
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cck37rXh.s 			page 7
+
+
+ 260 008e 5D1B     		subs	r5, r3, r5
+ 261              	.LVL24:
+ 262 0090 A560     		str	r5, [r4, #8]
+  86:./mqtt/source/mqtt_buffer.c **** 
+  87:./mqtt/source/mqtt_buffer.c ****     return ext;
+ 263              		.loc 1 87 0
+ 264 0092 BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 265              	.LVL25:
+ 266              	.L12:
+ 267              	.LBB5:
+ 268              	.LBB4:
+  53:./mqtt/source/mqtt_buffer.c ****             }
+ 269              		.loc 1 53 0
+ 270 0096 0020     		movs	r0, #0
+ 271              	.LVL26:
+ 272 0098 BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 273              	.LVL27:
+ 274              	.L13:
+ 275              	.LBE4:
+  67:./mqtt/source/mqtt_buffer.c ****         }
+ 276              		.loc 1 67 0
+ 277 009c 0020     		movs	r0, #0
+ 278              	.LVL28:
+ 279              	.LBE5:
+  88:./mqtt/source/mqtt_buffer.c **** }
+ 280              		.loc 1 88 0
+ 281 009e BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 282              		.cfi_endproc
+ 283              	.LFE3:
+ 285 00a2 00BF     		.section	.text.MqttBuffer_AppendExtent,"ax",%progbits
+ 286              		.align	2
+ 287              		.global	MqttBuffer_AppendExtent
+ 288              		.thumb
+ 289              		.thumb_func
+ 291              	MqttBuffer_AppendExtent:
+ 292              	.LFB5:
+  89:./mqtt/source/mqtt_buffer.c **** 
+  90:./mqtt/source/mqtt_buffer.c **** int MqttBuffer_Append(struct MqttBuffer *buf, char *payload, uint32_t size, int own)
+  91:./mqtt/source/mqtt_buffer.c **** {
+  92:./mqtt/source/mqtt_buffer.c ****     const uint32_t bytes = own ? size : sizeof(struct MqttExtent);
+  93:./mqtt/source/mqtt_buffer.c **** 
+  94:./mqtt/source/mqtt_buffer.c ****     struct MqttExtent *ext = MqttBuffer_AllocExtent(buf, bytes);
+  95:./mqtt/source/mqtt_buffer.c ****     if(NULL == ext) {
+  96:./mqtt/source/mqtt_buffer.c ****         return MQTTERR_OUTOFMEMORY;
+  97:./mqtt/source/mqtt_buffer.c ****     }
+  98:./mqtt/source/mqtt_buffer.c **** 
+  99:./mqtt/source/mqtt_buffer.c ****     if(own) {
+ 100:./mqtt/source/mqtt_buffer.c ****         ext->payload = ((char*)ext) + sizeof(struct MqttExtent);
+ 101:./mqtt/source/mqtt_buffer.c ****         memcpy(ext->payload, payload, size);
+ 102:./mqtt/source/mqtt_buffer.c ****     }
+ 103:./mqtt/source/mqtt_buffer.c ****     else {
+ 104:./mqtt/source/mqtt_buffer.c ****         ext->payload = payload;
+ 105:./mqtt/source/mqtt_buffer.c ****         ext->len = size;
+ 106:./mqtt/source/mqtt_buffer.c ****     }
+ 107:./mqtt/source/mqtt_buffer.c **** 
+ 108:./mqtt/source/mqtt_buffer.c ****     MqttBuffer_AppendExtent(buf, ext);
+ 109:./mqtt/source/mqtt_buffer.c ****     return MQTTERR_NOERROR;
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cck37rXh.s 			page 8
+
+
+ 110:./mqtt/source/mqtt_buffer.c **** 
+ 111:./mqtt/source/mqtt_buffer.c **** }
+ 112:./mqtt/source/mqtt_buffer.c **** 
+ 113:./mqtt/source/mqtt_buffer.c **** void MqttBuffer_AppendExtent(struct MqttBuffer *buf, struct MqttExtent *ext)
+ 114:./mqtt/source/mqtt_buffer.c **** {
+ 293              		.loc 1 114 0
+ 294              		.cfi_startproc
+ 295              		@ args = 0, pretend = 0, frame = 0
+ 296              		@ frame_needed = 0, uses_anonymous_args = 0
+ 297              		@ link register save eliminated.
+ 298              	.LVL29:
+ 115:./mqtt/source/mqtt_buffer.c ****     ext->next = NULL;
+ 299              		.loc 1 115 0
+ 300 0000 0023     		movs	r3, #0
+ 301 0002 8B60     		str	r3, [r1, #8]
+ 116:./mqtt/source/mqtt_buffer.c ****     if(NULL != buf->last_ext) {
+ 302              		.loc 1 116 0
+ 303 0004 4368     		ldr	r3, [r0, #4]
+ 304 0006 13B1     		cbz	r3, .L16
+ 117:./mqtt/source/mqtt_buffer.c ****         buf->last_ext->next = ext;
+ 305              		.loc 1 117 0
+ 306 0008 9960     		str	r1, [r3, #8]
+ 118:./mqtt/source/mqtt_buffer.c ****         buf->last_ext = ext;
+ 307              		.loc 1 118 0
+ 308 000a 4160     		str	r1, [r0, #4]
+ 309 000c 01E0     		b	.L17
+ 310              	.L16:
+ 119:./mqtt/source/mqtt_buffer.c ****     }
+ 120:./mqtt/source/mqtt_buffer.c ****     else {
+ 121:./mqtt/source/mqtt_buffer.c ****         //assert(NULL == buf->first_ext);
+ 122:./mqtt/source/mqtt_buffer.c ****         //assert(1 <= buf->alloc_count);
+ 123:./mqtt/source/mqtt_buffer.c **** 
+ 124:./mqtt/source/mqtt_buffer.c ****         buf->first_ext = ext;
+ 311              		.loc 1 124 0
+ 312 000e 0160     		str	r1, [r0]
+ 125:./mqtt/source/mqtt_buffer.c ****         buf->last_ext = ext;
+ 313              		.loc 1 125 0
+ 314 0010 4160     		str	r1, [r0, #4]
+ 315              	.L17:
+ 126:./mqtt/source/mqtt_buffer.c ****     }
+ 127:./mqtt/source/mqtt_buffer.c **** 
+ 128:./mqtt/source/mqtt_buffer.c ****     buf->buffered_bytes += ext->len;
+ 316              		.loc 1 128 0
+ 317 0012 0B68     		ldr	r3, [r1]
+ 318 0014 C269     		ldr	r2, [r0, #28]
+ 319 0016 1344     		add	r3, r3, r2
+ 320 0018 C361     		str	r3, [r0, #28]
+ 321 001a 7047     		bx	lr
+ 322              		.cfi_endproc
+ 323              	.LFE5:
+ 325              		.section	.text.MqttBuffer_Append,"ax",%progbits
+ 326              		.align	2
+ 327              		.global	MqttBuffer_Append
+ 328              		.thumb
+ 329              		.thumb_func
+ 331              	MqttBuffer_Append:
+ 332              	.LFB4:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cck37rXh.s 			page 9
+
+
+  91:./mqtt/source/mqtt_buffer.c ****     const uint32_t bytes = own ? size : sizeof(struct MqttExtent);
+ 333              		.loc 1 91 0
+ 334              		.cfi_startproc
+ 335              		@ args = 0, pretend = 0, frame = 0
+ 336              		@ frame_needed = 0, uses_anonymous_args = 0
+ 337              	.LVL30:
+ 338 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 339              	.LCFI3:
+ 340              		.cfi_def_cfa_offset 24
+ 341              		.cfi_offset 4, -24
+ 342              		.cfi_offset 5, -20
+ 343              		.cfi_offset 6, -16
+ 344              		.cfi_offset 7, -12
+ 345              		.cfi_offset 8, -8
+ 346              		.cfi_offset 14, -4
+ 347 0004 0546     		mov	r5, r0
+ 348 0006 8846     		mov	r8, r1
+ 349 0008 1646     		mov	r6, r2
+  92:./mqtt/source/mqtt_buffer.c **** 
+ 350              		.loc 1 92 0
+ 351 000a 1F46     		mov	r7, r3
+ 352 000c 0BB9     		cbnz	r3, .L23
+ 353 000e 0C21     		movs	r1, #12
+ 354              	.LVL31:
+ 355 0010 00E0     		b	.L19
+ 356              	.LVL32:
+ 357              	.L23:
+ 358 0012 1146     		mov	r1, r2
+ 359              	.LVL33:
+ 360              	.L19:
+  94:./mqtt/source/mqtt_buffer.c ****     if(NULL == ext) {
+ 361              		.loc 1 94 0 discriminator 4
+ 362 0014 2846     		mov	r0, r5
+ 363              	.LVL34:
+ 364 0016 FFF7FEFF 		bl	MqttBuffer_AllocExtent
+ 365              	.LVL35:
+  95:./mqtt/source/mqtt_buffer.c ****         return MQTTERR_OUTOFMEMORY;
+ 366              		.loc 1 95 0 discriminator 4
+ 367 001a 0446     		mov	r4, r0
+ 368 001c 88B1     		cbz	r0, .L24
+  99:./mqtt/source/mqtt_buffer.c ****         ext->payload = ((char*)ext) + sizeof(struct MqttExtent);
+ 369              		.loc 1 99 0
+ 370 001e 37B1     		cbz	r7, .L21
+ 100:./mqtt/source/mqtt_buffer.c ****         memcpy(ext->payload, payload, size);
+ 371              		.loc 1 100 0
+ 372 0020 0C30     		adds	r0, r0, #12
+ 373              	.LVL36:
+ 374 0022 6060     		str	r0, [r4, #4]
+ 101:./mqtt/source/mqtt_buffer.c ****     }
+ 375              		.loc 1 101 0
+ 376 0024 3246     		mov	r2, r6
+ 377 0026 4146     		mov	r1, r8
+ 378 0028 FFF7FEFF 		bl	memcpy
+ 379              	.LVL37:
+ 380 002c 02E0     		b	.L22
+ 381              	.LVL38:
+ 382              	.L21:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cck37rXh.s 			page 10
+
+
+ 104:./mqtt/source/mqtt_buffer.c ****         ext->len = size;
+ 383              		.loc 1 104 0
+ 384 002e C0F80480 		str	r8, [r0, #4]
+ 105:./mqtt/source/mqtt_buffer.c ****     }
+ 385              		.loc 1 105 0
+ 386 0032 0660     		str	r6, [r0]
+ 387              	.LVL39:
+ 388              	.L22:
+ 108:./mqtt/source/mqtt_buffer.c ****     return MQTTERR_NOERROR;
+ 389              		.loc 1 108 0
+ 390 0034 2146     		mov	r1, r4
+ 391 0036 2846     		mov	r0, r5
+ 392 0038 FFF7FEFF 		bl	MqttBuffer_AppendExtent
+ 393              	.LVL40:
+ 109:./mqtt/source/mqtt_buffer.c **** 
+ 394              		.loc 1 109 0
+ 395 003c 0020     		movs	r0, #0
+ 396 003e BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 397              	.LVL41:
+ 398              	.L24:
+  96:./mqtt/source/mqtt_buffer.c ****     }
+ 399              		.loc 1 96 0
+ 400 0042 4FF0FF30 		mov	r0, #-1
+ 401              	.LVL42:
+ 111:./mqtt/source/mqtt_buffer.c **** 
+ 402              		.loc 1 111 0
+ 403 0046 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 404              		.cfi_endproc
+ 405              	.LFE4:
+ 407 004a 00BF     		.text
+ 408              	.Letext0:
+ 409              		.file 2 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\machine\\_defaul
+ 410              		.file 3 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 411              		.file 4 "mqtt/include/mqtt_buffer.h"
+ 412              		.file 5 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\stdlib.h"
+ 413              		.file 6 "mqtt/include/mqtt.h"
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cck37rXh.s 			page 11
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 mqtt_buffer.c
+C:\Users\strag\AppData\Local\Temp\cck37rXh.s:22     .text.MqttBuffer_Init:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cck37rXh.s:27     .text.MqttBuffer_Init:00000000 MqttBuffer_Init
+C:\Users\strag\AppData\Local\Temp\cck37rXh.s:58     .text.MqttBuffer_Reset:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cck37rXh.s:63     .text.MqttBuffer_Reset:00000000 MqttBuffer_Reset
+C:\Users\strag\AppData\Local\Temp\cck37rXh.s:110    .text.MqttBuffer_Destroy:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cck37rXh.s:115    .text.MqttBuffer_Destroy:00000000 MqttBuffer_Destroy
+C:\Users\strag\AppData\Local\Temp\cck37rXh.s:135    .text.MqttBuffer_AllocExtent:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cck37rXh.s:140    .text.MqttBuffer_AllocExtent:00000000 MqttBuffer_AllocExtent
+C:\Users\strag\AppData\Local\Temp\cck37rXh.s:286    .text.MqttBuffer_AppendExtent:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cck37rXh.s:291    .text.MqttBuffer_AppendExtent:00000000 MqttBuffer_AppendExtent
+C:\Users\strag\AppData\Local\Temp\cck37rXh.s:326    .text.MqttBuffer_Append:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cck37rXh.s:331    .text.MqttBuffer_Append:00000000 MqttBuffer_Append
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+free
+malloc
+memset
+memcpy

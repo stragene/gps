@@ -1,0 +1,803 @@
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cclLkbti.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 1
+   4              		.eabi_attribute 28, 1
+   5              		.fpu fpv4-sp-d16
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.thumb
+  16              		.syntax unified
+  17              		.file	"heap_2.c"
+  18              		.text
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.section	.text.prvHeapInit,"ax",%progbits
+  22              		.align	2
+  23              		.thumb
+  24              		.thumb_func
+  26              	prvHeapInit:
+  27              	.LFB120:
+  28              		.file 1 "./freertos/Source/MemMang/heap_2.c"
+   1:./freertos/Source/MemMang/heap_2.c **** /*
+   2:./freertos/Source/MemMang/heap_2.c ****     FreeRTOS V9.0.0 - Copyright (C) 2016 Real Time Engineers Ltd.
+   3:./freertos/Source/MemMang/heap_2.c ****     All rights reserved
+   4:./freertos/Source/MemMang/heap_2.c **** 
+   5:./freertos/Source/MemMang/heap_2.c ****     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
+   6:./freertos/Source/MemMang/heap_2.c **** 
+   7:./freertos/Source/MemMang/heap_2.c ****     This file is part of the FreeRTOS distribution.
+   8:./freertos/Source/MemMang/heap_2.c **** 
+   9:./freertos/Source/MemMang/heap_2.c ****     FreeRTOS is free software; you can redistribute it and/or modify it under
+  10:./freertos/Source/MemMang/heap_2.c ****     the terms of the GNU General Public License (version 2) as published by the
+  11:./freertos/Source/MemMang/heap_2.c ****     Free Software Foundation >>>> AND MODIFIED BY <<<< the FreeRTOS exception.
+  12:./freertos/Source/MemMang/heap_2.c **** 
+  13:./freertos/Source/MemMang/heap_2.c ****     ***************************************************************************
+  14:./freertos/Source/MemMang/heap_2.c ****     >>!   NOTE: The modification to the GPL is included to allow you to     !<<
+  15:./freertos/Source/MemMang/heap_2.c ****     >>!   distribute a combined work that includes FreeRTOS without being   !<<
+  16:./freertos/Source/MemMang/heap_2.c ****     >>!   obliged to provide the source code for proprietary components     !<<
+  17:./freertos/Source/MemMang/heap_2.c ****     >>!   outside of the FreeRTOS kernel.                                   !<<
+  18:./freertos/Source/MemMang/heap_2.c ****     ***************************************************************************
+  19:./freertos/Source/MemMang/heap_2.c **** 
+  20:./freertos/Source/MemMang/heap_2.c ****     FreeRTOS is distributed in the hope that it will be useful, but WITHOUT ANY
+  21:./freertos/Source/MemMang/heap_2.c ****     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  22:./freertos/Source/MemMang/heap_2.c ****     FOR A PARTICULAR PURPOSE.  Full license text is available on the following
+  23:./freertos/Source/MemMang/heap_2.c ****     link: http://www.freertos.org/a00114.html
+  24:./freertos/Source/MemMang/heap_2.c **** 
+  25:./freertos/Source/MemMang/heap_2.c ****     ***************************************************************************
+  26:./freertos/Source/MemMang/heap_2.c ****      *                                                                       *
+  27:./freertos/Source/MemMang/heap_2.c ****      *    FreeRTOS provides completely free yet professionally developed,    *
+  28:./freertos/Source/MemMang/heap_2.c ****      *    robust, strictly quality controlled, supported, and cross          *
+  29:./freertos/Source/MemMang/heap_2.c ****      *    platform software that is more than just the market leader, it     *
+  30:./freertos/Source/MemMang/heap_2.c ****      *    is the industry's de facto standard.                               *
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cclLkbti.s 			page 2
+
+
+  31:./freertos/Source/MemMang/heap_2.c ****      *                                                                       *
+  32:./freertos/Source/MemMang/heap_2.c ****      *    Help yourself get started quickly while simultaneously helping     *
+  33:./freertos/Source/MemMang/heap_2.c ****      *    to support the FreeRTOS project by purchasing a FreeRTOS           *
+  34:./freertos/Source/MemMang/heap_2.c ****      *    tutorial book, reference manual, or both:                          *
+  35:./freertos/Source/MemMang/heap_2.c ****      *    http://www.FreeRTOS.org/Documentation                              *
+  36:./freertos/Source/MemMang/heap_2.c ****      *                                                                       *
+  37:./freertos/Source/MemMang/heap_2.c ****     ***************************************************************************
+  38:./freertos/Source/MemMang/heap_2.c **** 
+  39:./freertos/Source/MemMang/heap_2.c ****     http://www.FreeRTOS.org/FAQHelp.html - Having a problem?  Start by reading
+  40:./freertos/Source/MemMang/heap_2.c ****     the FAQ page "My application does not run, what could be wrong?".  Have you
+  41:./freertos/Source/MemMang/heap_2.c ****     defined configASSERT()?
+  42:./freertos/Source/MemMang/heap_2.c **** 
+  43:./freertos/Source/MemMang/heap_2.c ****     http://www.FreeRTOS.org/support - In return for receiving this top quality
+  44:./freertos/Source/MemMang/heap_2.c ****     embedded software for free we request you assist our global community by
+  45:./freertos/Source/MemMang/heap_2.c ****     participating in the support forum.
+  46:./freertos/Source/MemMang/heap_2.c **** 
+  47:./freertos/Source/MemMang/heap_2.c ****     http://www.FreeRTOS.org/training - Investing in training allows your team to
+  48:./freertos/Source/MemMang/heap_2.c ****     be as productive as possible as early as possible.  Now you can receive
+  49:./freertos/Source/MemMang/heap_2.c ****     FreeRTOS training directly from Richard Barry, CEO of Real Time Engineers
+  50:./freertos/Source/MemMang/heap_2.c ****     Ltd, and the world's leading authority on the world's leading RTOS.
+  51:./freertos/Source/MemMang/heap_2.c **** 
+  52:./freertos/Source/MemMang/heap_2.c ****     http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
+  53:./freertos/Source/MemMang/heap_2.c ****     including FreeRTOS+Trace - an indispensable productivity tool, a DOS
+  54:./freertos/Source/MemMang/heap_2.c ****     compatible FAT file system, and our tiny thread aware UDP/IP stack.
+  55:./freertos/Source/MemMang/heap_2.c **** 
+  56:./freertos/Source/MemMang/heap_2.c ****     http://www.FreeRTOS.org/labs - Where new FreeRTOS products go to incubate.
+  57:./freertos/Source/MemMang/heap_2.c ****     Come and try FreeRTOS+TCP, our new open source TCP/IP stack for FreeRTOS.
+  58:./freertos/Source/MemMang/heap_2.c **** 
+  59:./freertos/Source/MemMang/heap_2.c ****     http://www.OpenRTOS.com - Real Time Engineers ltd. license FreeRTOS to High
+  60:./freertos/Source/MemMang/heap_2.c ****     Integrity Systems ltd. to sell under the OpenRTOS brand.  Low cost OpenRTOS
+  61:./freertos/Source/MemMang/heap_2.c ****     licenses offer ticketed support, indemnification and commercial middleware.
+  62:./freertos/Source/MemMang/heap_2.c **** 
+  63:./freertos/Source/MemMang/heap_2.c ****     http://www.SafeRTOS.com - High Integrity Systems also provide a safety
+  64:./freertos/Source/MemMang/heap_2.c ****     engineered and independently SIL3 certified version for use in safety and
+  65:./freertos/Source/MemMang/heap_2.c ****     mission critical applications that require provable dependability.
+  66:./freertos/Source/MemMang/heap_2.c **** 
+  67:./freertos/Source/MemMang/heap_2.c ****     1 tab == 4 spaces!
+  68:./freertos/Source/MemMang/heap_2.c **** */
+  69:./freertos/Source/MemMang/heap_2.c **** 
+  70:./freertos/Source/MemMang/heap_2.c **** /*
+  71:./freertos/Source/MemMang/heap_2.c ****  * A sample implementation of pvPortMalloc() and vPortFree() that permits
+  72:./freertos/Source/MemMang/heap_2.c ****  * allocated blocks to be freed, but does not combine adjacent free blocks
+  73:./freertos/Source/MemMang/heap_2.c ****  * into a single larger block (and so will fragment memory).  See heap_4.c for
+  74:./freertos/Source/MemMang/heap_2.c ****  * an equivalent that does combine adjacent blocks into single larger blocks.
+  75:./freertos/Source/MemMang/heap_2.c ****  *
+  76:./freertos/Source/MemMang/heap_2.c ****  * See heap_1.c, heap_3.c and heap_4.c for alternative implementations, and the
+  77:./freertos/Source/MemMang/heap_2.c ****  * memory management pages of http://www.FreeRTOS.org for more information.
+  78:./freertos/Source/MemMang/heap_2.c ****  */
+  79:./freertos/Source/MemMang/heap_2.c **** #include <stdlib.h>
+  80:./freertos/Source/MemMang/heap_2.c **** 
+  81:./freertos/Source/MemMang/heap_2.c **** /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
+  82:./freertos/Source/MemMang/heap_2.c **** all the API functions to use the MPU wrappers.  That should only be done when
+  83:./freertos/Source/MemMang/heap_2.c **** task.h is included from an application file. */
+  84:./freertos/Source/MemMang/heap_2.c **** #define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+  85:./freertos/Source/MemMang/heap_2.c **** 
+  86:./freertos/Source/MemMang/heap_2.c **** #include "FreeRTOS.h"
+  87:./freertos/Source/MemMang/heap_2.c **** #include "task.h"
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cclLkbti.s 			page 3
+
+
+  88:./freertos/Source/MemMang/heap_2.c **** 
+  89:./freertos/Source/MemMang/heap_2.c **** #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+  90:./freertos/Source/MemMang/heap_2.c **** 
+  91:./freertos/Source/MemMang/heap_2.c **** #if( configSUPPORT_DYNAMIC_ALLOCATION == 0 )
+  92:./freertos/Source/MemMang/heap_2.c **** 	#error This file must not be used if configSUPPORT_DYNAMIC_ALLOCATION is 0
+  93:./freertos/Source/MemMang/heap_2.c **** #endif
+  94:./freertos/Source/MemMang/heap_2.c **** 
+  95:./freertos/Source/MemMang/heap_2.c **** /* A few bytes might be lost to byte aligning the heap start address. */
+  96:./freertos/Source/MemMang/heap_2.c **** #define configADJUSTED_HEAP_SIZE	( configTOTAL_HEAP_SIZE - portBYTE_ALIGNMENT )
+  97:./freertos/Source/MemMang/heap_2.c **** 
+  98:./freertos/Source/MemMang/heap_2.c **** /*
+  99:./freertos/Source/MemMang/heap_2.c ****  * Initialises the heap structures before their first use.
+ 100:./freertos/Source/MemMang/heap_2.c ****  */
+ 101:./freertos/Source/MemMang/heap_2.c **** static void prvHeapInit( void );
+ 102:./freertos/Source/MemMang/heap_2.c **** 
+ 103:./freertos/Source/MemMang/heap_2.c **** /* Allocate the memory for the heap. */
+ 104:./freertos/Source/MemMang/heap_2.c **** #if( configAPPLICATION_ALLOCATED_HEAP == 1 )
+ 105:./freertos/Source/MemMang/heap_2.c **** 	/* The application writer has already defined the array used for the RTOS
+ 106:./freertos/Source/MemMang/heap_2.c **** 	heap - probably so it can be placed in a special segment or address. */
+ 107:./freertos/Source/MemMang/heap_2.c **** 	extern uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
+ 108:./freertos/Source/MemMang/heap_2.c **** #else
+ 109:./freertos/Source/MemMang/heap_2.c **** 	static uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
+ 110:./freertos/Source/MemMang/heap_2.c **** #endif /* configAPPLICATION_ALLOCATED_HEAP */
+ 111:./freertos/Source/MemMang/heap_2.c **** 
+ 112:./freertos/Source/MemMang/heap_2.c **** 
+ 113:./freertos/Source/MemMang/heap_2.c **** /* Define the linked list structure.  This is used to link free blocks in order
+ 114:./freertos/Source/MemMang/heap_2.c **** of their size. */
+ 115:./freertos/Source/MemMang/heap_2.c **** typedef struct A_BLOCK_LINK
+ 116:./freertos/Source/MemMang/heap_2.c **** {
+ 117:./freertos/Source/MemMang/heap_2.c **** 	struct A_BLOCK_LINK *pxNextFreeBlock;	/*<< The next free block in the list. */
+ 118:./freertos/Source/MemMang/heap_2.c **** 	size_t xBlockSize;						/*<< The size of the free block. */
+ 119:./freertos/Source/MemMang/heap_2.c **** } BlockLink_t;
+ 120:./freertos/Source/MemMang/heap_2.c **** 
+ 121:./freertos/Source/MemMang/heap_2.c **** 
+ 122:./freertos/Source/MemMang/heap_2.c **** static const uint16_t heapSTRUCT_SIZE	= ( ( sizeof ( BlockLink_t ) + ( portBYTE_ALIGNMENT - 1 ) ) &
+ 123:./freertos/Source/MemMang/heap_2.c **** #define heapMINIMUM_BLOCK_SIZE	( ( size_t ) ( heapSTRUCT_SIZE * 2 ) )
+ 124:./freertos/Source/MemMang/heap_2.c **** 
+ 125:./freertos/Source/MemMang/heap_2.c **** /* Create a couple of list links to mark the start and end of the list. */
+ 126:./freertos/Source/MemMang/heap_2.c **** static BlockLink_t xStart, xEnd;
+ 127:./freertos/Source/MemMang/heap_2.c **** 
+ 128:./freertos/Source/MemMang/heap_2.c **** /* Keeps track of the number of free bytes remaining, but says nothing about
+ 129:./freertos/Source/MemMang/heap_2.c **** fragmentation. */
+ 130:./freertos/Source/MemMang/heap_2.c **** static size_t xFreeBytesRemaining = configADJUSTED_HEAP_SIZE;
+ 131:./freertos/Source/MemMang/heap_2.c **** 
+ 132:./freertos/Source/MemMang/heap_2.c **** /* STATIC FUNCTIONS ARE DEFINED AS MACROS TO MINIMIZE THE FUNCTION CALL DEPTH. */
+ 133:./freertos/Source/MemMang/heap_2.c **** 
+ 134:./freertos/Source/MemMang/heap_2.c **** /*
+ 135:./freertos/Source/MemMang/heap_2.c ****  * Insert a block into the list of free blocks - which is ordered by size of
+ 136:./freertos/Source/MemMang/heap_2.c ****  * the block.  Small blocks at the start of the list and large blocks at the end
+ 137:./freertos/Source/MemMang/heap_2.c ****  * of the list.
+ 138:./freertos/Source/MemMang/heap_2.c ****  */
+ 139:./freertos/Source/MemMang/heap_2.c **** #define prvInsertBlockIntoFreeList( pxBlockToInsert )								\
+ 140:./freertos/Source/MemMang/heap_2.c **** {																					\
+ 141:./freertos/Source/MemMang/heap_2.c **** BlockLink_t *pxIterator;															\
+ 142:./freertos/Source/MemMang/heap_2.c **** size_t xBlockSize;																	\
+ 143:./freertos/Source/MemMang/heap_2.c **** 																					\
+ 144:./freertos/Source/MemMang/heap_2.c **** 	xBlockSize = pxBlockToInsert->xBlockSize;										\
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cclLkbti.s 			page 4
+
+
+ 145:./freertos/Source/MemMang/heap_2.c **** 																					\
+ 146:./freertos/Source/MemMang/heap_2.c **** 	/* Iterate through the list until a block is found that has a larger size */	\
+ 147:./freertos/Source/MemMang/heap_2.c **** 	/* than the block we are inserting. */											\
+ 148:./freertos/Source/MemMang/heap_2.c **** 	for( pxIterator = &xStart; pxIterator->pxNextFreeBlock->xBlockSize < xBlockSize; pxIterator = pxIt
+ 149:./freertos/Source/MemMang/heap_2.c **** 	{																				\
+ 150:./freertos/Source/MemMang/heap_2.c **** 		/* There is nothing to do here - just iterate to the correct position. */	\
+ 151:./freertos/Source/MemMang/heap_2.c **** 	}																				\
+ 152:./freertos/Source/MemMang/heap_2.c **** 																					\
+ 153:./freertos/Source/MemMang/heap_2.c **** 	/* Update the list to include the block being inserted in the correct */		\
+ 154:./freertos/Source/MemMang/heap_2.c **** 	/* position. */																	\
+ 155:./freertos/Source/MemMang/heap_2.c **** 	pxBlockToInsert->pxNextFreeBlock = pxIterator->pxNextFreeBlock;					\
+ 156:./freertos/Source/MemMang/heap_2.c **** 	pxIterator->pxNextFreeBlock = pxBlockToInsert;									\
+ 157:./freertos/Source/MemMang/heap_2.c **** }
+ 158:./freertos/Source/MemMang/heap_2.c **** /*-----------------------------------------------------------*/
+ 159:./freertos/Source/MemMang/heap_2.c **** 
+ 160:./freertos/Source/MemMang/heap_2.c **** void *pvPortMalloc( size_t xWantedSize )
+ 161:./freertos/Source/MemMang/heap_2.c **** {
+ 162:./freertos/Source/MemMang/heap_2.c **** BlockLink_t *pxBlock, *pxPreviousBlock, *pxNewBlockLink;
+ 163:./freertos/Source/MemMang/heap_2.c **** static BaseType_t xHeapHasBeenInitialised = pdFALSE;
+ 164:./freertos/Source/MemMang/heap_2.c **** void *pvReturn = NULL;
+ 165:./freertos/Source/MemMang/heap_2.c **** 
+ 166:./freertos/Source/MemMang/heap_2.c **** 	vTaskSuspendAll();
+ 167:./freertos/Source/MemMang/heap_2.c **** 	{
+ 168:./freertos/Source/MemMang/heap_2.c **** 		/* If this is the first call to malloc then the heap will require
+ 169:./freertos/Source/MemMang/heap_2.c **** 		initialisation to setup the list of free blocks. */
+ 170:./freertos/Source/MemMang/heap_2.c **** 		if( xHeapHasBeenInitialised == pdFALSE )
+ 171:./freertos/Source/MemMang/heap_2.c **** 		{
+ 172:./freertos/Source/MemMang/heap_2.c **** 			prvHeapInit();
+ 173:./freertos/Source/MemMang/heap_2.c **** 			xHeapHasBeenInitialised = pdTRUE;
+ 174:./freertos/Source/MemMang/heap_2.c **** 		}
+ 175:./freertos/Source/MemMang/heap_2.c **** 
+ 176:./freertos/Source/MemMang/heap_2.c **** 		/* The wanted size is increased so it can contain a BlockLink_t
+ 177:./freertos/Source/MemMang/heap_2.c **** 		structure in addition to the requested amount of bytes. */
+ 178:./freertos/Source/MemMang/heap_2.c **** 		if( xWantedSize > 0 )
+ 179:./freertos/Source/MemMang/heap_2.c **** 		{
+ 180:./freertos/Source/MemMang/heap_2.c **** 			xWantedSize += heapSTRUCT_SIZE;
+ 181:./freertos/Source/MemMang/heap_2.c **** 
+ 182:./freertos/Source/MemMang/heap_2.c **** 			/* Ensure that blocks are always aligned to the required number of bytes. */
+ 183:./freertos/Source/MemMang/heap_2.c **** 			if( ( xWantedSize & portBYTE_ALIGNMENT_MASK ) != 0 )
+ 184:./freertos/Source/MemMang/heap_2.c **** 			{
+ 185:./freertos/Source/MemMang/heap_2.c **** 				/* Byte alignment required. */
+ 186:./freertos/Source/MemMang/heap_2.c **** 				xWantedSize += ( portBYTE_ALIGNMENT - ( xWantedSize & portBYTE_ALIGNMENT_MASK ) );
+ 187:./freertos/Source/MemMang/heap_2.c **** 			}
+ 188:./freertos/Source/MemMang/heap_2.c **** 		}
+ 189:./freertos/Source/MemMang/heap_2.c **** 
+ 190:./freertos/Source/MemMang/heap_2.c **** 		if( ( xWantedSize > 0 ) && ( xWantedSize < configADJUSTED_HEAP_SIZE ) )
+ 191:./freertos/Source/MemMang/heap_2.c **** 		{
+ 192:./freertos/Source/MemMang/heap_2.c **** 			/* Blocks are stored in byte order - traverse the list from the start
+ 193:./freertos/Source/MemMang/heap_2.c **** 			(smallest) block until one of adequate size is found. */
+ 194:./freertos/Source/MemMang/heap_2.c **** 			pxPreviousBlock = &xStart;
+ 195:./freertos/Source/MemMang/heap_2.c **** 			pxBlock = xStart.pxNextFreeBlock;
+ 196:./freertos/Source/MemMang/heap_2.c **** 			while( ( pxBlock->xBlockSize < xWantedSize ) && ( pxBlock->pxNextFreeBlock != NULL ) )
+ 197:./freertos/Source/MemMang/heap_2.c **** 			{
+ 198:./freertos/Source/MemMang/heap_2.c **** 				pxPreviousBlock = pxBlock;
+ 199:./freertos/Source/MemMang/heap_2.c **** 				pxBlock = pxBlock->pxNextFreeBlock;
+ 200:./freertos/Source/MemMang/heap_2.c **** 			}
+ 201:./freertos/Source/MemMang/heap_2.c **** 
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cclLkbti.s 			page 5
+
+
+ 202:./freertos/Source/MemMang/heap_2.c **** 			/* If we found the end marker then a block of adequate size was not found. */
+ 203:./freertos/Source/MemMang/heap_2.c **** 			if( pxBlock != &xEnd )
+ 204:./freertos/Source/MemMang/heap_2.c **** 			{
+ 205:./freertos/Source/MemMang/heap_2.c **** 				/* Return the memory space - jumping over the BlockLink_t structure
+ 206:./freertos/Source/MemMang/heap_2.c **** 				at its start. */
+ 207:./freertos/Source/MemMang/heap_2.c **** 				pvReturn = ( void * ) ( ( ( uint8_t * ) pxPreviousBlock->pxNextFreeBlock ) + heapSTRUCT_SIZE );
+ 208:./freertos/Source/MemMang/heap_2.c **** 
+ 209:./freertos/Source/MemMang/heap_2.c **** 				/* This block is being returned for use so must be taken out of the
+ 210:./freertos/Source/MemMang/heap_2.c **** 				list of free blocks. */
+ 211:./freertos/Source/MemMang/heap_2.c **** 				pxPreviousBlock->pxNextFreeBlock = pxBlock->pxNextFreeBlock;
+ 212:./freertos/Source/MemMang/heap_2.c **** 
+ 213:./freertos/Source/MemMang/heap_2.c **** 				/* If the block is larger than required it can be split into two. */
+ 214:./freertos/Source/MemMang/heap_2.c **** 				if( ( pxBlock->xBlockSize - xWantedSize ) > heapMINIMUM_BLOCK_SIZE )
+ 215:./freertos/Source/MemMang/heap_2.c **** 				{
+ 216:./freertos/Source/MemMang/heap_2.c **** 					/* This block is to be split into two.  Create a new block
+ 217:./freertos/Source/MemMang/heap_2.c **** 					following the number of bytes requested. The void cast is
+ 218:./freertos/Source/MemMang/heap_2.c **** 					used to prevent byte alignment warnings from the compiler. */
+ 219:./freertos/Source/MemMang/heap_2.c **** 					pxNewBlockLink = ( void * ) ( ( ( uint8_t * ) pxBlock ) + xWantedSize );
+ 220:./freertos/Source/MemMang/heap_2.c **** 
+ 221:./freertos/Source/MemMang/heap_2.c **** 					/* Calculate the sizes of two blocks split from the single
+ 222:./freertos/Source/MemMang/heap_2.c **** 					block. */
+ 223:./freertos/Source/MemMang/heap_2.c **** 					pxNewBlockLink->xBlockSize = pxBlock->xBlockSize - xWantedSize;
+ 224:./freertos/Source/MemMang/heap_2.c **** 					pxBlock->xBlockSize = xWantedSize;
+ 225:./freertos/Source/MemMang/heap_2.c **** 
+ 226:./freertos/Source/MemMang/heap_2.c **** 					/* Insert the new block into the list of free blocks. */
+ 227:./freertos/Source/MemMang/heap_2.c **** 					prvInsertBlockIntoFreeList( ( pxNewBlockLink ) );
+ 228:./freertos/Source/MemMang/heap_2.c **** 				}
+ 229:./freertos/Source/MemMang/heap_2.c **** 
+ 230:./freertos/Source/MemMang/heap_2.c **** 				xFreeBytesRemaining -= pxBlock->xBlockSize;
+ 231:./freertos/Source/MemMang/heap_2.c **** 			}
+ 232:./freertos/Source/MemMang/heap_2.c **** 		}
+ 233:./freertos/Source/MemMang/heap_2.c **** 
+ 234:./freertos/Source/MemMang/heap_2.c **** 		traceMALLOC( pvReturn, xWantedSize );
+ 235:./freertos/Source/MemMang/heap_2.c **** 	}
+ 236:./freertos/Source/MemMang/heap_2.c **** 	( void ) xTaskResumeAll();
+ 237:./freertos/Source/MemMang/heap_2.c **** 
+ 238:./freertos/Source/MemMang/heap_2.c **** 	#if( configUSE_MALLOC_FAILED_HOOK == 1 )
+ 239:./freertos/Source/MemMang/heap_2.c **** 	{
+ 240:./freertos/Source/MemMang/heap_2.c **** 		if( pvReturn == NULL )
+ 241:./freertos/Source/MemMang/heap_2.c **** 		{
+ 242:./freertos/Source/MemMang/heap_2.c **** 			extern void vApplicationMallocFailedHook( void );
+ 243:./freertos/Source/MemMang/heap_2.c **** 			vApplicationMallocFailedHook();
+ 244:./freertos/Source/MemMang/heap_2.c **** 		}
+ 245:./freertos/Source/MemMang/heap_2.c **** 	}
+ 246:./freertos/Source/MemMang/heap_2.c **** 	#endif
+ 247:./freertos/Source/MemMang/heap_2.c **** 
+ 248:./freertos/Source/MemMang/heap_2.c **** 	return pvReturn;
+ 249:./freertos/Source/MemMang/heap_2.c **** }
+ 250:./freertos/Source/MemMang/heap_2.c **** /*-----------------------------------------------------------*/
+ 251:./freertos/Source/MemMang/heap_2.c **** 
+ 252:./freertos/Source/MemMang/heap_2.c **** void vPortFree( void *pv )
+ 253:./freertos/Source/MemMang/heap_2.c **** {
+ 254:./freertos/Source/MemMang/heap_2.c **** uint8_t *puc = ( uint8_t * ) pv;
+ 255:./freertos/Source/MemMang/heap_2.c **** BlockLink_t *pxLink;
+ 256:./freertos/Source/MemMang/heap_2.c **** 
+ 257:./freertos/Source/MemMang/heap_2.c **** 	if( pv != NULL )
+ 258:./freertos/Source/MemMang/heap_2.c **** 	{
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cclLkbti.s 			page 6
+
+
+ 259:./freertos/Source/MemMang/heap_2.c **** 		/* The memory being freed will have an BlockLink_t structure immediately
+ 260:./freertos/Source/MemMang/heap_2.c **** 		before it. */
+ 261:./freertos/Source/MemMang/heap_2.c **** 		puc -= heapSTRUCT_SIZE;
+ 262:./freertos/Source/MemMang/heap_2.c **** 
+ 263:./freertos/Source/MemMang/heap_2.c **** 		/* This unexpected casting is to keep some compilers from issuing
+ 264:./freertos/Source/MemMang/heap_2.c **** 		byte alignment warnings. */
+ 265:./freertos/Source/MemMang/heap_2.c **** 		pxLink = ( void * ) puc;
+ 266:./freertos/Source/MemMang/heap_2.c **** 
+ 267:./freertos/Source/MemMang/heap_2.c **** 		vTaskSuspendAll();
+ 268:./freertos/Source/MemMang/heap_2.c **** 		{
+ 269:./freertos/Source/MemMang/heap_2.c **** 			/* Add this block to the list of free blocks. */
+ 270:./freertos/Source/MemMang/heap_2.c **** 			prvInsertBlockIntoFreeList( ( ( BlockLink_t * ) pxLink ) );
+ 271:./freertos/Source/MemMang/heap_2.c **** 			xFreeBytesRemaining += pxLink->xBlockSize;
+ 272:./freertos/Source/MemMang/heap_2.c **** 			traceFREE( pv, pxLink->xBlockSize );
+ 273:./freertos/Source/MemMang/heap_2.c **** 		}
+ 274:./freertos/Source/MemMang/heap_2.c **** 		( void ) xTaskResumeAll();
+ 275:./freertos/Source/MemMang/heap_2.c **** 	}
+ 276:./freertos/Source/MemMang/heap_2.c **** }
+ 277:./freertos/Source/MemMang/heap_2.c **** /*-----------------------------------------------------------*/
+ 278:./freertos/Source/MemMang/heap_2.c **** 
+ 279:./freertos/Source/MemMang/heap_2.c **** size_t xPortGetFreeHeapSize( void )
+ 280:./freertos/Source/MemMang/heap_2.c **** {
+ 281:./freertos/Source/MemMang/heap_2.c **** 	return xFreeBytesRemaining;
+ 282:./freertos/Source/MemMang/heap_2.c **** }
+ 283:./freertos/Source/MemMang/heap_2.c **** /*-----------------------------------------------------------*/
+ 284:./freertos/Source/MemMang/heap_2.c **** 
+ 285:./freertos/Source/MemMang/heap_2.c **** void vPortInitialiseBlocks( void )
+ 286:./freertos/Source/MemMang/heap_2.c **** {
+ 287:./freertos/Source/MemMang/heap_2.c **** 	/* This just exists to keep the linker quiet. */
+ 288:./freertos/Source/MemMang/heap_2.c **** }
+ 289:./freertos/Source/MemMang/heap_2.c **** /*-----------------------------------------------------------*/
+ 290:./freertos/Source/MemMang/heap_2.c **** 
+ 291:./freertos/Source/MemMang/heap_2.c **** static void prvHeapInit( void )
+ 292:./freertos/Source/MemMang/heap_2.c **** {
+  29              		.loc 1 292 0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+ 293:./freertos/Source/MemMang/heap_2.c **** BlockLink_t *pxFirstFreeBlock;
+ 294:./freertos/Source/MemMang/heap_2.c **** uint8_t *pucAlignedHeap;
+ 295:./freertos/Source/MemMang/heap_2.c **** 
+ 296:./freertos/Source/MemMang/heap_2.c **** 	/* Ensure the heap starts on a correctly aligned boundary. */
+ 297:./freertos/Source/MemMang/heap_2.c **** 	pucAlignedHeap = ( uint8_t * ) ( ( ( portPOINTER_SIZE_TYPE ) &ucHeap[ portBYTE_ALIGNMENT ] ) & ( ~
+  34              		.loc 1 297 0
+  35 0000 074B     		ldr	r3, .L2
+  36 0002 23F00703 		bic	r3, r3, #7
+  37              	.LVL0:
+ 298:./freertos/Source/MemMang/heap_2.c **** 
+ 299:./freertos/Source/MemMang/heap_2.c **** 	/* xStart is used to hold a pointer to the first item in the list of free
+ 300:./freertos/Source/MemMang/heap_2.c **** 	blocks.  The void cast is used to prevent compiler warnings. */
+ 301:./freertos/Source/MemMang/heap_2.c **** 	xStart.pxNextFreeBlock = ( void * ) pucAlignedHeap;
+  38              		.loc 1 301 0
+  39 0006 074A     		ldr	r2, .L2+4
+  40 0008 1360     		str	r3, [r2]
+ 302:./freertos/Source/MemMang/heap_2.c **** 	xStart.xBlockSize = ( size_t ) 0;
+  41              		.loc 1 302 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cclLkbti.s 			page 7
+
+
+  42 000a 0020     		movs	r0, #0
+  43 000c 5060     		str	r0, [r2, #4]
+ 303:./freertos/Source/MemMang/heap_2.c **** 
+ 304:./freertos/Source/MemMang/heap_2.c **** 	/* xEnd is used to mark the end of the list of free blocks. */
+ 305:./freertos/Source/MemMang/heap_2.c **** 	xEnd.xBlockSize = configADJUSTED_HEAP_SIZE;
+  44              		.loc 1 305 0
+  45 000e 064A     		ldr	r2, .L2+8
+  46 0010 41F2F831 		movw	r1, #5112
+  47 0014 5160     		str	r1, [r2, #4]
+ 306:./freertos/Source/MemMang/heap_2.c **** 	xEnd.pxNextFreeBlock = NULL;
+  48              		.loc 1 306 0
+  49 0016 1060     		str	r0, [r2]
+  50              	.LVL1:
+ 307:./freertos/Source/MemMang/heap_2.c **** 
+ 308:./freertos/Source/MemMang/heap_2.c **** 	/* To start with there is a single free block that is sized to take up the
+ 309:./freertos/Source/MemMang/heap_2.c **** 	entire heap space. */
+ 310:./freertos/Source/MemMang/heap_2.c **** 	pxFirstFreeBlock = ( void * ) pucAlignedHeap;
+ 311:./freertos/Source/MemMang/heap_2.c **** 	pxFirstFreeBlock->xBlockSize = configADJUSTED_HEAP_SIZE;
+  51              		.loc 1 311 0
+  52 0018 5960     		str	r1, [r3, #4]
+ 312:./freertos/Source/MemMang/heap_2.c **** 	pxFirstFreeBlock->pxNextFreeBlock = &xEnd;
+  53              		.loc 1 312 0
+  54 001a 1A60     		str	r2, [r3]
+  55 001c 7047     		bx	lr
+  56              	.L3:
+  57 001e 00BF     		.align	2
+  58              	.L2:
+  59 0020 08000000 		.word	.LANCHOR0+8
+  60 0024 00000000 		.word	.LANCHOR1
+  61 0028 00000000 		.word	.LANCHOR2
+  62              		.cfi_endproc
+  63              	.LFE120:
+  65              		.section	.text.pvPortMalloc,"ax",%progbits
+  66              		.align	2
+  67              		.global	pvPortMalloc
+  68              		.thumb
+  69              		.thumb_func
+  71              	pvPortMalloc:
+  72              	.LFB116:
+ 161:./freertos/Source/MemMang/heap_2.c **** BlockLink_t *pxBlock, *pxPreviousBlock, *pxNewBlockLink;
+  73              		.loc 1 161 0
+  74              		.cfi_startproc
+  75              		@ args = 0, pretend = 0, frame = 0
+  76              		@ frame_needed = 0, uses_anonymous_args = 0
+  77              	.LVL2:
+  78 0000 70B5     		push	{r4, r5, r6, lr}
+  79              	.LCFI0:
+  80              		.cfi_def_cfa_offset 16
+  81              		.cfi_offset 4, -16
+  82              		.cfi_offset 5, -12
+  83              		.cfi_offset 6, -8
+  84              		.cfi_offset 14, -4
+  85 0002 0446     		mov	r4, r0
+  86              	.LVL3:
+ 166:./freertos/Source/MemMang/heap_2.c **** 	{
+  87              		.loc 1 166 0
+  88 0004 FFF7FEFF 		bl	vTaskSuspendAll
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cclLkbti.s 			page 8
+
+
+  89              	.LVL4:
+ 170:./freertos/Source/MemMang/heap_2.c **** 		{
+  90              		.loc 1 170 0
+  91 0008 224B     		ldr	r3, .L17
+  92 000a 1B68     		ldr	r3, [r3]
+  93 000c 23B9     		cbnz	r3, .L5
+ 172:./freertos/Source/MemMang/heap_2.c **** 			xHeapHasBeenInitialised = pdTRUE;
+  94              		.loc 1 172 0
+  95 000e FFF7FEFF 		bl	prvHeapInit
+  96              	.LVL5:
+ 173:./freertos/Source/MemMang/heap_2.c **** 		}
+  97              		.loc 1 173 0
+  98 0012 0122     		movs	r2, #1
+  99 0014 1F4B     		ldr	r3, .L17
+ 100 0016 1A60     		str	r2, [r3]
+ 101              	.L5:
+ 178:./freertos/Source/MemMang/heap_2.c **** 		{
+ 102              		.loc 1 178 0
+ 103 0018 34B1     		cbz	r4, .L6
+ 180:./freertos/Source/MemMang/heap_2.c **** 
+ 104              		.loc 1 180 0
+ 105 001a 0834     		adds	r4, r4, #8
+ 106              	.LVL6:
+ 183:./freertos/Source/MemMang/heap_2.c **** 			{
+ 107              		.loc 1 183 0
+ 108 001c 14F0070F 		tst	r4, #7
+ 109 0020 02D0     		beq	.L6
+ 186:./freertos/Source/MemMang/heap_2.c **** 			}
+ 110              		.loc 1 186 0
+ 111 0022 24F00704 		bic	r4, r4, #7
+ 112              	.LVL7:
+ 113 0026 0834     		adds	r4, r4, #8
+ 114              	.LVL8:
+ 115              	.L6:
+ 190:./freertos/Source/MemMang/heap_2.c **** 		{
+ 116              		.loc 1 190 0
+ 117 0028 621E     		subs	r2, r4, #1
+ 118 002a 41F2F633 		movw	r3, #5110
+ 119 002e 9A42     		cmp	r2, r3
+ 120 0030 28D8     		bhi	.L12
+ 121              	.LVL9:
+ 195:./freertos/Source/MemMang/heap_2.c **** 			while( ( pxBlock->xBlockSize < xWantedSize ) && ( pxBlock->pxNextFreeBlock != NULL ) )
+ 122              		.loc 1 195 0
+ 123 0032 1949     		ldr	r1, .L17+4
+ 124 0034 0B68     		ldr	r3, [r1]
+ 125              	.LVL10:
+ 196:./freertos/Source/MemMang/heap_2.c **** 			{
+ 126              		.loc 1 196 0
+ 127 0036 01E0     		b	.L9
+ 128              	.LVL11:
+ 129              	.L13:
+ 198:./freertos/Source/MemMang/heap_2.c **** 				pxBlock = pxBlock->pxNextFreeBlock;
+ 130              		.loc 1 198 0
+ 131 0038 1946     		mov	r1, r3
+ 132              	.LVL12:
+ 199:./freertos/Source/MemMang/heap_2.c **** 			}
+ 133              		.loc 1 199 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cclLkbti.s 			page 9
+
+
+ 134 003a 1346     		mov	r3, r2
+ 135              	.LVL13:
+ 136              	.L9:
+ 196:./freertos/Source/MemMang/heap_2.c **** 			{
+ 137              		.loc 1 196 0
+ 138 003c 5A68     		ldr	r2, [r3, #4]
+ 139 003e 9442     		cmp	r4, r2
+ 140 0040 02D9     		bls	.L8
+ 196:./freertos/Source/MemMang/heap_2.c **** 			{
+ 141              		.loc 1 196 0 is_stmt 0 discriminator 1
+ 142 0042 1A68     		ldr	r2, [r3]
+ 143 0044 002A     		cmp	r2, #0
+ 144 0046 F7D1     		bne	.L13
+ 145              	.L8:
+ 203:./freertos/Source/MemMang/heap_2.c **** 			{
+ 146              		.loc 1 203 0 is_stmt 1
+ 147 0048 144A     		ldr	r2, .L17+8
+ 148 004a 9342     		cmp	r3, r2
+ 149 004c 1CD0     		beq	.L14
+ 207:./freertos/Source/MemMang/heap_2.c **** 
+ 150              		.loc 1 207 0
+ 151 004e 0D68     		ldr	r5, [r1]
+ 152 0050 0835     		adds	r5, r5, #8
+ 153              	.LVL14:
+ 211:./freertos/Source/MemMang/heap_2.c **** 
+ 154              		.loc 1 211 0
+ 155 0052 1A68     		ldr	r2, [r3]
+ 156 0054 0A60     		str	r2, [r1]
+ 214:./freertos/Source/MemMang/heap_2.c **** 				{
+ 157              		.loc 1 214 0
+ 158 0056 5A68     		ldr	r2, [r3, #4]
+ 159 0058 121B     		subs	r2, r2, r4
+ 160 005a 102A     		cmp	r2, #16
+ 161 005c 0CD9     		bls	.L10
+ 219:./freertos/Source/MemMang/heap_2.c **** 
+ 162              		.loc 1 219 0
+ 163 005e 1E19     		adds	r6, r3, r4
+ 164              	.LVL15:
+ 223:./freertos/Source/MemMang/heap_2.c **** 					pxBlock->xBlockSize = xWantedSize;
+ 165              		.loc 1 223 0
+ 166 0060 7260     		str	r2, [r6, #4]
+ 224:./freertos/Source/MemMang/heap_2.c **** 
+ 167              		.loc 1 224 0
+ 168 0062 5C60     		str	r4, [r3, #4]
+ 169              	.LBB2:
+ 227:./freertos/Source/MemMang/heap_2.c **** 				}
+ 170              		.loc 1 227 0
+ 171 0064 7468     		ldr	r4, [r6, #4]
+ 172              	.LVL16:
+ 173 0066 0C49     		ldr	r1, .L17+4
+ 174              	.LVL17:
+ 175 0068 00E0     		b	.L11
+ 176              	.LVL18:
+ 177              	.L15:
+ 178 006a 1146     		mov	r1, r2
+ 179              	.LVL19:
+ 180              	.L11:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cclLkbti.s 			page 10
+
+
+ 227:./freertos/Source/MemMang/heap_2.c **** 				}
+ 181              		.loc 1 227 0 is_stmt 0 discriminator 1
+ 182 006c 0A68     		ldr	r2, [r1]
+ 183 006e 5068     		ldr	r0, [r2, #4]
+ 184 0070 8442     		cmp	r4, r0
+ 185 0072 FAD8     		bhi	.L15
+ 227:./freertos/Source/MemMang/heap_2.c **** 				}
+ 186              		.loc 1 227 0 discriminator 4
+ 187 0074 3260     		str	r2, [r6]
+ 188              	.LVL20:
+ 189 0076 0E60     		str	r6, [r1]
+ 190              	.LVL21:
+ 191              	.L10:
+ 192              	.LBE2:
+ 230:./freertos/Source/MemMang/heap_2.c **** 			}
+ 193              		.loc 1 230 0 is_stmt 1
+ 194 0078 5968     		ldr	r1, [r3, #4]
+ 195 007a 094A     		ldr	r2, .L17+12
+ 196 007c 1368     		ldr	r3, [r2]
+ 197              	.LVL22:
+ 198 007e 5B1A     		subs	r3, r3, r1
+ 199 0080 1360     		str	r3, [r2]
+ 200 0082 02E0     		b	.L7
+ 201              	.LVL23:
+ 202              	.L12:
+ 164:./freertos/Source/MemMang/heap_2.c **** 
+ 203              		.loc 1 164 0
+ 204 0084 0025     		movs	r5, #0
+ 205 0086 00E0     		b	.L7
+ 206              	.LVL24:
+ 207              	.L14:
+ 208 0088 0025     		movs	r5, #0
+ 209              	.LVL25:
+ 210              	.L7:
+ 236:./freertos/Source/MemMang/heap_2.c **** 
+ 211              		.loc 1 236 0
+ 212 008a FFF7FEFF 		bl	xTaskResumeAll
+ 213              	.LVL26:
+ 249:./freertos/Source/MemMang/heap_2.c **** /*-----------------------------------------------------------*/
+ 214              		.loc 1 249 0
+ 215 008e 2846     		mov	r0, r5
+ 216 0090 70BD     		pop	{r4, r5, r6, pc}
+ 217              	.LVL27:
+ 218              	.L18:
+ 219 0092 00BF     		.align	2
+ 220              	.L17:
+ 221 0094 00000000 		.word	.LANCHOR3
+ 222 0098 00000000 		.word	.LANCHOR1
+ 223 009c 00000000 		.word	.LANCHOR2
+ 224 00a0 00000000 		.word	.LANCHOR4
+ 225              		.cfi_endproc
+ 226              	.LFE116:
+ 228              		.section	.text.vPortFree,"ax",%progbits
+ 229              		.align	2
+ 230              		.global	vPortFree
+ 231              		.thumb
+ 232              		.thumb_func
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cclLkbti.s 			page 11
+
+
+ 234              	vPortFree:
+ 235              	.LFB117:
+ 253:./freertos/Source/MemMang/heap_2.c **** uint8_t *puc = ( uint8_t * ) pv;
+ 236              		.loc 1 253 0
+ 237              		.cfi_startproc
+ 238              		@ args = 0, pretend = 0, frame = 0
+ 239              		@ frame_needed = 0, uses_anonymous_args = 0
+ 240              	.LVL28:
+ 257:./freertos/Source/MemMang/heap_2.c **** 	{
+ 241              		.loc 1 257 0
+ 242 0000 D0B1     		cbz	r0, .L24
+ 253:./freertos/Source/MemMang/heap_2.c **** uint8_t *puc = ( uint8_t * ) pv;
+ 243              		.loc 1 253 0
+ 244 0002 70B5     		push	{r4, r5, r6, lr}
+ 245              	.LCFI1:
+ 246              		.cfi_def_cfa_offset 16
+ 247              		.cfi_offset 4, -16
+ 248              		.cfi_offset 5, -12
+ 249              		.cfi_offset 6, -8
+ 250              		.cfi_offset 14, -4
+ 251 0004 0546     		mov	r5, r0
+ 261:./freertos/Source/MemMang/heap_2.c **** 
+ 252              		.loc 1 261 0
+ 253 0006 A0F10806 		sub	r6, r0, #8
+ 254              	.LVL29:
+ 267:./freertos/Source/MemMang/heap_2.c **** 		{
+ 255              		.loc 1 267 0
+ 256 000a FFF7FEFF 		bl	vTaskSuspendAll
+ 257              	.LVL30:
+ 258              	.LBB3:
+ 270:./freertos/Source/MemMang/heap_2.c **** 			xFreeBytesRemaining += pxLink->xBlockSize;
+ 259              		.loc 1 270 0
+ 260 000e 55F8044C 		ldr	r4, [r5, #-4]
+ 261              	.LVL31:
+ 262 0012 0A4A     		ldr	r2, .L25
+ 263 0014 00E0     		b	.L21
+ 264              	.LVL32:
+ 265              	.L22:
+ 266 0016 1A46     		mov	r2, r3
+ 267              	.LVL33:
+ 268              	.L21:
+ 270:./freertos/Source/MemMang/heap_2.c **** 			xFreeBytesRemaining += pxLink->xBlockSize;
+ 269              		.loc 1 270 0 is_stmt 0 discriminator 1
+ 270 0018 1368     		ldr	r3, [r2]
+ 271 001a 5968     		ldr	r1, [r3, #4]
+ 272 001c 8C42     		cmp	r4, r1
+ 273 001e FAD8     		bhi	.L22
+ 270:./freertos/Source/MemMang/heap_2.c **** 			xFreeBytesRemaining += pxLink->xBlockSize;
+ 274              		.loc 1 270 0 discriminator 4
+ 275 0020 45F8083C 		str	r3, [r5, #-8]
+ 276 0024 1660     		str	r6, [r2]
+ 277              	.LBE3:
+ 271:./freertos/Source/MemMang/heap_2.c **** 			traceFREE( pv, pxLink->xBlockSize );
+ 278              		.loc 1 271 0 is_stmt 1 discriminator 4
+ 279 0026 55F8043C 		ldr	r3, [r5, #-4]
+ 280 002a 054A     		ldr	r2, .L25+4
+ 281              	.LVL34:
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cclLkbti.s 			page 12
+
+
+ 282 002c 1168     		ldr	r1, [r2]
+ 283 002e 0B44     		add	r3, r3, r1
+ 284 0030 1360     		str	r3, [r2]
+ 274:./freertos/Source/MemMang/heap_2.c **** 	}
+ 285              		.loc 1 274 0 discriminator 4
+ 286 0032 FFF7FEFF 		bl	xTaskResumeAll
+ 287              	.LVL35:
+ 288 0036 70BD     		pop	{r4, r5, r6, pc}
+ 289              	.LVL36:
+ 290              	.L24:
+ 291              	.LCFI2:
+ 292              		.cfi_def_cfa_offset 0
+ 293              		.cfi_restore 4
+ 294              		.cfi_restore 5
+ 295              		.cfi_restore 6
+ 296              		.cfi_restore 14
+ 297 0038 7047     		bx	lr
+ 298              	.L26:
+ 299 003a 00BF     		.align	2
+ 300              	.L25:
+ 301 003c 00000000 		.word	.LANCHOR1
+ 302 0040 00000000 		.word	.LANCHOR4
+ 303              		.cfi_endproc
+ 304              	.LFE117:
+ 306              		.section	.text.xPortGetFreeHeapSize,"ax",%progbits
+ 307              		.align	2
+ 308              		.global	xPortGetFreeHeapSize
+ 309              		.thumb
+ 310              		.thumb_func
+ 312              	xPortGetFreeHeapSize:
+ 313              	.LFB118:
+ 280:./freertos/Source/MemMang/heap_2.c **** 	return xFreeBytesRemaining;
+ 314              		.loc 1 280 0
+ 315              		.cfi_startproc
+ 316              		@ args = 0, pretend = 0, frame = 0
+ 317              		@ frame_needed = 0, uses_anonymous_args = 0
+ 318              		@ link register save eliminated.
+ 282:./freertos/Source/MemMang/heap_2.c **** /*-----------------------------------------------------------*/
+ 319              		.loc 1 282 0
+ 320 0000 014B     		ldr	r3, .L28
+ 321 0002 1868     		ldr	r0, [r3]
+ 322 0004 7047     		bx	lr
+ 323              	.L29:
+ 324 0006 00BF     		.align	2
+ 325              	.L28:
+ 326 0008 00000000 		.word	.LANCHOR4
+ 327              		.cfi_endproc
+ 328              	.LFE118:
+ 330              		.section	.text.vPortInitialiseBlocks,"ax",%progbits
+ 331              		.align	2
+ 332              		.global	vPortInitialiseBlocks
+ 333              		.thumb
+ 334              		.thumb_func
+ 336              	vPortInitialiseBlocks:
+ 337              	.LFB119:
+ 286:./freertos/Source/MemMang/heap_2.c **** 	/* This just exists to keep the linker quiet. */
+ 338              		.loc 1 286 0
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cclLkbti.s 			page 13
+
+
+ 339              		.cfi_startproc
+ 340              		@ args = 0, pretend = 0, frame = 0
+ 341              		@ frame_needed = 0, uses_anonymous_args = 0
+ 342              		@ link register save eliminated.
+ 343 0000 7047     		bx	lr
+ 344              		.cfi_endproc
+ 345              	.LFE119:
+ 347 0002 00BF     		.section	.bss.xStart,"aw",%nobits
+ 348              		.align	2
+ 349              		.set	.LANCHOR1,. + 0
+ 352              	xStart:
+ 353 0000 00000000 		.space	8
+ 353      00000000 
+ 354              		.section	.bss.ucHeap,"aw",%nobits
+ 355              		.align	2
+ 356              		.set	.LANCHOR0,. + 0
+ 359              	ucHeap:
+ 360 0000 00000000 		.space	5120
+ 360      00000000 
+ 360      00000000 
+ 360      00000000 
+ 360      00000000 
+ 361              		.section	.data.xFreeBytesRemaining,"aw",%progbits
+ 362              		.align	2
+ 363              		.set	.LANCHOR4,. + 0
+ 366              	xFreeBytesRemaining:
+ 367 0000 F8130000 		.word	5112
+ 368              		.section	.bss.xEnd,"aw",%nobits
+ 369              		.align	2
+ 370              		.set	.LANCHOR2,. + 0
+ 373              	xEnd:
+ 374 0000 00000000 		.space	8
+ 374      00000000 
+ 375              		.section	.bss.xHeapHasBeenInitialised.7119,"aw",%nobits
+ 376              		.align	2
+ 377              		.set	.LANCHOR3,. + 0
+ 380              	xHeapHasBeenInitialised.7119:
+ 381 0000 00000000 		.space	4
+ 382              		.text
+ 383              	.Letext0:
+ 384              		.file 2 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\lib\\gcc\\arm-none-eabi\\5.4.1\\include\
+ 385              		.file 3 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\machine\\_defaul
+ 386              		.file 4 "d:\\gcc-arm-none-eabi-5_4-2016q3-20160926-win32\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 387              		.file 5 "freertos/Source/portable/GCC/ARM_CM4_MPU/portmacro.h"
+ 388              		.file 6 "freertos/include/task.h"
+ 389              		.file 7 "cmsis/include/core_cm4.h"
+ARM GAS  C:\Users\strag\AppData\Local\Temp\cclLkbti.s 			page 14
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 heap_2.c
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:22     .text.prvHeapInit:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:26     .text.prvHeapInit:00000000 prvHeapInit
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:59     .text.prvHeapInit:00000020 $d
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:66     .text.pvPortMalloc:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:71     .text.pvPortMalloc:00000000 pvPortMalloc
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:221    .text.pvPortMalloc:00000094 $d
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:229    .text.vPortFree:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:234    .text.vPortFree:00000000 vPortFree
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:301    .text.vPortFree:0000003c $d
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:307    .text.xPortGetFreeHeapSize:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:312    .text.xPortGetFreeHeapSize:00000000 xPortGetFreeHeapSize
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:326    .text.xPortGetFreeHeapSize:00000008 $d
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:331    .text.vPortInitialiseBlocks:00000000 $t
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:336    .text.vPortInitialiseBlocks:00000000 vPortInitialiseBlocks
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:348    .bss.xStart:00000000 $d
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:352    .bss.xStart:00000000 xStart
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:355    .bss.ucHeap:00000000 $d
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:359    .bss.ucHeap:00000000 ucHeap
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:362    .data.xFreeBytesRemaining:00000000 $d
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:366    .data.xFreeBytesRemaining:00000000 xFreeBytesRemaining
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:369    .bss.xEnd:00000000 $d
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:373    .bss.xEnd:00000000 xEnd
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:376    .bss.xHeapHasBeenInitialised.7119:00000000 $d
+C:\Users\strag\AppData\Local\Temp\cclLkbti.s:380    .bss.xHeapHasBeenInitialised.7119:00000000 xHeapHasBeenInitialised.7119
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+vTaskSuspendAll
+xTaskResumeAll

@@ -46,5 +46,5 @@ extern int onenetConnect(void);
 extern int onenetSubscribe(char **topic, int num);
 extern int onenetPublish(int temp, int humi);
 extern int onenetResCmd(char *resp);
-extern int onenetSendData(int temp, int humi);
+extern int onenetSendData(float lon, float lat);
 #endif

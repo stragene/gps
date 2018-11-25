@@ -12,10 +12,10 @@ void sendHttpPkt(char *phead, char *pbody)
     char sendBuf1[500];
 
     sprintf(sendBuf1, "%s%d\r\n\r\n%s", phead, strlen(pbody), pbody);
-    printf("send HTTP pkt:\r\n%s\r\n", sendBuf1);
-    pSim800GPRS->SendCmd("AT+CIPSEND=%d\r\n", ">", 500, 1);
+    //printf("send HTTP pkt:\r\n%s\r\n", sendBuf1);
+    pSim800GPRS->SendCmd("AT+CIPSEND=%d\r\n", ">", TICKS_500MS, 1);
     pSim800GPRS->AutoReadEn();
-    pSim800GPRS->SendData((uint8_t *)sendBuf1, strlen(sendBuf1));
+    pSim800GPRS->SendData((uint8_t *)sendBuf1, strlen(sendBuf1), 50 * TICKS_1S);
 }
 
 /**
@@ -62,14 +62,16 @@ char *uartDataParse(char *buffer, int32_t *plen)
   */
 void sendPkt(char *p, int len)
 {
-    char sendBuf[30] = {0};
+    char sendBuf[30];
+    char rsvData = 0;
 
     /* 非透传模式先发送AT+CIPSEND=X */
-    //sprintf(sendBuf, "AT+CIPSEND=%d\r\n", len);
+    sprintf(sendBuf, "AT+CIPSEND=%d\r\n", len);
     //SendCmd(sendBuf, ">", 500);
-    pSim800GPRS->SendCmd("AT+CIPSEND=%d\r\n", ">", 500, 1);
+    //pSim800GPRS->SendCmd("AT+CIPSEND=%d\r\n", ">", 500, 1);
+    pSim800GPRS->SendCmd(sendBuf, ">", TICKS_500MS, 1);
     /* MQTT设备连接包，发送 */
-    pSim800GPRS->SendData(p, len);
+    pSim800GPRS->SendData(p, len, 50 * TICKS_1S);
 }
 
 //-------------------------------- Commands ------------------------------------------------------
@@ -127,7 +129,8 @@ static int MqttSample_SendPkt(void *arg, const struct iovec *iov, int iovcnt)
 
     sendPkt(sendbuf, len);
     printf("send over\n");
-    return bytes;
+    //return bytes;
+    return len;
 }
 
 //------------------------------- packet handlers -------------------------------------------
@@ -307,19 +310,26 @@ static int MqttSample_Unsubscribe(struct MqttSampleContext *ctx, char **topics, 
     return 0;
 }
 
-int MqttSample_Savedata11(struct MqttSampleContext *ctx, int temp, int humi)
+//int MqttSample_Savedata11(struct MqttSampleContext *ctx, int lon, int lat)
+int MqttSample_Savedata11(struct MqttSampleContext *ctx, float lon, float lat)
 {
     int err;
     struct MqttExtent *ext;
     uint16_t pkt_id = 1;
+    uint16_t lon_d, lon_f, lat_d, lat_f;
+    lon_d = (uint16_t)lon * 10000;
+    lon_f = (lon * 10000) - lon_d;
+    lat_d = (uint16_t)lat * 10000;
+    lat_f = (lat * 10000) - lat_d;
 
-    char json[] = "{\"datastreams\":[{\"id\":\"temp\",\"datapoints\":[{\"value\":%d}]},{\"id\":\"humi\",\"datapoints\":[{\"value\":%d}]}]}";
+    char json[] = "{\"datastreams\":[{\"id\":\"loc\",\"datapoints\":[{\"value\":{\"lon\":%d.%4d,\"lat\":%d.%4d}}]}]}";
     char t_json[200];
     int payload_len;
     char *t_payload;
     unsigned short json_len;
 
-    sprintf(t_json, json, temp, humi);
+    //sprintf(t_json, json, lon, lat);
+    sprintf(t_json, json, (uint16_t)lon, lon_f, (uint16_t)lat, lat_f);
     payload_len = 1 + 2 + strlen(t_json) / sizeof(char);
     json_len = strlen(t_json) / sizeof(char);
 
@@ -360,7 +370,7 @@ int MqttSample_Savedata11(struct MqttSampleContext *ctx, int temp, int humi)
     return 0;
 }
 
-static int MqttSample_Savedata(struct MqttSampleContext *ctx, int temp, int humi)
+static int MqttSample_Savedata(struct MqttSampleContext *ctx, float lon, float lat)
 {
     char opt;
     int Qos = 1;
@@ -371,7 +381,7 @@ static int MqttSample_Savedata(struct MqttSampleContext *ctx, int temp, int humi
     */
 
     printf("Qos: %d    Type: %d\r\n", Qos, type);
-    MqttSample_Savedata11(ctx, temp, humi); // qos=1 type=1
+    MqttSample_Savedata11(ctx, lon, lat); // qos=1 type=1
 }
 
 static int MqttSample_Publish(struct MqttSampleContext *ctx, int latitude, int longitude)
@@ -493,14 +503,14 @@ int onenetGetDevID(struct MqttSampleContext *ctx)
             if ((pend = strstr(p, "\",")) != NULL)
             {
                 memcpy(device_id, p, pend - p);
-                printf("get device id: %s\r\n", device_id);
+                //printf("get device id: %s\r\n", device_id);
                 *ctx->devid = device_id;
             }
         }
     }
     else if (ctx->devid == NULL)
     {
-        printf("device regist fail!\r\n");
+        //printf("device regist fail!\r\n");
         while (1)
             ;
     }
@@ -508,20 +518,29 @@ int onenetGetDevID(struct MqttSampleContext *ctx)
 /*连接mqtt主站*/
 int onenetConnect()
 {
-    int err, bytes;
+    int err, bytes, i;
     /* MQTTcontext 初始化 */
     if (MqttSample_Init(onenetCtx) < 0)
     {
         return -1;
     }
-    onenetGetDevID(onenetCtx);
+    //onenetGetDevID(onenetCtx);
+    onenetCtx->devid = "45245697";
     /****************初始化完成******************/
     /* mqtt连接 */
-    MqttSample_Connect(onenetCtx, PROD_ID, API_KEY, onenetCtx->devid, KEEP_ALIVE, CLEAN_SESSION);
-    bytes = Mqtt_SendPkt(onenetCtx->mqttctx, onenetCtx->mqttbuf, 0);
-    MqttBuffer_Reset(onenetCtx->mqttbuf);
-    mDelay(1000);
-    err = Mqtt_RecvPkt(onenetCtx->mqttctx);
+    //MqttSample_Connect(onenetCtx, PROD_ID, API_KEY, onenetCtx->devid, KEEP_ALIVE, CLEAN_SESSION);
+    MqttSample_Connect(onenetCtx, PROD_ID, onenetCtx->devid, onenetCtx->devid, KEEP_ALIVE, CLEAN_SESSION);
+    for (i = 0; i < 3; i++)
+    {
+        bytes = Mqtt_SendPkt(onenetCtx->mqttctx, onenetCtx->mqttbuf, 0);
+        MqttBuffer_Reset(onenetCtx->mqttbuf);
+        if (bytes == 0)
+            continue;
+        mDelay(1000);
+        err = Mqtt_RecvPkt(onenetCtx->mqttctx);
+        if (err == MQTTERR_NOERROR)
+            break;
+    }
     return err;
 }
 
@@ -551,11 +570,11 @@ int onenetResCmd(char *resp)
     bytes = Mqtt_SendPkt(onenetCtx->mqttctx, onenetCtx->mqttbuf, 0);
     MqttBuffer_Reset(onenetCtx->mqttbuf);
 }
-int onenetSendData(int temp, int humi)
+int onenetSendData(float lon, float lat)
 {
     int bytes;
     /*mqtt上传数据 */
-    MqttSample_Savedata(onenetCtx, temp, humi);
+    MqttSample_Savedata(onenetCtx, lon, lat);
     bytes = Mqtt_SendPkt(onenetCtx->mqttctx, onenetCtx->mqttbuf, 0);
     MqttBuffer_Reset(onenetCtx->mqttbuf);
     return bytes;

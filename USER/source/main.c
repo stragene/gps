@@ -10,41 +10,45 @@
 #include "semphr.h"
 
 void vBoardInit(void);
-void vSim800_TCPInit(void);
+void vSim800_TCPInit(void *pGprs);
 void vRunLed_Init(void);
 void vTaskRunLed(void);
-void vTaskPPPRead(void);
+//void vTaskPPPRead(void);
+void vTaskPublish(void);
 SemaphoreHandle_t xSemGprsRsvd;
 /*QueueHandle_t handQueueU1Frame;*/
 
 void vBoardInit(void)
 {
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+    //NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
     vInnerFlash_Init();
     vRunLed_Init();
-    Sim800GPRSInit();
+    //Sim800GPRSInit();
     pSim800GPS->Init();
 }
 
-void vSim800_TCPInit(void)
+void vSim800_TCPInit(void *pGprsDev)
 {
-    pSim800GPRS->PowerEn();
-    pSim800GPRS->delay(1000);
-    pSim800GPRS->OnOff();
-    pSim800GPRS->delay(2000);
+    struct gprs_dev *pGprs = pGprsDev;
+    pGprs->PowerEn();
+    pGprs->delay(TICKS_1S);
+    pGprs->OnOff();
+    pGprs->delay(TICKS_1S);
     USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
     while (1)
     {
-        if (pSim800GPRS->SendCmd("AT\r\n", "OK", 1000, 6) &&
-            pSim800GPRS->SendCmd("ATE0\r\n", "OK", 1000, 6) &&
-            pSim800GPRS->SendCmd("AT+CPIN?\r\n", "READY", 500, 3) &&
-            pSim800GPRS->SendCmd("AT+CSQ\r\n", "", 500, 3) &&
-            pSim800GPRS->SendCmd("AT+CGATT?\r\n", "", 500, 3) &&
-            pSim800GPRS->SendCmd("AT+CIPSHUT\r\n", "SHUT OK", 2000, 3) &&
-            pSim800GPRS->SendCmd("AT+CSTT=\"CMNET\"\r\n", "OK", 2000, 3) &&
-            pSim800GPRS->SendCmd("AT+CIICR\r\n", "OK", 90000, 3) &&
-            pSim800GPRS->SendCmd("AT+CIFSR\r\n", "", 2000, 3) &&
-            pSim800GPRS->SendCmd("AT+CIPSTART=\"TCP\",\"116.247.119.165\",9336\r\n", "CONNECT", 2000, 3))
+        if (pGprs->SendCmd("AT\r\n", "OK", TICKS_1S, 6) &&
+            pGprs->SendCmd("ATE0\r\n", "OK", TICKS_500MS, 6) &&
+            pGprs->SendCmd("AT+CPIN?\r\n", "READY", TICKS_1S, 3) &&
+            pGprs->SendCmd("AT+CSQ\r\n", "", TICKS_500MS, 3) &&
+            pGprs->SendCmd("AT+CGATT?\r\n", "", TICKS_500MS, 3) &&
+            pGprs->SendCmd("AT+CIPSHUT\r\n", "SHUT OK", 2 * TICKS_1S, 3) &&
+            pGprs->SendCmd("AT+CSTT=\"CMNET\"\r\n", "OK", 2 * TICKS_1S, 3) &&
+            pGprs->SendCmd("AT+CIICR\r\n", "OK", 90 * TICKS_1S, 3) &&
+            pGprs->SendCmd("AT+CIFSR\r\n", "", 2 * TICKS_1S, 3) &&
+            //pGprs->SendCmd("AT+CIPSTART=\"TCP\",\"116.247.119.165\",9336\r\n", "CONNECT", 2000, 3))
+            pGprs->SendCmd("AT+CIPSTART=\"TCP\",\"183.230.40.39\",6002\r\n", "CONNECT", 2 * TICKS_1S, 3))
+        //pGprs->SendCmd("AT+CIPSTART=\"TCP\",\"124.128.119.120\",6002\r\n", "CONNECT", 2000, 3))
         {
             break;
         }
@@ -54,13 +58,15 @@ void vSim800_TCPInit(void)
 int main(void)
 {
     vBoardInit();
-    vSim800_TCPInit();
+    vSim800GPRSInit(pSim800GPRS);
+    vSim800_TCPInit(pSim800GPRS);
     onenetConnect();
-    onenetPublish(1111,2222);
-    
-    vSemaphoreCreateBinary(xSemGprsRsvd);
+
+    //vSemaphoreCreateBinary(xSemGprsRsvd);
     //handQueueU1Frame =xQueueCreate(2, sizeof(uint8_t));
+    //xTaskCreate((void *)vTaskRunLed, "RunLed", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate((void *)vTaskRunLed, "RunLed", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate((void *)vTaskPublish, "Publish", 4 * configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
 
     //xTaskCreate((void *)vTaskComInit, "ComInit", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     vTaskStartScheduler();
@@ -78,4 +84,15 @@ void vTaskRunLed(void)
         vTaskDelay(1000 / portTICK_RATE_MS);
     }
 }
-
+void vTaskPublish(void)
+{
+    float lon = 116.9905972;
+    for (;;)
+    {
+        lon = lon + 0.0001;
+        //onenetSendData(116.9905972, 36.6484770);
+        onenetSendData(lon, 36.6484770);
+        //onenetPublish(1111, 2222);
+        vTaskDelay(2000 / portTICK_RATE_MS);
+    }
+}

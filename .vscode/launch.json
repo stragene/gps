@@ -15,8 +15,8 @@
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",
-            "miDebuggerPath": "D:/Program Files (x86)/eclipse_cpp/gcc-arm-none-eabi-5_4-2016q3-20160926-win32/bin/arm-none-eabi-gdb.exe",
-            //"miDebuggerPath": "D:/gcc-arm-none-eabi-5_4-2016q3-20160926-win32/bin/arm-none-eabi-gdb.exe",
+            //"miDebuggerPath": "D:/Program Files (x86)/eclipse_cpp/gcc-arm-none-eabi-5_4-2016q3-20160926-win32/bin/arm-none-eabi-gdb.exe",
+            "miDebuggerPath": "D:/gcc-arm-none-eabi-5_4-2016q3-20160926-win32/bin/arm-none-eabi-gdb.exe",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -34,7 +34,8 @@
                 },
                 {
                     //"text": "file E:/485-Relay/Code/AutoBaudRate/build/AutoBaund.elf",
-                    "text": "file D:/workspace/gps/build/GPS_GPRS.elf",
+                    //"text": "file D:/workspace/gps/build/GPS_GPRS.elf",
+                    "text": "file E:/GPS+GSM/Source_Dir/gps/build/GPS_GPRS.elf",
                     "description": "load file to gdb",
                     "ignoreFailures": false
                 },
