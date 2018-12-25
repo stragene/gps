@@ -37,7 +37,7 @@ void vGps_Init(void)
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
     GPIO_Initstruc.GPIO_Pin = GPIO_Pin_2;
     GPIO_Initstruc.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_Initstruc.GPIO_OType = GPIO_OType_PP; //开漏
+    GPIO_Initstruc.GPIO_OType = GPIO_OType_PP;
     GPIO_Initstruc.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Initstruc.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(GPIOA, &GPIO_Initstruc);
@@ -83,7 +83,7 @@ void vGps_Init(void)
 *******************************************************************************/
 void vGps_PEn(void)
 {
-    GPIO_WriteBit(GPIOA, GPIO_Pin_2, Bit_SET);
+    GPIO_WriteBit(GPIOA, GPIO_Pin_2, Bit_RESET);
 }
 /*******************************************************************************
 * 函数名称           : vGps_EnDen()

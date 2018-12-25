@@ -1,5 +1,6 @@
 #include "main.h"
 #include "gpio.h"
+#include "gps.h"
 #include "uart.h"
 #include "flash.h"
 #include "sim800.h"
@@ -59,7 +60,22 @@ int main(void)
 {
     vBoardInit();
     vSim800GPRSInit(pSim800GPRS);
+    pSim800GPRS->PowerEn();
+    pSim800GPRS->delay(TICKS_1S);
+    pSim800GPRS->OnOff();
+    pSim800GPRS->delay(TICKS_1S);
+    USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
+    pSim800GPRS->SendCmd("AT\r\n", "OK", TICKS_1S, 6);
+    pSim800GPRS->SendCmd("ATE0\r\n", "OK", TICKS_500MS, 6);
+    //pSim800GPS->PowerEn();
+    pSim800GPRS->SendCmd("AT+CGNSSPWR=1\r\n", "OK", 2 * TICKS_1S, 5);
+    pSim800GPRS->SendCmd("AT+CGPSPWR?\r\n", "OK", 2 * TICKS_1S, 5);
+    pSim800GPRS->SendCmd("AT+CGPSPWR=0\r\n", "OK", 2 * TICKS_1S, 5);
+    pSim800GPRS->SendCmd("AT+CGPSPWR=1\r\n", "OK", 2 * TICKS_1S, 5);
+    pSim800GPRS->SendCmd("AT+CGPSSTATUS?\r\n", "3D", 2 * TICKS_1S, 3);
+    pSim800GPRS->SendCmd("AT+CGPSINF=0\r\n", "OK", 2 * TICKS_1S, 3);
     vSim800_TCPInit(pSim800GPRS);
+
     onenetConnect();
 
     //vSemaphoreCreateBinary(xSemGprsRsvd);

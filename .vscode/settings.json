@@ -11,6 +11,7 @@
         "lwipopts.h": "c",
         "stm32f37x.h": "c",
         "xutility": "c",
-        "freertos.h": "c"
+        "freertos.h": "c",
+        "gps.h": "c"
     }
 }
